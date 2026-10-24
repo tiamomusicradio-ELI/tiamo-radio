@@ -112,7 +112,7 @@ def search_drive_songs(artist, song):
 
         return results.get('files', [])
     except Exception as e:
-        print(f"Drive Search Error: {e}")
+        print(f"Drive Search Error: {e}", flush=True)
         return []
 
 def fix_hebrew(text):
@@ -154,7 +154,7 @@ def get_main_programs():
         service = get_drive_service()
         parent_folder_id = os.environ.get('GOOGLE_DRIVE_FOLDER_ID', PARENT_FOLDER_ID)
         
-        print(f"DEBUG - Fetching items from Drive parent_id: {parent_folder_id}")
+        print(f"DEBUG - Fetching items from Drive parent_id: {parent_folder_id}", flush=True)
         results = service.files().list(
             q=f"'{parent_folder_id}' in parents and trashed = false",
             pageSize=50,
@@ -162,7 +162,7 @@ def get_main_programs():
         ).execute()
         items = results.get('files', [])
         
-        print("DEBUG - All items found:", items)
+        print("DEBUG - All items found:", items, flush=True)
 
         def natural_sort_key(s):
             return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', s['name'])]
@@ -170,7 +170,7 @@ def get_main_programs():
         items.sort(key=natural_sort_key)
         return jsonify(items)
     except Exception as e:
-        print("DEBUG - Error in get_main_programs:", str(e))
+        print("DEBUG - Error in get_main_programs:", str(e), flush=True)
         return jsonify([])
 
 @app.route('/get_sub_items')
