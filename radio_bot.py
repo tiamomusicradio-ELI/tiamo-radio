@@ -36,7 +36,7 @@ def fix_hebrew(text):
         return text[::-1]
     return text
 
-def def get_subfolders(service, parent_id):
+def get_subfolders(service, parent_id):
     try:
         print(f"DEBUG - Searching subfolders for parent_id: {parent_id}")
         query = f"'{parent_id}' in parents and mimeType='application/vnd.google-apps.folder' and trashed = false"
