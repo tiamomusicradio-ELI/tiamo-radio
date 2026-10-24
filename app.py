@@ -8,7 +8,7 @@ import base64
 import pickle
 import pandas as pd
 from functools import wraps
-from flask import Flask, jsonify, render_template, request, Response, send_from_directory
+from flask import Flask, jsonify, render_template, request, Response
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
@@ -167,14 +167,6 @@ scanner_thread.start()
 @requires_auth
 def index():
     return render_template('index.html')
-
-@app.route('/listen')
-def serve_landing_page():
-    return send_from_directory('landing_page', 'index.html')
-
-@app.route('/landing_page/<path:filename>')
-def serve_landing_assets(filename):
-    return send_from_directory('landing_page', filename)
 
 # --- שליפת התיקיות הראשיות מהדרייב (עבור דף ניהול מדיה) ---
 @app.route('/get_main_programs', methods=['GET'])
