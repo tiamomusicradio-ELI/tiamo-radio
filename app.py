@@ -154,15 +154,15 @@ def get_main_programs():
         service = get_drive_service()
         parent_folder_id = os.environ.get('GOOGLE_DRIVE_FOLDER_ID', PARENT_FOLDER_ID)
         
-        print(f"DEBUG - Fetching main folders from Drive parent_id: {parent_folder_id}")
+        print(f"DEBUG - Fetching items from Drive parent_id: {parent_folder_id}")
         results = service.files().list(
-            q=f"'{parent_folder_id}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
+            q=f"'{parent_folder_id}' in parents and trashed = false",
             pageSize=50,
-            fields="files(id, name)"
+            fields="files(id, name, mimeType)"
         ).execute()
         items = results.get('files', [])
         
-        print("DEBUG - Folders found:", items)
+        print("DEBUG - All items found:", items)
 
         def natural_sort_key(s):
             return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', s['name'])]
