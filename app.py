@@ -4,6 +4,8 @@ import io
 import time
 import threading
 import re
+import base64
+import pickle
 import pandas as pd
 from functools import wraps
 from flask import Flask, jsonify, render_template, request, Response, send_from_directory
@@ -17,7 +19,9 @@ app = Flask(__name__)
 
 EXCEL_FILE = "עדכון תוכנית שידורים TIAMO - 4.8.26.xlsx"
 SCOPES = ['https://www.googleapis.com/auth/drive']
-PARENT_FOLDER_ID = '1tAy9l49lJAbMWRVJdoK4b2uEiU6vQLH-' 
+
+# שליפת מזהה התיקייה הראשית מתוך משתני הסביבה של Render (עם גיבוי למזהה המקורי אם צריך)
+PARENT_FOLDER_ID = os.environ.get('GOOGLE_DRIVE_FOLDER_ID', '1tAy9l49lJAbMWRVJdoK4b2uEiU6vQLH-')
 
 # ----------------- הגדרות אבטחה וניהול -----------------
 ADMIN_USERNAME = "admin"
@@ -56,39 +60,27 @@ requested_songs_list = [
 ]
 
 def get_drive_service():
+    # יצירת קובץ ה-token אוטומטית בענן ממשתנה סביבה אם הוא קיים ואין קובץ מקומי
+    if not os.path.exists('token.pickle') and os.environ.get('TOKEN_PICKLE_BASE64'):
+        try:
+            with open('token.pickle', 'wb') as token:
+                token.write(base64.b64decode(os.environ['TOKEN_PICKLE_BASE64']))
+        except Exception as e:
+            print(f"Error decoding token from env: {e}")
+
     creds = None
     if os.path.exists('token.pickle'):
-        import pickle
         with open('token.pickle', 'rb') as token:
             creds = pickle.load(token)
             
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            try:
-                creds.refresh(Request())
-            except Exception:
-                creds = None
-                
-        if not creds:
-            if os.path.exists('credentials.json'):
-                flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
-            elif os.path.exists('client_secret.json'):
-                flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
-            else:
-                raise Exception("לא נמצאו קובצי הגדרות הרשאה ל-Google Drive")
-            
-            # בדיקה האם אנחנו בסביבת ענן (Render) כדי להימנע מפתיחת דפדפן אינטראקטיבי
-            if os.environ.get('RENDER') or os.environ.get('PORT'):
-                raise Exception("נדרש קובץ token.pickle מעודכן או הגדרת הרשאות ענן תקינה")
-            else:
-                creds = flow.run_local_server(port=0)
-                
-        try:
-            import pickle
-            with open('token.pickle', 'wb') as token:
-                pickle.dump(creds, token)
-        except Exception:
-            pass
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
             
     return build('drive', 'v3', credentials=creds)
 
@@ -113,7 +105,7 @@ def parse_playlist_text(raw_text):
                 parsed_songs.append({'artist': artist, 'song': song})
                 continue
 
-        # 2. ניקוי מילות פתיחה נפוצות בוואצאפ
+        # 2. ניקוי מילות פתיחה נפוצות בוואצאפ (כמו: "שלום, אני אלי ומבקש את השיר:")
         clean_text = re.sub(r'^(שלום|היי|אהלן)?\s*,?\s*(אני\s+[\w\s]+\s+)?(מבקש|רוצה|אפשר)\s*(את\s+השיר|את)?\s*:?\s*', '', line, flags=re.IGNORECASE).strip()
 
         # 3. ניסיון זיהוי ביטויים כמו "השיר X של Y" או "X של Y"
@@ -124,14 +116,14 @@ def parse_playlist_text(raw_text):
             parsed_songs.append({'artist': artist, 'song': song})
             continue
 
-        # 4. אם יש נקודתיים
+        # 4. אם יש נקודתיים (למשל: "מבקש את השיר: מברוק")
         if ':' in line:
             parts = line.split(':', 1)
             song = parts[1].strip()
             parsed_songs.append({'artist': 'לא צוין', 'song': song})
             continue
 
-        # 5. ברירת מחדל
+        # 5. ברירת מחדל אם לא זוהה אמן נפרד
         parsed_songs.append({'artist': 'לא צוין', 'song': clean_text})
             
     return parsed_songs
