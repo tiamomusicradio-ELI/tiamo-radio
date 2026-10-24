@@ -176,8 +176,8 @@ def serve_landing_page():
 def serve_landing_assets(filename):
     return send_from_directory('landing_page', filename)
 
-# --- הנתיב שאליו האתר פונה כדי להציג את התיקיות בניהול מדיה ---
-@app.route('/get_main_programs')
+# --- שליפת התיקיות הראשיות מהדרייב (עבור דף ניהול מדיה) ---
+@app.route('/get_main_programs', methods=['GET'])
 @requires_auth
 def get_main_programs():
     try:
