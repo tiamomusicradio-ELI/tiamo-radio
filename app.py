@@ -4,14 +4,10 @@ import io
 import time
 import threading
 import re
-import base64
-import pickle
 import pandas as pd
 from functools import wraps
 from flask import Flask, jsonify, render_template, request, Response
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
+from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload
 
@@ -20,7 +16,7 @@ app = Flask(__name__)
 EXCEL_FILE = "עדכון תוכנית שידורים TIAMO - 4.8.26.xlsx"
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
-# שליפת מזהה התיקייה הראשית מתוך משתני הסביבה של Render (עם גיבוי למזהה המקורי אם צריך)
+# שליפת מזהה התיקייה הראשית מתוך משתני הסביבה של Render (עם גיבוי למזהה המקורי)
 PARENT_FOLDER_ID = os.environ.get('GOOGLE_DRIVE_FOLDER_ID', '1tAy9l49lJAbMWRVJdoK4b2uEiU6vQLH-')
 
 # ----------------- הגדרות אבטחה וניהול -----------------
@@ -60,27 +56,9 @@ requested_songs_list = [
 ]
 
 def get_drive_service():
-    if not os.path.exists('token.pickle') and os.environ.get('TOKEN_PICKLE_BASE64'):
-        try:
-            with open('token.pickle', 'wb') as token:
-                token.write(base64.b64decode(os.environ['TOKEN_PICKLE_BASE64']))
-        except Exception as e:
-            print(f"Error decoding token from env: {e}")
-
-    creds = None
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
-            
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
-            creds = flow.run_local_server(port=0)
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
-            
+    creds = service_account.Credentials.from_service_account_file(
+        'credentials.json', scopes=SCOPES
+    )
     return build('drive', 'v3', credentials=creds)
 
 def parse_playlist_text(raw_text):
