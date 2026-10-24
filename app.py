@@ -60,7 +60,6 @@ requested_songs_list = [
 ]
 
 def get_drive_service():
-    # יצירת קובץ ה-token אוטומטית בענן ממשתנה סביבה אם הוא קיים ואין קובץ מקומי
     if not os.path.exists('token.pickle') and os.environ.get('TOKEN_PICKLE_BASE64'):
         try:
             with open('token.pickle', 'wb') as token:
@@ -85,9 +84,6 @@ def get_drive_service():
     return build('drive', 'v3', credentials=creds)
 
 def parse_playlist_text(raw_text):
-    """
-    מפרק הודעת WhatsApp בפורמט חופשי או 'אמן - שיר' למערך מובנה.
-    """
     lines = raw_text.strip().split('\n')
     parsed_songs = []
     
@@ -96,7 +92,6 @@ def parse_playlist_text(raw_text):
         if not line:
             continue
             
-        # 1. בדיקה אם יש מקף ברור (למשל: "חיים משה - אהבת חיי")
         if '-' in line:
             parts = line.split('-', 1)
             artist = parts[0].strip()
@@ -105,10 +100,8 @@ def parse_playlist_text(raw_text):
                 parsed_songs.append({'artist': artist, 'song': song})
                 continue
 
-        # 2. ניקוי מילות פתיחה נפוצות בוואצאפ (כמו: "שלום, אני אלי ומבקש את השיר:")
         clean_text = re.sub(r'^(שלום|היי|אהלן)?\s*,?\s*(אני\s+[\w\s]+\s+)?(מבקש|רוצה|אפשר)\s*(את\s+השיר|את)?\s*:?\s*', '', line, flags=re.IGNORECASE).strip()
 
-        # 3. ניסיון זיהוי ביטויים כמו "השיר X של Y" או "X של Y"
         match_of = re.search(r'(.+?)\s+של\s+(.+)', clean_text)
         if match_of:
             song = match_of.group(1).strip()
@@ -116,20 +109,17 @@ def parse_playlist_text(raw_text):
             parsed_songs.append({'artist': artist, 'song': song})
             continue
 
-        # 4. אם יש נקודתיים (למשל: "מבקש את השיר: מברוק")
         if ':' in line:
             parts = line.split(':', 1)
             song = parts[1].strip()
             parsed_songs.append({'artist': 'לא צוין', 'song': song})
             continue
 
-        # 5. ברירת מחדל אם לא זוהה אמן נפרד
         parsed_songs.append({'artist': 'לא צוין', 'song': clean_text})
             
     return parsed_songs
 
 def search_drive_songs(artist, song):
-    """חיפוש קבצי שמע ב-Google Drive לפי שם אמן ושיר"""
     try:
         service = get_drive_service()
         search_query = f"name contains '{song}' and trashed = false"
@@ -178,7 +168,6 @@ scanner_thread.start()
 def index():
     return render_template('index.html')
 
-# --- נתיבים לדף הנחיתה של המאזינים (ללא צורך בסיסמה) ---
 @app.route('/listen')
 def serve_landing_page():
     return send_from_directory('landing_page', 'index.html')
@@ -186,26 +175,32 @@ def serve_landing_page():
 @app.route('/landing_page/<path:filename>')
 def serve_landing_assets(filename):
     return send_from_directory('landing_page', filename)
-# -----------------------------------------------------
 
+# --- הנתיב שאליו האתר פונה כדי להציג את התיקיות בניהול מדיה ---
 @app.route('/get_main_programs')
 @requires_auth
 def get_main_programs():
     try:
         service = get_drive_service()
+        parent_folder_id = os.environ.get('GOOGLE_DRIVE_FOLDER_ID', PARENT_FOLDER_ID)
+        
+        print(f"DEBUG - Fetching main folders from Drive parent_id: {parent_folder_id}")
         results = service.files().list(
-            q=f"'{PARENT_FOLDER_ID}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
+            q=f"'{parent_folder_id}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
             pageSize=50,
             fields="files(id, name)"
         ).execute()
         items = results.get('files', [])
         
+        print("DEBUG - Folders found:", items)
+
         def natural_sort_key(s):
             return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', s['name'])]
         
         items.sort(key=natural_sort_key)
         return jsonify(items)
     except Exception as e:
+        print("DEBUG - Error in get_main_programs:", str(e))
         return jsonify([])
 
 @app.route('/get_sub_items')
@@ -412,24 +407,6 @@ def manual_scan_whatsapp():
     try:
         return jsonify({'success': True, 'message': 'הסריקה הושלמה בהצלחה!'})
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
-
-# --- הנתיב החדש לשליפת תיקיות הדרייב לאתר ---
-@app.route('/get_drive_folders', methods=['GET'])
-@requires_auth
-def get_drive_folders():
-    try:
-        service = get_drive_service()
-        parent_folder_id = os.environ.get('GOOGLE_DRIVE_FOLDER_ID', PARENT_FOLDER_ID)
-        query = f"'{parent_folder_id}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
-        results = service.files().list(q=query, pageSize=100, fields="files(id, name)").execute()
-        folders = results.get('files', [])
-        
-        print("DEBUG - Folders found in Drive:", folders)
-
-        return jsonify({'success': True, 'folders': folders})
-    except Exception as e:
-        print("DEBUG - Error fetching folders:", str(e))
         return jsonify({'success': False, 'error': str(e)})
 
 if __name__ == '__main__':
