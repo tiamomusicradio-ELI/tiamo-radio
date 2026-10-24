@@ -414,5 +414,23 @@ def manual_scan_whatsapp():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
+# --- הנתיב החדש לשליפת תיקיות הדרייב לאתר ---
+@app.route('/get_drive_folders', methods=['GET'])
+@requires_auth
+def get_drive_folders():
+    try:
+        service = get_drive_service()
+        parent_folder_id = os.environ.get('GOOGLE_DRIVE_FOLDER_ID', PARENT_FOLDER_ID)
+        query = f"'{parent_folder_id}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
+        results = service.files().list(q=query, pageSize=100, fields="files(id, name)").execute()
+        folders = results.get('files', [])
+        
+        print("DEBUG - Folders found in Drive:", folders)
+
+        return jsonify({'success': True, 'folders': folders})
+    except Exception as e:
+        print("DEBUG - Error fetching folders:", str(e))
+        return jsonify({'success': False, 'error': str(e)})
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
