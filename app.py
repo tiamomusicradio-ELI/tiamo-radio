@@ -4,14 +4,10 @@ import io
 import time
 import threading
 import re
-import base64
-import pickle
 import pandas as pd
 from functools import wraps
-from flask import Flask, jsonify, render_template, request, Response, send_from_directory
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
+from flask import Flask, jsonify, render_template, request, Response
+from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload
 
@@ -20,7 +16,7 @@ app = Flask(__name__)
 EXCEL_FILE = "עדכון תוכנית שידורים TIAMO - 4.8.26.xlsx"
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
-# שליפת מזהה התיקייה הראשית מתוך משתני הסביבה של Render (עם גיבוי למזהה המקורי אם צריך)
+# שליפת מזהה התיקייה הראשית מתוך משתני הסביבה של Render (עם גיבוי למזהה המקורי)
 PARENT_FOLDER_ID = os.environ.get('GOOGLE_DRIVE_FOLDER_ID', '1tAy9l49lJAbMWRVJdoK4b2uEiU6vQLH-')
 
 # ----------------- הגדרות אבטחה וניהול -----------------
@@ -60,34 +56,19 @@ requested_songs_list = [
 ]
 
 def get_drive_service():
-    # יצירת קובץ ה-token אוטומטית בענן ממשתנה סביבה אם הוא קיים ואין קובץ מקומי
-    if not os.path.exists('token.pickle') and os.environ.get('TOKEN_PICKLE_BASE64'):
-        try:
-            with open('token.pickle', 'wb') as token:
-                token.write(base64.b64decode(os.environ['TOKEN_PICKLE_BASE64']))
-        except Exception as e:
-            print(f"Error decoding token from env: {e}")
-
-    creds = None
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
-            
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
-            creds = flow.run_local_server(port=0)
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
-            
+    # בדיקה האם תוכן ה-JSON מוגדר במשתנה הסביבה של Render
+    creds_json = os.environ.get('GOOGLE_CREDENTIALS_JSON')
+    if creds_json:
+        creds_info = json.loads(creds_json)
+        creds = service_account.Credentials.from_service_account_info(creds_info, scopes=SCOPES)
+    else:
+        # גיבוי לעבודה מקומית במחשב שלך אם הקובץ קיים פיזית
+        creds = service_account.Credentials.from_service_account_file(
+            'credentials.json', scopes=SCOPES
+        )
     return build('drive', 'v3', credentials=creds)
 
 def parse_playlist_text(raw_text):
-    """
-    מפרק הודעת WhatsApp בפורמט חופשי או 'אמן - שיר' למערך מובנה.
-    """
     lines = raw_text.strip().split('\n')
     parsed_songs = []
     
@@ -96,7 +77,6 @@ def parse_playlist_text(raw_text):
         if not line:
             continue
             
-        # 1. בדיקה אם יש מקף ברור (למשל: "חיים משה - אהבת חיי")
         if '-' in line:
             parts = line.split('-', 1)
             artist = parts[0].strip()
@@ -105,10 +85,8 @@ def parse_playlist_text(raw_text):
                 parsed_songs.append({'artist': artist, 'song': song})
                 continue
 
-        # 2. ניקוי מילות פתיחה נפוצות בוואצאפ (כמו: "שלום, אני אלי ומבקש את השיר:")
         clean_text = re.sub(r'^(שלום|היי|אהלן)?\s*,?\s*(אני\s+[\w\s]+\s+)?(מבקש|רוצה|אפשר)\s*(את\s+השיר|את)?\s*:?\s*', '', line, flags=re.IGNORECASE).strip()
 
-        # 3. ניסיון זיהוי ביטויים כמו "השיר X של Y" או "X של Y"
         match_of = re.search(r'(.+?)\s+של\s+(.+)', clean_text)
         if match_of:
             song = match_of.group(1).strip()
@@ -116,20 +94,17 @@ def parse_playlist_text(raw_text):
             parsed_songs.append({'artist': artist, 'song': song})
             continue
 
-        # 4. אם יש נקודתיים (למשל: "מבקש את השיר: מברוק")
         if ':' in line:
             parts = line.split(':', 1)
             song = parts[1].strip()
             parsed_songs.append({'artist': 'לא צוין', 'song': song})
             continue
 
-        # 5. ברירת מחדל אם לא זוהה אמן נפרד
         parsed_songs.append({'artist': 'לא צוין', 'song': clean_text})
             
     return parsed_songs
 
 def search_drive_songs(artist, song):
-    """חיפוש קבצי שמע ב-Google Drive לפי שם אמן ושיר"""
     try:
         service = get_drive_service()
         search_query = f"name contains '{song}' and trashed = false"
@@ -144,7 +119,7 @@ def search_drive_songs(artist, song):
 
         return results.get('files', [])
     except Exception as e:
-        print(f"Drive Search Error: {e}")
+        print(f"Drive Search Error: {e}", flush=True)
         return []
 
 def fix_hebrew(text):
@@ -178,34 +153,31 @@ scanner_thread.start()
 def index():
     return render_template('index.html')
 
-# --- נתיבים לדף הנחיתה של המאזינים (ללא צורך בסיסמה) ---
-@app.route('/listen')
-def serve_landing_page():
-    return send_from_directory('landing_page', 'index.html')
-
-@app.route('/landing_page/<path:filename>')
-def serve_landing_assets(filename):
-    return send_from_directory('landing_page', filename)
-# -----------------------------------------------------
-
-@app.route('/get_main_programs')
+# --- שליפת התיקיות הראשיות מהדרייב (עבור דף ניהול מדיה) ---
+@app.route('/get_main_programs', methods=['GET'])
 @requires_auth
 def get_main_programs():
     try:
         service = get_drive_service()
+        parent_folder_id = os.environ.get('GOOGLE_DRIVE_FOLDER_ID', PARENT_FOLDER_ID)
+        
+        print(f"DEBUG - Fetching items from Drive parent_id: {parent_folder_id}", flush=True)
         results = service.files().list(
-            q=f"'{PARENT_FOLDER_ID}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
+            q=f"'{parent_folder_id}' in parents and trashed = false",
             pageSize=50,
-            fields="files(id, name)"
+            fields="files(id, name, mimeType)"
         ).execute()
         items = results.get('files', [])
         
+        print("DEBUG - All items found:", items, flush=True)
+
         def natural_sort_key(s):
             return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', s['name'])]
         
         items.sort(key=natural_sort_key)
         return jsonify(items)
     except Exception as e:
+        print("DEBUG - Error in get_main_programs:", str(e), flush=True)
         return jsonify([])
 
 @app.route('/get_sub_items')
