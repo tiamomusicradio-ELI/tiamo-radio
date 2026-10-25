@@ -14,7 +14,7 @@ from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload
 
 app = Flask(__name__)
 
-EXCEL_FILE = "עדכון תוכנית שידורים TIAMO - 4.8.26.xlsx"
+EXCEL_FILE = "עדכון תוכנית שידורים TIAMO - שבועי.xlsx"
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
 # שליפת מזהה התיקייה הראשית מתוך משתני הסביבה של Render (עם גיבוי למזהה המקורי)
