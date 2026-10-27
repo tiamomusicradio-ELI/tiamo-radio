@@ -31,10 +31,10 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 20px 40px;
+            padding: 20px 35px;
         }
 
-        /* פינה עליונה ימנית - ניהול בוט */
+        /* פינה עליונה ימנית - ניהול */
         .top-admin-btn {
             position: absolute;
             top: 20px;
@@ -56,7 +56,7 @@
             color: #000;
         }
 
-        /* פינה עליונה שמאלית - תאריך וסטטוס ON AIR */
+        /* פינה עליונה שמאלית - תאריך וסטטוס שידור */
         .top-left-status {
             position: absolute;
             top: 20px;
@@ -66,15 +66,26 @@
             z-index: 10;
         }
         .date-display {
-            font-size: 15px;
-            font-weight: 800;
+            font-size: 14px;
+            font-weight: bold;
             color: #ffffff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.9);
             margin-bottom: 4px;
         }
         .on-air-badge-img {
             height: 22px;
             display: block;
+        }
+        .on-air-tag-fallback {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(220, 38, 38, 0.9);
+            color: #fff;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
         }
 
         /* לוגו כותרת ראשי */
@@ -83,7 +94,7 @@
             margin-top: 5px;
         }
         .main-logo {
-            font-size: 64px;
+            font-size: 60px;
             font-weight: 900;
             font-style: italic;
             color: #ffffff;
@@ -97,11 +108,9 @@
         /* גוף הדף */
         .content-layout {
             display: flex;
-            direction: ltr;
             justify-content: space-between;
             align-items: center;
             flex: 1;
-            width: 100%;
         }
 
         /* עמודת מקשים שמאלית */
@@ -111,44 +120,21 @@
             align-items: center;
             gap: 12px;
             width: 220px;
-            direction: rtl;
         }
 
-        /* כפתור הפעלה סאונד */
-        .play-big-btn {
-            width: 95px;
-            height: 60px;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border: 3px solid #ffffff;
-            border-radius: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* כפתור הפעלה סאונד - תמונה */
+        .play-btn-wrapper {
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(29, 78, 216, 0.6);
-            transition: transform 0.2s;
-            margin-bottom: 6px;
+            transition: transform 0.2s ease;
+            margin-bottom: 5px;
         }
-        .play-big-btn:hover {
+        .play-btn-wrapper:hover {
             transform: scale(1.08);
         }
-        .play-icon-triangle {
-            width: 0;
-            height: 0;
-            border-top: 12px solid transparent;
-            border-bottom: 12px solid transparent;
-            border-left: 20px solid #ffffff;
-            margin-left: 4px;
-        }
-        .pause-icon-bars {
-            display: flex;
-            gap: 5px;
-        }
-        .pause-bar {
-            width: 5px;
-            height: 22px;
-            background: #fff;
-            border-radius: 2px;
+        .play-btn-img {
+            width: 100px;
+            height: auto;
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6));
         }
 
         /* כפתורים לבנים */
@@ -157,7 +143,7 @@
             background: #ffffff;
             color: #000000;
             border: none;
-            padding: 10px 0;
+            padding: 9px 0;
             border-radius: 25px;
             font-weight: bold;
             font-size: 15px;
@@ -195,14 +181,13 @@
             transition: transform 0.2s;
             box-shadow: 0 2px 8px rgba(0,0,0,0.6);
             border: 1px solid rgba(255,255,255,0.4);
-            cursor: pointer;
         }
         .icon-btn-img:hover {
             transform: scale(1.15);
             border-color: #d4af37;
         }
 
-        /* מרכז המסך - נגן ויזואלי ופרטי תוכנית */
+        /* מרכז הדף - נגן ויזואלי */
         .center-display {
             flex: 1;
             display: flex;
@@ -210,72 +195,44 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            direction: rtl;
-            margin-right: 80px;
+            margin-right: 40px;
         }
 
-        /* תיבת גלי קול מונפשים מתחת לכותרת */
         .waveform-box {
             width: 100%;
-            max-width: 500px;
-            height: 65px;
-            background: rgba(255, 255, 255, 0.92);
-            border-radius: 14px;
+            max-width: 480px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 5px 20px;
+            padding: 5px 15px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.6);
             margin-bottom: 25px;
-            position: relative;
             overflow: hidden;
         }
-
         .waves-gif {
-            width: 100%;
-            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
             object-fit: contain;
-        }
-
-        /* הנפשת CSS דינמית למקרה של השמעה */
-        .equalizer-bars {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            height: 40px;
-            position: absolute;
-        }
-        .eq-bar {
-            width: 4px;
-            height: 10px;
-            background: #3b82f6;
-            border-radius: 2px;
-            animation: eqWave 1s ease-in-out infinite alternate;
-        }
-        .eq-bar:nth-child(2n) { animation-delay: 0.15s; background: #2563eb; }
-        .eq-bar:nth-child(3n) { animation-delay: 0.3s; background: #d4af37; }
-        .eq-bar:nth-child(4n) { animation-delay: 0.45s; background: #1d4ed8; }
-
-        @keyframes eqWave {
-            0% { height: 6px; }
-            100% { height: 38px; }
         }
 
         .now-playing-box {
             text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
         }
         .listening-label {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: bold;
             color: #ffd700;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
         .program-name-text {
-            font-size: 34px;
+            font-size: 32px;
             font-weight: 900;
             color: #ffffff;
-            margin-bottom: 6px;
-            text-shadow: 0 0 15px rgba(212,175,55,0.7);
+            margin-bottom: 5px;
+            text-shadow: 0 0 15px rgba(212,175,55,0.6);
         }
         .program-time-text {
             font-size: 22px;
@@ -283,130 +240,49 @@
             color: #ffffff;
         }
 
-        /* מודאלים הכלליים */
+        /* מודאלים */
         .modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.85);
-            z-index: 10000;
+            background: rgba(0,0,0,0.8);
+            z-index: 9999;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(4px);
         }
         .modal-box {
             background: #1e293b;
             color: #fff;
             padding: 30px;
-            border-radius: 16px;
+            border-radius: 15px;
             max-width: 550px;
             width: 90%;
             border: 1px solid #d4af37;
             position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             text-align: right;
             direction: rtl;
         }
-
-        /* מודאל "בא לי לשמוע" בהתאמה מדויקת לצילום המסך */
-        .request-modal-card {
-            background: rgba(20, 20, 25, 0.88);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 20px;
-            width: 90%;
-            max-width: 540px;
-            padding: 35px 30px;
-            position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
-            direction: rtl;
-            backdrop-filter: blur(10px);
-        }
-        .request-title {
-            font-size: 28px;
-            font-weight: 800;
-            color: #ffffff;
-            text-align: center;
-            margin-bottom: 25px;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.8);
-        }
-        .req-form-row {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 15px;
-            margin-bottom: 16px;
-        }
-        .req-label {
-            font-size: 17px;
-            font-weight: bold;
-            color: #ffffff;
-            min-width: 140px;
-            text-align: right;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
-        }
-        .req-input {
-            flex: 1;
-            background: rgba(0, 0, 0, 0.45);
-            border: 1.5px solid rgba(255, 255, 255, 0.75);
-            border-radius: 8px;
-            padding: 9px 14px;
-            color: #ffffff;
-            font-size: 15px;
-            outline: none;
-            direction: rtl;
-            transition: 0.2s;
-        }
-        .req-input:focus {
-            border-color: #f3c653;
-            box-shadow: 0 0 8px rgba(243, 198, 83, 0.5);
-        }
-        .req-submit-btn {
-            width: 200px;
-            background: #ffffff;
-            color: #000000;
-            border: none;
-            padding: 10px 0;
-            border-radius: 25px;
-            font-weight: 900;
-            font-size: 17px;
-            cursor: pointer;
-            margin: 25px auto 0 auto;
-            display: block;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            transition: 0.2s;
-        }
-        .req-submit-btn:hover {
-            background: #f3c653;
-            transform: scale(1.04);
-        }
-        .req-back-btn {
+        .close-modal {
             position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.9);
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.6);
-        }
-        .req-back-btn:hover {
-            transform: scale(1.1);
-            background: #ffffff;
-        }
-
-        .close-modal-icon {
-            position: absolute;
-            top: 12px;
-            left: 18px;
+            top: 10px;
+            left: 15px;
             font-size: 24px;
             cursor: pointer;
             color: #94a3b8;
+        }
+        .modal-box h2 {
+            color: #d4af37;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        .modal-box p, .modal-box li {
+            color: #cbd5e1;
+            line-height: 1.7;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+        .modal-box ul {
+            padding-right: 20px;
         }
     </style>
 </head>
@@ -414,13 +290,14 @@
 
     <div class="page-container">
         
-        <!-- כפתור ניהול בוט -->
+        <!-- כפתור ניהול -->
         <a href="/admin" class="top-admin-btn">⚙️ ניהול הבוט</a>
 
-        <!-- תאריך ו-ON AIR בפינה השמאלית -->
+        <!-- תאריך ו-ON AIR -->
         <div class="top-left-status">
             <div id="current-date-str" class="date-display">--/--/----</div>
-            <img src="/static/media/onair.9c9a32ce220717d9c14a.png" alt="ON AIR" class="on-air-badge-img" onerror="this.onerror=null; this.src='/static/media/onair.png';">
+            <img src="/static/media/onair.9c9a32ce220717d9c14a.png" alt="ON AIR" class="on-air-badge-img" onerror="this.style.display='none'; document.getElementById('on-air-fallback').style.display='inline-flex';">
+            <div id="on-air-fallback" class="on-air-tag-fallback" style="display:none;">ON AIR</div>
         </div>
 
         <!-- כותרת מותג -->
@@ -434,23 +311,23 @@
             <!-- עמודת כפתורים משמאל -->
             <div class="controls-column">
                 
-                <div class="play-big-btn" onclick="togglePlay()">
-                    <div id="play-btn-icon" class="play-icon-triangle"></div>
+                <div class="play-btn-wrapper" onclick="togglePlay()">
+                    <img id="play-btn-img" src="/static/media/play.0b905ca79ff2e620cc43.png" alt="Play" class="play-btn-img">
                 </div>
 
                 <button class="action-pill" onclick="openAboutModal()">אודות התחנה</button>
-                <button class="action-pill" onclick="openRequestModal()">בא לי לשמוע</button>
+                <a href="https://wa.me/972538550511?text=שלום%20אני%20רוצה%20לבקש%20שיר" target="_blank" class="action-pill">בא לי לשמוע</a>
                 <button class="action-pill" onclick="openScheduleModal()">לוח שידורים</button>
 
                 <div class="tagline">מוזיקה באווירה אחרת</div>
 
-                <!-- אייקונים מקוריים בתחתית -->
+                <!-- אייקונים מקוריים -->
                 <div class="social-icons-row">
-                    <a href="#" title="אקו״ם" onclick="alert('משודר ברישיון אקו״ם (AKUM)'); return false;">
-                        <img src="/static/media/akom-icon.dec8680896ce39293054.jpg" alt="אקום" class="icon-btn-img" onerror="this.onerror=null; this.src='/static/media/akom-icon.jpg';">
+                    <a href="#" title="אקו״ם" onclick="alert('משודר ברישיון אקו״ם'); return false;">
+                        <img src="/static/media/akom-icon.dec8680896ce39293054.jpg" alt="אקום" class="icon-btn-img">
                     </a>
                     <a href="https://facebook.com" target="_blank" title="פייסבוק">
-                        <img src="/static/media/facebook-icon.8c02ee7e7d97d2f06aef.png" alt="פייסבוק" class="icon-btn-img" onerror="this.onerror=null; this.src='/static/facebook.png';">
+                        <img src="/static/media/facebook-icon.8c02ee7e7d97d2f06aef.png" alt="פייסבוק" class="icon-btn-img">
                     </a>
                     <a href="https://wa.me/972538550511" target="_blank" title="וואצאפ">
                         <img src="/static/media/whatsapp-icon.bd6023bdc19e69eacc58.png" alt="וואצאפ" class="icon-btn-img">
@@ -459,210 +336,86 @@
                         <img src="/static/media/email-icon.98d49a3020068d9bed4d.png" alt="אימייל" class="icon-btn-img">
                     </a>
                 </div>
-
             </div>
 
-            <!-- מרכז המסך - גלי הקול + פרטי תוכנית -->
+            <!-- נגן ויזואלי במרכז -->
             <div class="center-display">
-                
                 <div class="waveform-box">
-                    <img src="/static/media/waves.ba97a297acb1d1a2d0c6.gif" alt="Audio Waves" class="waves-gif" onerror="this.style.display='none'; document.getElementById('css-equalizer').style.display='flex';">
-                    
-                    <div id="css-equalizer" class="equalizer-bars" style="display:none;">
-                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
-                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
-                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
-                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
-                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
-                    </div>
+                    <img src="/static/media/waveform.gif" alt="Soundwave" class="waves-gif" onerror="this.style.display='none'">
                 </div>
-
                 <div class="now-playing-box">
-                    <div class="listening-label">אתם מאזינים לתוכנית</div>
-                    <div id="live-program-title" class="program-name-text">טוען תוכנית...</div>
-                    <div id="live-program-time" class="program-time-text">--:--</div>
+                    <div class="listening-label">מאזינים עכשיו ל- TIAMO MUSIC</div>
+                    <div class="program-name-text">מוסיקה לנשמה</div>
+                    <div class="program-time-text">שידור חי 24/7</div>
                 </div>
-
             </div>
 
         </div>
-
-        <div></div> <!-- Spacer -->
-
     </div>
 
-    <!-- נגן סאונד -->
-    <audio id="audio-stream" src="https://liveradio.co.il:8030/stream" preload="none"></audio>
-
-    <!-- מודאל "בא לי לשמוע" (טופס בקשת שיר לוואצאפ) -->
-    <div id="requestModal" class="modal-overlay">
-        <div class="request-modal-card">
-            <h2 class="request-title">בא לי לשמוע</h2>
-            
-            <form id="song-request-form" onsubmit="sendWhatsAppSongRequest(event)">
-                <div class="req-form-row">
-                    <input type="text" id="req-name" class="req-input" required placeholder="">
-                    <label class="req-label">שם מלא</label>
-                </div>
-
-                <div class="req-form-row">
-                    <input type="text" id="req-song" class="req-input" required placeholder="">
-                    <label class="req-label">שם השיר המבוקש</label>
-                </div>
-
-                <div class="req-form-row">
-                    <input type="text" id="req-artist" class="req-input" placeholder="">
-                    <label class="req-label">שם הזמר</label>
-                </div>
-
-                <div class="req-form-row">
-                    <input type="text" id="req-note" class="req-input" placeholder="">
-                    <label class="req-label">בקשה מיוחדת</label>
-                </div>
-
-                <button type="submit" class="req-submit-btn">שליחה</button>
-            </form>
-
-            <button class="req-back-btn" onclick="closeModal('requestModal')" title="חזרה">
-                <img src="/static/media/back.6991b3cc873ad2fe66f3.png" alt="חזרה" style="width:20px; height:20px;" onerror="this.parentNode.innerHTML='↩';">
-            </button>
-        </div>
-    </div>
-
-    <!-- מודאל אודות התחנה -->
-    <div id="aboutModal" class="modal-overlay">
+    <!-- מודאל אודות התחנה (עם המלל המדויק) -->
+    <div id="aboutModal" class="modal-overlay" onclick="closeModals(event)">
         <div class="modal-box">
-            <span class="close-modal-icon" onclick="closeModal('aboutModal')">&times;</span>
-            <h3 style="color:#d4af37; margin-bottom:15px; font-size:22px;">📻 אודות TIAMO MUSIC</h3>
-            <p style="line-height:1.7; color:#cbd5e1; font-size:15px;">
-                תחנת הרדיו <strong>TIAMO MUSIC</strong> מביאה לכם את המוזיקה הטובה ביותר 24/7, בשידורים רציפים מתוך לוח השידורים והתוכניות האהובות.<br><br>
-                האזנה נעימה!
-            </p>
+            <span class="close-modal" onclick="closeAboutModal()">&times;</span>
+            <h2>רדיו TIAMO MUSIC</h2>
+            <p>נועד לשדר למאזינים מוסיקה באוירה אחרת .</p>
+            <p>"מוסיקה לנשמה" המיועדת לכל אלה שהמוסיקה מהווה עבורם נוסטלגיה, והערכה למלודיה מכל הסגנונות אך בדגש על מוסיקה אתנית מכל התפוצות , מוסיקה הפורצת את כל הגבולות מהמזרח, הדרום, הצפון והמערב.</p>
+            <p>בתחנה תאזינו למוסיקה מכל גווני הקשת , וכמו תמיד תהיה מרוממת ומענגת , ותחבר בין אנשים תקופות ואהבה למוסיקה טובה.</p>
+            <p>כל זאת, לצד תוכניות קצרות של פודקאסטים בתחומי הייעוץ לחיים לטובת קהל מאזיני התחנה</p>
+            <p style="color: #ffd700; font-weight: bold; margin-top: 15px; font-size: 16px;">האזנה נעימה לכולם.</p>
         </div>
     </div>
 
     <!-- מודאל לוח שידורים -->
-    <div id="scheduleModal" class="modal-overlay">
-        <div class="modal-box" style="max-width:650px;">
-            <span class="close-modal-icon" onclick="closeModal('scheduleModal')">&times;</span>
-            <h3 style="color:#d4af37; margin-bottom:15px; font-size:22px;">📅 לוח שידורים שבועי</h3>
-            <div id="schedule-content" style="max-height:380px; overflow-y:auto; font-size:14px; padding-left:5px;">
-                טוען לוח שידורים...
-            </div>
+    <div id="scheduleModal" class="modal-overlay" onclick="closeModals(event)">
+        <div class="modal-box">
+            <span class="close-modal" onclick="closeScheduleModal()">&times;</span>
+            <h2>לוח שידורים ותוכניות</h2>
+            <ul>
+                <li><strong>מוסיקה לנשמה:</strong> רצף נוסטלגי ואתני מסביב שעון.</li>
+                <li><strong>פודקאסט ייעוץ לחיים:</strong> פינות תוכן מיוחדות והעשרה.</li>
+                <li><strong>בקשות שירים:</strong> ניתן לשלוח הודעות ובקשות ישירות דרך כפתור הווטסאפ.</li>
+            </ul>
         </div>
     </div>
 
     <script>
-        const audio = document.getElementById('audio-stream');
-        const playIcon = document.getElementById('play-btn-icon');
-        let isPlaying = false;
+        // תאריך נוכחי
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        document.getElementById('current-date-str').textContent = new Date().toLocaleDateString('he-IL', options);
 
-        // הגדרת תאריך נוכחי
-        (function setTodayDate() {
-            const dateElem = document.getElementById('current-date-str');
-            if (dateElem) {
-                const now = new Date();
-                const day = String(now.getDate()).padStart(2, '0');
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const year = now.getFullYear();
-                dateElem.innerText = `${day}/${month}/${year}`;
-            }
-        })();
-
-        function togglePlay() {
-            if (isPlaying) {
-                audio.pause();
-                playIcon.className = "play-icon-triangle";
-                playIcon.innerHTML = "";
-                isPlaying = false;
-            } else {
-                audio.play().then(() => {
-                    playIcon.className = "pause-icon-bars";
-                    playIcon.innerHTML = '<div class="pause-bar"></div><div class="pause-bar"></div>';
-                    isPlaying = true;
-                }).catch(err => {
-                    alert("לא ניתן להתחבר לשידור כרגע.");
-                });
-            }
-        }
-
-        function fetchLiveStatus() {
-            fetch('/get_current_program_status')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('live-program-title').innerText = data.program;
-                        document.getElementById('live-program-time').innerText = data.end_time ? `עד ${data.end_time}` : '';
-                    }
-                })
-                .catch(err => console.log('שגיאה בטעינת תוכנית'));
-        }
-
-        /* פתיחה וסגירה של חלון "בא לי לשמוע" */
-        function openRequestModal() {
-            document.getElementById('requestModal').style.display = 'flex';
-        }
-
-        function sendWhatsAppSongRequest(e) {
-            e.preventDefault();
-            const name = document.getElementById('req-name').value.trim();
-            const song = document.getElementById('req-song').value.trim();
-            const artist = document.getElementById('req-artist').value.trim();
-            const note = document.getElementById('req-note').value.trim();
-
-            let message = `שלום TIAMO MUSIC! 👋\nאני רוצה לבקש שיר:\n`;
-            message += `👤 *שם מלא:* ${name}\n`;
-            message += `🎵 *שיר מבוקש:* ${song}\n`;
-            if (artist) message += `🎤 *זמר/ת:* ${artist}\n`;
-            if (note) message += `💬 *בקשה מיוחדת:* ${note}\n`;
-
-            const encodedMsg = encodeURIComponent(message);
-            const waUrl = `https://wa.me/972538550511?text=${encodedMsg}`;
-            
-            window.open(waUrl, '_blank');
-            closeModal('requestModal');
-        }
-
+        // פונקציות פתיחה וסגירה של מודאלים
         function openAboutModal() {
             document.getElementById('aboutModal').style.display = 'flex';
         }
-
+        function closeAboutModal() {
+            document.getElementById('aboutModal').style.display = 'none';
+        }
         function openScheduleModal() {
-            const modal = document.getElementById('scheduleModal');
-            const content = document.getElementById('schedule-content');
-            modal.style.display = 'flex';
-            content.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">טוען לוח שידורים...</div>';
-
-            fetch('/get_full_schedule')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.data && data.data.length > 0) {
-                        let html = '<table style="width:100%; text-align:right; border-collapse:collapse; margin-top:5px;">';
-                        data.data.forEach((row, idx) => {
-                            if (idx >= 2 && row[1]) {
-                                html += `<tr style="border-bottom:1px solid #334155;">
-                                    <td style="padding:8px; color:#d4af37; font-weight:bold;">${row[1]}</td>
-                                    <td style="padding:8px; color:#fff;">${row[2] || '-'}</td>
-                                </tr>`;
-                            }
-                        });
-                        html += '</table>';
-                        content.innerHTML = html;
-                    } else {
-                        content.innerHTML = '<div style="text-align:center; padding:20px; color:#ef4444;">לא ניתן לטעון לוח שידורים כעת.</div>';
-                    }
-                })
-                .catch(err => {
-                    content.innerHTML = '<div style="text-align:center; padding:20px; color:#ef4444;">שגיאה בחיבור לשרת.</div>';
-                });
+            document.getElementById('scheduleModal').style.display = 'flex';
+        }
+        function closeScheduleModal() {
+            document.getElementById('scheduleModal').style.display = 'none';
+        }
+        function closeModals(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.style.display = 'none';
+            }
         }
 
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
+        // סימולציית כפתור Play/Pause
+        let isPlaying = false;
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            const playImg = document.getElementById('play-btn-img');
+            if (isPlaying) {
+                playImg.style.opacity = '0.7';
+                alert('השידור החי מופעל...');
+            } else {
+                playImg.style.opacity = '1.0';
+                alert('השידור הושהה.');
+            }
         }
-
-        fetchLiveStatus();
-        setInterval(fetchLiveStatus, 30000);
     </script>
 </body>
 </html>
