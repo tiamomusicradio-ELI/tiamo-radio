@@ -3,21 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TIAMO MUSIC RADIO - דף הבית והאזנה לשידור חי</title>
+    <title>TIAMO MUSIC RADIO - שידור חי</title>
     <link rel="shortcut icon" href="/static/favicon.ico">
     <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.85);
-            --card-border: #334155;
-            --primary-gold: #d4af37;
-            --gold-hover: #f3c653;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --success-green: #10b981;
-            --danger-red: #ef4444;
-        }
-
         * {
             box-sizing: border-box;
             margin: 0;
@@ -26,266 +14,453 @@
         }
 
         body {
-            background-color: var(--bg-color);
-            background-image: radial-gradient(circle at top center, #1e293b 0%, #0f172a 100%);
-            color: var(--text-main);
-            min-height: 100vh;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: #000 url('/static/media/background.740792a413912a029ca7.jpeg') no-repeat center center / cover;
+            color: #fff;
+            direction: rtl;
+            position: relative;
+        }
+
+        /* גיבוי רקע שקיעה במידה והתמונה המקומית חסרה */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, rgba(15, 23, 42, 0.4), rgba(0, 0, 0, 0.6));
+            z-index: 1;
+        }
+
+        .page-container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: space-between;
-            direction: rtl;
-            text-align: center;
-            padding: 20px;
-            position: relative;
+            padding: 25px 40px;
         }
 
-        header {
-            margin-top: 20px;
-            margin-bottom: 30px;
-        }
-
-        .logo-title {
-            color: var(--primary-gold);
-            font-size: 36px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
-        }
-
-        .logo-subtitle {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        .player-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
+        /* פינה עליונה ימנית - כפתור ניהול בוט */
+        .top-admin-btn {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #d4af37;
+            color: #d4af37;
+            padding: 6px 14px;
             border-radius: 20px;
-            padding: 35px 25px;
-            width: 100%;
-            max-width: 450px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            backdrop-filter: blur(10px);
-            position: relative;
+            font-size: 13px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        .top-admin-btn:hover {
+            background: #d4af37;
+            color: #000;
         }
 
-        .on-air-badge {
+        /* פינה עליונה שמאלית - תאריך וסטטוס שידור */
+        .top-left-status {
+            position: absolute;
+            top: 20px;
+            left: 25px;
+            text-align: left;
+            direction: ltr;
+        }
+        .date-display {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            margin-bottom: 4px;
+        }
+        .on-air-tag {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--danger-red);
-            border: 1px solid var(--danger-red);
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .on-air-badge.active {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--success-green);
-            border-color: var(--success-green);
-        }
-
-        .dot {
-            width: 8px;
-            height: 8px;
-            background-color: currentColor;
-            border-radius: 50%;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.3; }
-            50% { opacity: 1; }
-            100% { opacity: 0.3; }
-        }
-
-        .program-info {
-            margin-bottom: 25px;
-        }
-
-        .program-title {
-            font-size: 22px;
-            font-weight: bold;
-            color: var(--text-main);
-            margin-bottom: 6px;
-        }
-
-        .program-time {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .play-btn-container {
-            margin: 25px 0;
-        }
-
-        .main-play-btn {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-gold), #b89228);
-            border: none;
-            color: #111;
-            font-size: 32px;
-            cursor: pointer;
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .main-play-btn:hover {
-            transform: scale(1.08);
-            background: linear-gradient(135deg, var(--gold-hover), var(--primary-gold));
-            box-shadow: 0 0 35px rgba(243, 198, 83, 0.7);
-        }
-
-        .volume-control {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .volume-slider {
-            width: 140px;
-            accent-color: var(--primary-gold);
-            cursor: pointer;
-        }
-
-        .social-grid {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-
-        .social-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--card-border);
-            color: var(--text-main);
-            padding: 10px 18px;
+            background: rgba(220, 38, 38, 0.85);
+            color: #fff;
+            padding: 3px 10px;
             border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.6);
+        }
+        .dot-blink {
+            width: 7px;
+            height: 7px;
+            background: #fff;
+            border-radius: 50%;
+            animation: blink 1.2s infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+
+        /* לוגו מרכזי עליון */
+        .main-header {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .main-logo {
+            font-size: 64px;
+            font-weight: 900;
+            font-style: italic;
+            color: #ffffff;
+            text-shadow: 
+                3px 3px 0px #b48811,
+                6px 6px 0px #000,
+                0 0 25px rgba(243, 198, 83, 0.8);
+            letter-spacing: 3px;
+        }
+
+        /* תוכנו המרכזי של הדף */
+        .content-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 1;
+            margin-top: -20px;
+        }
+
+        /* עמודת מקשים ימנית / שמאלית */
+        .controls-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            width: 220px;
+        }
+
+        /* כפתור Play כחול מעוגל */
+        .play-big-btn {
+            width: 95px;
+            height: 60px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border: 3px solid #ffffff;
+            border-radius: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(29, 78, 216, 0.6);
+            transition: transform 0.2s;
+            margin-bottom: 10px;
+        }
+        .play-big-btn:hover {
+            transform: scale(1.08);
+        }
+        .play-icon-triangle {
+            width: 0;
+            height: 0;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            border-left: 20px solid #ffffff;
+            margin-left: 4px;
+        }
+        .pause-icon-bars {
+            display: flex;
+            gap: 5px;
+        }
+        .pause-bar {
+            width: 5px;
+            height: 22px;
+            background: #fff;
+            border-radius: 2px;
+        }
+
+        /* כפתורים לבנים מעוגלים */
+        .action-pill {
+            width: 100%;
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 10px 0;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 15px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
             text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
             transition: 0.2s;
         }
-
-        .social-btn:hover {
-            background: rgba(212, 175, 55, 0.15);
-            border-color: var(--primary-gold);
-            color: var(--primary-gold);
+        .action-pill:hover {
+            background: #f3c653;
+            transform: translateY(-2px);
         }
 
-        footer {
-            margin-top: 40px;
-            font-size: 12px;
-            color: var(--text-muted);
+        .tagline {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px #000;
+            margin-top: 10px;
+            margin-bottom: 8px;
+        }
+
+        /* סרגל אייקונים שבתחתית */
+        .social-icons-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .icon-circle {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            transition: 0.2s;
+            backdrop-filter: blur(4px);
+        }
+        .icon-circle:hover {
+            background: #d4af37;
+            color: #000;
+            border-color: #d4af37;
+        }
+
+        /* מרכז הדף - גל קול ופרטי תוכנית */
+        .center-display {
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            text-align: center;
+            margin-right: 50px;
         }
 
-        .acum-badge {
+        .waveform-container {
+            width: 90%;
+            max-width: 500px;
+            height: 55px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 12px;
             display: flex;
             align-items: center;
-            gap: 6px;
-            opacity: 0.7;
-            font-size: 11px;
+            justify-content: center;
+            padding: 0 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        /* אנימציית גלי קול */
+        .wave-bars {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            height: 35px;
+        }
+        .wave-bar {
+            width: 4px;
+            background: #3b82f6;
+            border-radius: 3px;
+            height: 10px;
+        }
+        .wave-bar.playing {
+            animation: soundWave 1.2s ease-in-out infinite alternate;
+        }
+        .wave-bar:nth-child(2n) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(3n) { animation-delay: 0.4s; }
+        .wave-bar:nth-child(4n) { animation-delay: 0.1s; }
+
+        @keyframes soundWave {
+            0% { height: 8px; background: #3b82f6; }
+            50% { height: 32px; background: #1d4ed8; }
+            100% { height: 12px; background: #d4af37; }
+        }
+
+        .now-playing-box {
+            color: #fce7f3;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
+        }
+        .listening-label {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+        .program-name-text {
+            font-size: 32px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 5px;
+            text-shadow: 0 0 15px rgba(212,175,55,0.6);
+        }
+        .program-time-text {
+            font-size: 22px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        /* מודאלים (חלונות קופצים לאודות וללוח שידורים) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.8);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-box {
+            background: #1e293b;
+            color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid #d4af37;
+            position: relative;
+        }
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #94a3b8;
         }
     </style>
 </head>
 <body>
 
-    <!-- כפתור כניסה למערכת ניהול בפינה העליונה -->
-    <div style="position: absolute; top: 20px; left: 20px; z-index: 1000;">
-        <a href="/admin" class="social-btn" style="border-color: var(--primary-gold); color: var(--primary-gold); padding: 8px 14px; font-size: 12px;">
-            ⚙️ כניסה לניהול הבוט
-        </a>
+    <div class="page-container">
+        
+        <!-- כפתור מעבר לניהול הבוט -->
+        <a href="/admin" class="top-admin-btn">⚙️ ניהול הבוט</a>
+
+        <!-- תאריך וסטטוס שידור -->
+        <div class="top-left-status">
+            <div id="current-date-str" class="date-display">--/--/----</div>
+            <div class="on-air-tag">
+                <span class="dot-blink"></span>
+                <span>ON AIR</span>
+            </div>
+        </div>
+
+        <!-- לוגו ראשי -->
+        <header class="main-header">
+            <h1 class="main-logo">TIAMO MUSIC</h1>
+        </header>
+
+        <!-- חלק מרכזי -->
+        <div class="content-layout">
+            
+            <!-- עמודת בקרת ניגון וכפתורים משמאל -->
+            <div class="controls-column">
+                
+                <div class="play-big-btn" onclick="togglePlay()">
+                    <div id="play-btn-icon" class="play-icon-triangle"></div>
+                </div>
+
+                <button class="action-pill" onclick="openAboutModal()">אודות התחנה</button>
+                <a href="https://wa.me/972538550511?text=שלום%20אני%20רוצה%20לבקש%20שיר" target="_blank" class="action-pill">בא לי לשמוע</a>
+                <button class="action-pill" onclick="openScheduleModal()">לוח שידורים</button>
+
+                <div class="tagline">מוזיקה באווירה אחרת</div>
+
+                <div class="social-icons-row">
+                    <a href="#" class="icon-circle" title="אקו״ם" onclick="alert('משודר ברישיון אקו״ם'); return false;">©</a>
+                    <a href="https://facebook.com" target="_blank" class="icon-circle" title="פייסבוק">f</a>
+                    <a href="https://wa.me/972538550511" target="_blank" class="icon-circle" title="וואצאפ">💬</a>
+                    <a href="mailto:info@tiamomusic.co.il" class="icon-circle" title="אימייל">✉</a>
+                </div>
+
+            </div>
+
+            <!-- מרכז המסך - נגן תוכניות -->
+            <div class="center-display">
+                
+                <div class="waveform-container">
+                    <div class="wave-bars" id="wave-bars-container">
+                        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                    </div>
+                </div>
+
+                <div class="now-playing-box">
+                    <div class="listening-label">אתם מאזינים לתוכנית</div>
+                    <div id="live-program-title" class="program-name-text">טוען תוכנית...</div>
+                    <div id="live-program-time" class="program-time-text">--:--</div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div></div> <!-- Spacer -->
+
     </div>
 
-    <header>
-        <h1 class="logo-title">TIAMO MUSIC</h1>
-        <p class="logo-subtitle">תחנת הרדיו הדיגיטלית שלך 24/7</p>
-    </header>
+    <!-- נגן סאונד נסתר -->
+    <audio id="audio-stream" src="https://liveradio.co.il:8030/stream" preload="none"></audio>
 
-    <main class="player-card">
-        <div id="live-badge" class="on-air-badge active">
-            <span class="dot"></span>
-            <span id="live-text">שידור חי באוויר</span>
+    <!-- מודאל אודות -->
+    <div id="aboutModal" class="modal-overlay">
+        <div class="modal-box">
+            <span class="close-modal" onclick="closeModal('aboutModal')">&times;</span>
+            <h3 style="color:#d4af37; margin-bottom:15px;">אודות TIAMO MUSIC</h3>
+            <p style="line-height:1.6; color:#cbd5e1;">תחנת הרדיו TIAMO MUSIC מביאה לכם את המוזיקה הטובה ביותר 24/7, בשידורים רציפים מתוך לוח השידורים והתוכניות האהובות. האזנה נעימה!</p>
         </div>
+    </div>
 
-        <div class="program-info">
-            <div id="program-name" class="program-title">טוען תוכנית משודרת...</div>
-            <div id="program-time" class="program-time">⏰ צפויה להסתיים ב: --:--</div>
+    <!-- מודאל לוח שידורים -->
+    <div id="scheduleModal" class="modal-overlay">
+        <div class="modal-box" style="max-width:650px;">
+            <span class="close-modal" onclick="closeModal('scheduleModal')">&times;</span>
+            <h3 style="color:#d4af37; margin-bottom:15px;">📅 לוח שידורים שבועי</h3>
+            <div id="schedule-content" style="max-height:350px; overflow-y:auto; font-size:14px;">
+                טוען לוח שידורים...
+            </div>
         </div>
-
-        <div class="play-btn-container">
-            <button id="play-button" class="main-play-btn" onclick="toggleRadioPlay()">▶</button>
-        </div>
-
-        <div class="volume-control">
-            <span style="font-size: 14px;">🔈</span>
-            <input type="range" id="volume-range" class="volume-slider" min="0" max="1" step="0.05" value="0.8" oninput="changeVolume(this.value)">
-            <span style="font-size: 14px;">🔊</span>
-        </div>
-
-        <div class="social-grid">
-            <a href="https://wa.me/972538550511?text=שלום%20אני%20רוצה%20לבקש%20שיר" target="_blank" class="social-btn">
-                <span>💬 בקשת שיר בוואצאפ</span>
-            </a>
-            <a href="https://facebook.com" target="_blank" class="social-btn">
-                <span>🌐 פייסבוק</span>
-            </a>
-        </div>
-    </main>
-
-    <footer>
-        <p>© 2026 TIAMO MUSIC RADIO - כל הזכויות שמורות</p>
-        <div class="acum-badge">
-            <span>📜 משודר ברישיון אקו"ם (AKUM)</span>
-        </div>
-    </footer>
-
-    <audio id="radio-audio" src="https://liveradio.co.il:8030/stream" preload="none"></audio>
+    </div>
 
     <script>
-        const audio = document.getElementById('radio-audio');
-        const playBtn = document.getElementById('play-button');
+        const audio = document.getElementById('audio-stream');
+        const playIcon = document.getElementById('play-btn-icon');
+        const waveBars = document.querySelectorAll('.wave-bar');
         let isPlaying = false;
 
-        function toggleRadioPlay() {
+        // עדכון תאריך נוכחי
+        const now = new Date();
+        const dateStr = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
+        document.getElementById('current-date-str').innerText = dateStr;
+
+        function togglePlay() {
             if (isPlaying) {
                 audio.pause();
-                playBtn.innerHTML = '▶';
+                playIcon.className = "play-icon-triangle";
+                playIcon.innerHTML = "";
+                waveBars.forEach(bar => bar.classList.remove('playing'));
                 isPlaying = false;
             } else {
                 audio.play().then(() => {
-                    playBtn.innerHTML = '⏸';
+                    playIcon.className = "pause-icon-bars";
+                    playIcon.innerHTML = '<div class="pause-bar"></div><div class="pause-bar"></div>';
+                    waveBars.forEach(bar => bar.classList.add('playing'));
                     isPlaying = true;
                 }).catch(err => {
-                    console.log("שגיאה בהפעלת השידור:", err);
-                    alert("לא ניתן להתחבר לשרת השידור כעת.");
+                    alert("לא ניתן להתחבר לשידור כרגע.");
                 });
             }
-        }
-
-        function changeVolume(val) {
-            audio.volume = val;
         }
 
         function fetchLiveStatus() {
@@ -293,11 +468,45 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        document.getElementById('program-name').innerText = data.program;
-                        document.getElementById('program-time').innerText = `⏰ צפויה להסתיים ב: ${data.end_time}`;
+                        document.getElementById('live-program-title').innerText = data.program;
+                        document.getElementById('live-program-time').innerText = data.end_time ? `עד ${data.end_time}` : '';
                     }
                 })
-                .catch(err => console.log('שגיאה בעדכון סטטוס התוכנית'));
+                .catch(err => console.log('שגיאה בטעינת תוכנית'));
+        }
+
+        function openAboutModal() {
+            document.getElementById('aboutModal').style.display = 'flex';
+        }
+
+        function openScheduleModal() {
+            const modal = document.getElementById('scheduleModal');
+            const content = document.getElementById('schedule-content');
+            modal.style.display = 'flex';
+            
+            fetch('/get_full_schedule')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data.length > 0) {
+                        let html = '<table style="width:100%; text-align:right; border-collapse:collapse;">';
+                        data.data.forEach((row, idx) => {
+                            if (idx >= 2 && row[1]) {
+                                html += `<tr style="border-bottom:1px solid #334155;">
+                                    <td style="padding:6px; color:#d4af37; font-weight:bold;">${row[1]}</td>
+                                    <td style="padding:6px;">${row[2] || '-'}</td>
+                                </tr>`;
+                            }
+                        });
+                        html += '</table>';
+                        content.innerHTML = html;
+                    } else {
+                        content.innerText = 'לא ניתן לטעון את לוח השידורים כעת.';
+                    }
+                });
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
         }
 
         fetchLiveStatus();
