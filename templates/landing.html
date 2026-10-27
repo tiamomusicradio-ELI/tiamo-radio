@@ -40,7 +40,6 @@
             position: relative;
         }
 
-        /* סרגל עליון / לוגו */
         header {
             margin-top: 20px;
             margin-bottom: 30px;
@@ -60,7 +59,6 @@
             margin-top: 5px;
         }
 
-        /* כרטיס הנגן המרכזי */
         .player-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -123,7 +121,6 @@
             color: var(--text-muted);
         }
 
-        /* כפתור הפעלה מרכזי */
         .play-btn-container {
             margin: 25px 0;
         }
@@ -150,7 +147,6 @@
             box-shadow: 0 0 35px rgba(243, 198, 83, 0.7);
         }
 
-        /* בקרת עוצמת שמע */
         .volume-control {
             display: flex;
             align-items: center;
@@ -165,7 +161,6 @@
             cursor: pointer;
         }
 
-        /* כפתורי קישורים ורשתות חברתיות */
         .social-grid {
             display: flex;
             justify-content: center;
@@ -195,12 +190,6 @@
             color: var(--primary-gold);
         }
 
-        .social-btn img {
-            width: 20px;
-            height: 20px;
-        }
-
-        /* פוטר ורישיון אקו"ם */
         footer {
             margin-top: 40px;
             font-size: 12px;
@@ -222,4 +211,97 @@
 </head>
 <body>
 
-    <!--
+    <!-- כפתור כניסה למערכת ניהול בפינה העליונה -->
+    <div style="position: absolute; top: 20px; left: 20px; z-index: 1000;">
+        <a href="/admin" class="social-btn" style="border-color: var(--primary-gold); color: var(--primary-gold); padding: 8px 14px; font-size: 12px;">
+            ⚙️ כניסה לניהול הבוט
+        </a>
+    </div>
+
+    <header>
+        <h1 class="logo-title">TIAMO MUSIC</h1>
+        <p class="logo-subtitle">תחנת הרדיו הדיגיטלית שלך 24/7</p>
+    </header>
+
+    <main class="player-card">
+        <div id="live-badge" class="on-air-badge active">
+            <span class="dot"></span>
+            <span id="live-text">שידור חי באוויר</span>
+        </div>
+
+        <div class="program-info">
+            <div id="program-name" class="program-title">טוען תוכנית משודרת...</div>
+            <div id="program-time" class="program-time">⏰ צפויה להסתיים ב: --:--</div>
+        </div>
+
+        <div class="play-btn-container">
+            <button id="play-button" class="main-play-btn" onclick="toggleRadioPlay()">▶</button>
+        </div>
+
+        <div class="volume-control">
+            <span style="font-size: 14px;">🔈</span>
+            <input type="range" id="volume-range" class="volume-slider" min="0" max="1" step="0.05" value="0.8" oninput="changeVolume(this.value)">
+            <span style="font-size: 14px;">🔊</span>
+        </div>
+
+        <div class="social-grid">
+            <a href="https://wa.me/972538550511?text=שלום%20אני%20רוצה%20לבקש%20שיר" target="_blank" class="social-btn">
+                <span>💬 בקשת שיר בוואצאפ</span>
+            </a>
+            <a href="https://facebook.com" target="_blank" class="social-btn">
+                <span>🌐 פייסבוק</span>
+            </a>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 TIAMO MUSIC RADIO - כל הזכויות שמורות</p>
+        <div class="acum-badge">
+            <span>📜 משודר ברישיון אקו"ם (AKUM)</span>
+        </div>
+    </footer>
+
+    <audio id="radio-audio" src="https://liveradio.co.il:8030/stream" preload="none"></audio>
+
+    <script>
+        const audio = document.getElementById('radio-audio');
+        const playBtn = document.getElementById('play-button');
+        let isPlaying = false;
+
+        function toggleRadioPlay() {
+            if (isPlaying) {
+                audio.pause();
+                playBtn.innerHTML = '▶';
+                isPlaying = false;
+            } else {
+                audio.play().then(() => {
+                    playBtn.innerHTML = '⏸';
+                    isPlaying = true;
+                }).catch(err => {
+                    console.log("שגיאה בהפעלת השידור:", err);
+                    alert("לא ניתן להתחבר לשרת השידור כעת.");
+                });
+            }
+        }
+
+        function changeVolume(val) {
+            audio.volume = val;
+        }
+
+        function fetchLiveStatus() {
+            fetch('/get_current_program_status')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('program-name').innerText = data.program;
+                        document.getElementById('program-time').innerText = `⏰ צפויה להסתיים ב: ${data.end_time}`;
+                    }
+                })
+                .catch(err => console.log('שגיאה בעדכון סטטוס התוכנית'));
+        }
+
+        fetchLiveStatus();
+        setInterval(fetchLiveStatus, 60000);
+    </script>
+</body>
+</html>
