@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TIAMO MUSIC RADIO - שידור חי</title>
     <link rel="shortcut icon" href="/static/favicon.ico">
     <style>
@@ -231,7 +231,7 @@
             margin-bottom: 30px;
             position: relative;
             overflow: hidden;
-            pointer-events: none; /* מונע מהתיבה לחסום לחיצות סביבה בטעות */
+            pointer-events: none;
         }
 
         .equalizer-bars {
@@ -411,6 +411,92 @@
             cursor: pointer;
             color: #94a3b8;
         }
+
+        /* ========================================== */
+        /* עיצוב והתאמה למסכים ניידים (Mobile Responsive) */
+        /* ========================================== */
+        @media screen and (max-width: 768px) {
+            body {
+                height: auto;
+                min-height: 100vh;
+                overflow-y: auto;
+            }
+
+            .page-container {
+                padding: 15px;
+                justify-content: flex-start;
+                gap: 20px;
+            }
+
+            .top-admin-btn {
+                top: 12px;
+                right: 15px;
+                padding: 4px 10px;
+                font-size: 11px;
+            }
+
+            .top-left-status {
+                top: 12px;
+                left: 15px;
+            }
+
+            .date-display {
+                font-size: 13px;
+            }
+
+            .main-header {
+                margin-top: 35px;
+            }
+
+            .main-logo {
+                font-size: 38px;
+            }
+
+            .content-layout {
+                flex-direction: column-reverse;
+                align-items: center;
+                gap: 25px;
+            }
+
+            .center-display {
+                margin-right: 0;
+                width: 100%;
+            }
+
+            .controls-column {
+                width: 100%;
+                max-width: 320px;
+            }
+
+            .waveform-box {
+                max-width: 100%;
+                height: 70px;
+            }
+
+            .program-name-text {
+                font-size: 24px;
+            }
+
+            .listening-label, .program-time-text {
+                font-size: 18px;
+            }
+
+            .modal-box, .request-modal-card {
+                width: 95%;
+                padding: 25px 15px;
+            }
+
+            .req-form-row {
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 5px;
+            }
+
+            .req-label {
+                min-width: 100%;
+                font-size: 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -544,7 +630,7 @@
                 "מוסיקה לנשמה" המיועדת לכל אלה שהמוסיקה מהווה עבורם נוסטלגיה, והערכה למלודיה מכל הסגנונות אך בדגש על מוסיקה אתנית מכל התפוצות , מוסיקה הפורצת את כל הגבולות מהמזרח, הדרום, הצפון והמערב.
             </p>
             <p style="line-height:1.75; color:#cbd5e1; font-size:15px; margin-bottom:12px;">
-                בתחנה תאזינו למוסיקה מכל גווני הקשת , וכמו תמיד תהיה מרוממת ומענגת , ותחבר בין אנשים תקופות ואהבה למוסיקה טובה.
+                בתחנה תאזינו למוסיקה מכל גווני הקשת , וכמו תמיד תהיה מרוממת ומענגת , ותחבר بين אנשים תקופות ואהבה למוסיקה טובה.
             </p>
             <p style="line-height:1.75; color:#cbd5e1; font-size:15px; margin-bottom:25px;">
                 כל זאת, לצד תוכניות קצרות של פודקאסטים בתחומי הייעוץ לחיים לטובת קהל מאזיני התחנה
