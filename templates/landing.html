@@ -214,7 +214,7 @@
             margin-right: 60px;
         }
 
-        /* תיבת גלי קול רחבה וגדולה יותר בדיוק כמו באתר המקורי */
+        /* תיבת גלי קול רחבה וגדולה יותר */
         .waveform-box {
             width: 100%;
             max-width: 720px;
@@ -224,7 +224,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 8px 25px;
+            padding: 4px 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
             margin-bottom: 30px;
             position: relative;
@@ -234,19 +234,19 @@
         .waves-gif {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover; /* מותאם למילוי מלא של גובה התיבה */
         }
 
         .equalizer-bars {
             display: flex;
             align-items: center;
             gap: 5px;
-            height: 50px;
+            height: 75px; /* מותאם לגובה המלא של התיבה */
             position: absolute;
         }
         .eq-bar {
             width: 5px;
-            height: 12px;
+            height: 15px;
             background: #3b82f6;
             border-radius: 3px;
             animation: eqWave 1s ease-in-out infinite alternate;
@@ -256,8 +256,8 @@
         .eq-bar:nth-child(4n) { animation-delay: 0.45s; background: #1d4ed8; }
 
         @keyframes eqWave {
-            0% { height: 8px; }
-            100% { height: 50px; }
+            0% { height: 15px; }
+            100% { height: 75px; } /* מגיע עד לגובה המקסימלי של התיבה */
         }
 
         .now-playing-box {
@@ -454,16 +454,16 @@
                         <img src="/static/media/facebook-icon.8c02ee7e7d97d2f06aef.png" alt="פייסבוק" class="icon-btn-img" onerror="this.onerror=null; this.src='/static/facebook.png';">
                     </a>
                     <a href="https://wa.me/972538550511" target="_blank" title="וואצאפ">
-                        <img src="/static/media/whatsapp-icon.bd6023bdc19e69eacc58.png" alt="וואצאפ" class="icon-btn-img">
+                        <img src="/static/media/whatsapp-icon.bd6023bdc19e69eacc58.png" alt="וואצאפ" class="icon-btn-img" onerror="this.onerror=null; this.src='/static/whatsapp.png';">
                     </a>
                     <a href="mailto:info@tiamomusic.co.il" title="אימייל">
-                        <img src="/static/media/email-icon.98d49a3020068d9bed4d.png" alt="אימייל" class="icon-btn-img">
+                        <img src="/static/media/email-icon.98d49a3020068d9bed4d.png" alt="אימייל" class="icon-btn-img" onerror="this.onerror=null; this.src='/static/email.png';">
                     </a>
                 </div>
 
             </div>
 
-            <!-- מרכז המסך - גלי קול רחבים וארוכים יותר -->
+            <!-- מרכז המסך - גלי קול מותאמים לגובה המלא של התיבה -->
             <div class="center-display">
                 
                 <div class="waveform-box">
@@ -504,204 +504,4 @@
             <form id="song-request-form" onsubmit="sendWhatsAppSongRequest(event)">
                 <div class="req-form-row">
                     <input type="text" id="req-name" class="req-input" required placeholder="">
-                    <label class="req-label">שם מלא</label>
-                </div>
-
-                <div class="req-form-row">
-                    <input type="text" id="req-song" class="req-input" required placeholder="">
-                    <label class="req-label">שם השיר המבוקש</label>
-                </div>
-
-                <div class="req-form-row">
-                    <input type="text" id="req-artist" class="req-input" placeholder="">
-                    <label class="req-label">שם הזמר</label>
-                </div>
-
-                <div class="req-form-row">
-                    <input type="text" id="req-note" class="req-input" placeholder="">
-                    <label class="req-label">בקשה מיוחדת</label>
-                </div>
-
-                <button type="submit" class="req-submit-btn">שליחה</button>
-            </form>
-
-            <button class="modal-back-btn" onclick="closeModal('requestModal')" title="חזרה">
-                <img src="/static/media/back.6991b3cc873ad2fe66f3.png" alt="חזרה" style="width:20px; height:20px;" onerror="this.parentNode.innerHTML='↩';">
-            </button>
-        </div>
-    </div>
-
-    <!-- מודאל אודות התחנה -->
-    <div id="aboutModal" class="modal-overlay">
-        <div class="modal-box">
-            <span class="close-modal-icon" onclick="closeModal('aboutModal')">&times;</span>
-            <h3 style="color:#d4af37; margin-bottom:18px; font-size:24px;">רדיו TIAMO MUSIC</h3>
-            <p style="line-height:1.75; color:#cbd5e1; font-size:15px; margin-bottom:12px;">
-                נועד לשדר למאזינים מוסיקה באוירה אחרת .
-            </p>
-            <p style="line-height:1.75; color:#cbd5e1; font-size:15px; margin-bottom:12px;">
-                "מוסיקה לנשמה" המיועדת לכל אלה שהמוסיקה מהווה עבורם נוסטלגיה, והערכה למלודיה מכל הסגנונות אך בדגש על מוסיקה אתנית מכל התפוצות , מוסיקה הפורצת את כל הגבולות מהמזרח, הדרום, הצפון והמערב.
-            </p>
-            <p style="line-height:1.75; color:#cbd5e1; font-size:15px; margin-bottom:12px;">
-                בתחנה תאזינו למוסיקה מכל גווני הקשת , וכמו תמיד תהיה מרוממת ומענגת , ותחבר בין אנשים תקופות ואהבה למוסיקה טובה.
-            </p>
-            <p style="line-height:1.75; color:#cbd5e1; font-size:15px; margin-bottom:25px;">
-                כל זאת, לצד תוכניות קצרות של פודקאסטים בתחומי הייעוץ לחיים לטובת קהל מאזיני התחנה
-            </p>
-            <p style="color:#ffd700; font-weight:bold; font-size:17px; margin-bottom:25px;">
-                האזנה נעימה לכולם.
-            </p>
-
-            <button class="modal-back-btn" onclick="closeModal('aboutModal')" title="חזרה">
-                <img src="/static/media/back.6991b3cc873ad2fe66f3.png" alt="חזרה" style="width:20px; height:20px;" onerror="this.parentNode.innerHTML='↩';">
-            </button>
-        </div>
-    </div>
-
-    <!-- מודאל לוח שידורים -->
-    <div id="scheduleModal" class="modal-overlay">
-        <div class="modal-box" style="max-width:650px;">
-            <span class="close-modal-icon" onclick="closeModal('scheduleModal')">&times;</span>
-            <h3 style="color:#d4af37; margin-bottom:15px; font-size:22px;">📅 לוח שידורים להיום (<span id="schedule-date-title">--/--/----</span>)</h3>
-            <div id="schedule-content" style="max-height:340px; overflow-y:auto; font-size:14px; padding-left:5px; margin-bottom:25px;">
-                טוען לוח שידורים...
-            </div>
-
-            <button class="modal-back-btn" onclick="closeModal('scheduleModal')" title="חזרה">
-                <img src="/static/media/back.6991b3cc873ad2fe66f3.png" alt="חזרה" style="width:20px; height:20px;" onerror="this.parentNode.innerHTML='↩';">
-            </button>
-        </div>
-    </div>
-
-    <script>
-        const audio = document.getElementById('audio-stream');
-        const playIcon = document.getElementById('play-btn-icon');
-        let isPlaying = false;
-
-        const now = new Date();
-        const dayStr = String(now.getDate()).padStart(2, '0');
-        const monthStr = String(now.getMonth() + 1).padStart(2, '0');
-        const yearStr = now.getFullYear();
-        const todayFormatted = `${dayStr}/${monthStr}/${yearStr}`;
-
-        (function setTodayDate() {
-            const dateElem = document.getElementById('current-date-str');
-            if (dateElem) {
-                dateElem.innerText = todayFormatted;
-            }
-            const schedDateTitle = document.getElementById('schedule-date-title');
-            if (schedDateTitle) {
-                schedDateTitle.innerText = todayFormatted;
-            }
-        })();
-
-        function togglePlay() {
-            if (isPlaying) {
-                audio.pause();
-                playIcon.className = "play-icon-triangle";
-                playIcon.innerHTML = "";
-                isPlaying = false;
-            } else {
-                audio.play().then(() => {
-                    playIcon.className = "pause-icon-bars";
-                    playIcon.innerHTML = '<div class="pause-bar"></div><div class="pause-bar"></div>';
-                    isPlaying = true;
-                }).catch(err => {
-                    alert("לא ניתן להתחבר לשידור כרגע.");
-                });
-            }
-        }
-
-        function fetchLiveStatus() {
-            fetch('/get_current_program_status')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('live-program-title').innerText = data.program;
-                        document.getElementById('live-program-time').innerText = data.end_time ? `עד ${data.end_time}` : '';
-                    }
-                })
-                .catch(err => console.log('שגיאה בטעינת תוכנית'));
-        }
-
-        function openRequestModal() {
-            document.getElementById('requestModal').style.display = 'flex';
-        }
-
-        function sendWhatsAppSongRequest(e) {
-            e.preventDefault();
-            const name = document.getElementById('req-name').value.trim();
-            const song = document.getElementById('req-song').value.trim();
-            const artist = document.getElementById('req-artist').value.trim();
-            const note = document.getElementById('req-note').value.trim();
-
-            let message = `שלום TIAMO MUSIC! 👋\nאני רוצה לבקש שיר:\n`;
-            message += `👤 *שם מלא:* ${name}\n`;
-            message += `🎵 *שיר מבוקש:* ${song}\n`;
-            if (artist) message += `🎤 *זמר/ת:* ${artist}\n`;
-            if (note) message += `💬 *בקשה מיוחדת:* ${note}\n`;
-
-            const encodedMsg = encodeURIComponent(message);
-            const waUrl = `https://wa.me/972538550511?text=${encodedMsg}`;
-            
-            window.open(waUrl, '_blank');
-            closeModal('requestModal');
-        }
-
-        function openAboutModal() {
-            document.getElementById('aboutModal').style.display = 'flex';
-        }
-
-        function openScheduleModal() {
-            const modal = document.getElementById('scheduleModal');
-            const content = document.getElementById('schedule-content');
-            modal.style.display = 'flex';
-            content.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">טוען את לוח השידורים להיום...</div>';
-
-            fetch('/get_full_schedule')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.data && data.data.length > 0) {
-                        let html = '<table style="width:100%; text-align:right; border-collapse:collapse; margin-top:5px;">';
-                        let foundTodayItems = false;
-
-                        data.data.forEach((row, idx) => {
-                            if (idx >= 2 && row) {
-                                const rowDateStr = (row[0] || '').trim();
-                                const rowTimeStr = (row[1] || '').trim();
-                                const rowNameStr = (row[2] || '').trim();
-
-                                if (rowDateStr === todayFormatted || rowDateStr.includes(dayStr)) {
-                                    html += `<tr style="border-bottom:1px solid #334155;">
-                                        <td style="padding:8px; color:#d4af37; font-weight:bold; white-space:nowrap;">${rowTimeStr}</td>
-                                        <td style="padding:8px; color:#fff;">${rowNameStr || '-'}</td>
-                                    </tr>`;
-                                    foundTodayItems = true;
-                                }
-                            }
-                        });
-                        html += '</table>';
-
-                        if (foundTodayItems) {
-                            content.innerHTML = html;
-                        } else {
-                            content.innerHTML = `<div style="text-align:center; padding:20px; color:#cbd5e1;">אין שידורים רשומים לתאריך הנוכחי (${todayFormatted}) בטווח השעות 00:00 עד 00:00.</div>`;
-                        }
-                    } else {
-                        content.innerHTML = '<div style="text-align:center; padding:20px; color:#ef4444;">לא ניתן לטעון לוח שידורים כעת.</div>';
-                    }
-                })
-                .catch(err => {
-                    content.innerHTML = '<div style="text-align:center; padding:20px; color:#ef4444;">שגיאה בחיבור לשרת.</div>';
-                });
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
-        }
-
-        fetchLiveStatus();
-        setInterval(fetchLiveStatus, 30000);
-    </script>
-</body>
-</html>
+                    <label class="req-label">שם מלא</label
