@@ -112,6 +112,8 @@
             gap: 12px;
             width: 220px;
             direction: rtl;
+            position: relative;
+            z-index: 20;
         }
 
         /* כפתור הפעלה סאונד */
@@ -214,7 +216,7 @@
             margin-right: 60px;
         }
 
-        /* תיבת גלי קול רחבה וגדולה יותר בדיוק כמו באתר המקורי */
+        /* תיבת גלי קול רחבה, פסים גבוהים ובולטים שממלאים את כל התיבה */
         .waveform-box {
             width: 100%;
             max-width: 720px;
@@ -229,23 +231,19 @@
             margin-bottom: 30px;
             position: relative;
             overflow: hidden;
-        }
-
-        .waves-gif {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            pointer-events: none; /* מונע מהתיבה לחסום לחיצות סביבה בטעות */
         }
 
         .equalizer-bars {
             display: flex;
             align-items: center;
-            gap: 5px;
+            justify-content: center;
+            gap: 6px;
             height: 75px;
-            position: absolute;
+            width: 100%;
         }
         .eq-bar {
-            width: 5px;
+            width: 6px;
             height: 15px;
             background: #3b82f6;
             border-radius: 3px;
@@ -254,6 +252,7 @@
         .eq-bar:nth-child(2n) { animation-delay: 0.15s; background: #2563eb; }
         .eq-bar:nth-child(3n) { animation-delay: 0.3s; background: #d4af37; }
         .eq-bar:nth-child(4n) { animation-delay: 0.45s; background: #1d4ed8; }
+        .eq-bar:nth-child(5n) { animation-delay: 0.2s; background: #9333ea; }
 
         @keyframes eqWave {
             0% { height: 15px; }
@@ -282,7 +281,7 @@
             color: #ffffff;
         }
 
-        /* מודאלים הכלליים - מוגדרים כך שלא יחסמו לחיצות ויפתחו כראוי */
+        /* מודאלים הכלליים */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -466,19 +465,18 @@
 
             </div>
 
-            <!-- מרכז המסך - גלי קול רחבים וארוכים יותר -->
+            <!-- מרכז המסך - גלי קול רחבים וגבוהים הממלאים את כל התיבה -->
             <div class="center-display">
                 
                 <div class="waveform-box">
-                    <img src="/static/media/waves.ba97a297acb1d1a2d0c6.gif" alt="Audio Waves" class="waves-gif" onerror="this.style.display='none'; document.getElementById('css-equalizer').style.display='flex';">
-                    
-                    <div id="css-equalizer" class="equalizer-bars" style="display:none;">
+                    <div class="equalizer-bars">
                         <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
                         <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
                         <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
                         <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
                         <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
                         <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+                        <div class="eq-bar"></div><div class="eq-bar"></div>
                     </div>
                 </div>
 
@@ -585,4 +583,145 @@
         const dayStr = String(now.getDate()).padStart(2, '0');
         const monthStr = String(now.getMonth() + 1).padStart(2, '0');
         const yearStr = now.getFullYear();
-        const todayFormatted = `${dayStr}/${month
+        const todayFormatted = `${dayStr}/${monthStr}/${yearStr}`;
+
+        (function setTodayDate() {
+            const dateElem = document.getElementById('current-date-str');
+            if (dateElem) {
+                dateElem.innerText = todayFormatted;
+            }
+            const schedDateTitle = document.getElementById('schedule-date-title');
+            if (schedDateTitle) {
+                schedDateTitle.innerText = todayFormatted;
+            }
+        })();
+
+        function togglePlay() {
+            if (isPlaying) {
+                audio.pause();
+                playIcon.className = "play-icon-triangle";
+                playIcon.innerHTML = "";
+                isPlaying = false;
+            } else {
+                audio.play().then(() => {
+                    playIcon.className = "pause-icon-bars";
+                    playIcon.innerHTML = '<div class="pause-bar"></div><div class="pause-bar"></div>';
+                    isPlaying = true;
+                }).catch(err => {
+                    alert("לא ניתן להתחבר לשידור כרגע.");
+                });
+            }
+        }
+
+        function fetchLiveStatus() {
+            fetch('/get_current_program_status')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('live-program-title').innerText = data.program;
+                        document.getElementById('live-program-time').innerText = data.end_time ? `עד ${data.end_time}` : '';
+                    }
+                })
+                .catch(err => console.log('שגיאה בטעינת תוכנית'));
+        }
+
+        function openRequestModal() {
+            document.getElementById('requestModal').style.display = 'flex';
+        }
+
+        function sendWhatsAppSongRequest(e) {
+            e.preventDefault();
+            const name = document.getElementById('req-name').value.trim();
+            const song = document.getElementById('req-song').value.trim();
+            const artist = document.getElementById('req-artist').value.trim();
+            const note = document.getElementById('req-note').value.trim();
+
+            let message = `שלום TIAMO MUSIC! 👋\nאני רוצה לבקש שיר:\n`;
+            message += `👤 *שם מלא:* ${name}\n`;
+            message += `🎵 *שיר מבוקש:* ${song}\n`;
+            if (artist) message += `🎤 *זמר/ת:* ${artist}\n`;
+            if (note) message += `💬 *בקשה מיוחדת:* ${note}\n`;
+
+            const encodedMsg = encodeURIComponent(message);
+            const waUrl = `https://wa.me/972538550511?text=${encodedMsg}`;
+            
+            window.open(waUrl, '_blank');
+            closeModal('requestModal');
+        }
+
+        function openAboutModal() {
+            document.getElementById('aboutModal').style.display = 'flex';
+        }
+
+        function openScheduleModal() {
+            const modal = document.getElementById('scheduleModal');
+            const content = document.getElementById('schedule-content');
+            modal.style.display = 'flex';
+            content.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">טוען את לוח השידורים להיום...</div>';
+
+            fetch('/get_full_schedule')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data && data.data.length > 0) {
+                        let html = '<table style="width:100%; text-align:right; border-collapse:collapse; margin-top:5px;">';
+                        let rowCount = 0;
+
+                        data.data.forEach((row, idx) => {
+                            if (idx >= 2 && row) {
+                                const rowDateStr = (row[0] || '').trim();
+                                const rowTimeStr = (row[1] || '').trim();
+                                const rowNameStr = (row[2] || '').trim();
+
+                                if (rowTimeStr && rowNameStr) {
+                                    if (!rowDateStr || rowDateStr.includes(dayStr) || rowDateStr.includes(todayFormatted)) {
+                                        html += `<tr style="border-bottom:1px solid #334155;">
+                                            <td style="padding:8px; color:#d4af37; font-weight:bold; white-space:nowrap;">${rowTimeStr}</td>
+                                            <td style="padding:8px; color:#fff;">${rowNameStr}</td>
+                                        </tr>`;
+                                        rowCount++;
+                                    }
+                                }
+                            }
+                        });
+                        html += '</table>';
+
+                        if (rowCount > 0) {
+                            content.innerHTML = html;
+                        } else {
+                            let fallbackHtml = '<table style="width:100%; text-align:right; border-collapse:collapse; margin-top:5px;">';
+                            let fallbackCount = 0;
+                            data.data.forEach((row, idx) => {
+                                if (idx >= 2 && row && (row[1] || row[2])) {
+                                    fallbackHtml += `<tr style="border-bottom:1px solid #334155;">
+                                        <td style="padding:8px; color:#d4af37; font-weight:bold; white-space:nowrap;">${row[1] || ''}</td>
+                                        <td style="padding:8px; color:#fff;">${row[2] || '-'}</td>
+                                    </tr>`;
+                                    fallbackCount++;
+                                }
+                            });
+                            fallbackHtml += '</table>';
+                            
+                            if (fallbackCount > 0) {
+                                content.innerHTML = fallbackHtml;
+                            } else {
+                                content.innerHTML = `<div style="text-align:center; padding:20px; color:#cbd5e1;">לא נמצאו שידורים פעילים כרגע בקובץ האקסל.</div>`;
+                            }
+                        }
+                    } else {
+                        content.innerHTML = '<div style="text-align:center; padding:20px; color:#ef4444;">לא ניתן לטעון לוח שידורים כעת.</div>';
+                    }
+                })
+                .catch(err => {
+                    content.innerHTML = '<div style="text-align:center; padding:20px; color:#ef4444;">שגיאה בחיבור לשרת.</div>';
+                });
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        fetchLiveStatus();
+        setInterval(fetchLiveStatus, 30000);
+    </script>
+</body>
+</html>
