@@ -26,7 +26,7 @@ except Exception as e:
     print(f"שגיאה בהתחברות: {e}")
     exit()
 
-excel_file = 'עדכון תוכנית שידורים TIAMO - 4.8.26.xlsx'
+excel_file = "עדכון תוכנית שידורים TIAMO - שבועי.xlsx"
 last_played_program = None
 
 def fix_hebrew(text):

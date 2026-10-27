@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIAMO MUSIC RADIO - דף הבית והאזנה לשידור חי</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --card-border: #334155;
+            --primary-gold: #d4af37;
+            --gold-hover: #f3c653;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success-green: #10b981;
+            --danger-red: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at top center, #1e293b 0%, #0f172a 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            direction: rtl;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* סרגל עליון / לוגו */
+        header {
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        .logo-title {
+            color: var(--primary-gold);
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .logo-subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* כרטיס הנגן המרכזי */
+        .player-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 35px 25px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .on-air-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger-red);
+            border: 1px solid var(--danger-red);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .on-air-badge.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-green);
+            border-color: var(--success-green);
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background-color: currentColor;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        .program-info {
+            margin-bottom: 25px;
+        }
+
+        .program-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .program-time {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* כפתור הפעלה מרכזי */
+        .play-btn-container {
+            margin: 25px 0;
+        }
+
+        .main-play-btn {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-gold), #b89228);
+            border: none;
+            color: #111;
+            font-size: 32px;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-play-btn:hover {
+            transform: scale(1.08);
+            background: linear-gradient(135deg, var(--gold-hover), var(--primary-gold));
+            box-shadow: 0 0 35px rgba(243, 198, 83, 0.7);
+        }
+
+        /* בקרת עוצמת שמע */
+        .volume-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .volume-slider {
+            width: 140px;
+            accent-color: var(--primary-gold);
+            cursor: pointer;
+        }
+
+        /* כפתורי קישורים ורשתות חברתיות */
+        .social-grid {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 10px 18px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .social-btn:hover {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: var(--primary-gold);
+            color: var(--primary-gold);
+        }
+
+        .social-btn img {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* פוטר ורישיון אקו"ם */
+        footer {
+            margin-top: 40px;
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .acum-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0.7;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+
+    <!--
