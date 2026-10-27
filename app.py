@@ -149,9 +149,16 @@ scanner_thread = threading.Thread(target=background_whatsapp_scanner, daemon=Tru
 scanner_thread.start()
 
 # --- עמודי המערכת ---
+
+# --- דף הבית הציבורי למאזינים (ללא צורך בסיסמה) ---
 @app.route('/')
-@requires_auth
 def index():
+    return render_template('landing.html')
+
+# --- דף ניהול הבוט והרדיו (מוגן בסיסמה) ---
+@app.route('/admin')
+@requires_auth
+def admin_panel():
     return render_template('index.html')
 
 # --- שליפת התיקיות הראשיות מהדרייב (עבור דף ניהול מדיה) ---
@@ -223,8 +230,8 @@ def stream_preview(file_id):
     except Exception as e:
         return str(e), 500
 
+# נתיב ציבורי המאפשר לדף הנחיתה להציג את התוכנית המשודרת כעת
 @app.route('/get_current_program_status')
-@requires_auth
 def get_current_program_status():
     try:
         df = pd.read_excel(EXCEL_FILE, sheet_name='תוכנית חודשית', header=None)
