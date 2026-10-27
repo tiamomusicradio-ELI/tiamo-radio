@@ -214,7 +214,7 @@
             margin-right: 60px;
         }
 
-        /* תיבת גלי קול רחבה וגדולה יותר */
+        /* תיבת גלי קול רחבה וגדולה יותר בדיוק כמו באתר המקורי */
         .waveform-box {
             width: 100%;
             max-width: 720px;
@@ -234,14 +234,14 @@
         .waves-gif {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* מותאם למילוי מלא של גובה התיבה */
+            object-fit: cover;
         }
 
         .equalizer-bars {
             display: flex;
             align-items: center;
             gap: 5px;
-            height: 75px; /* מותאם לגובה המלא של התיבה */
+            height: 75px;
             position: absolute;
         }
         .eq-bar {
@@ -257,7 +257,7 @@
 
         @keyframes eqWave {
             0% { height: 15px; }
-            100% { height: 75px; } /* מגיע עד לגובה המקסימלי של התיבה */
+            100% { height: 75px; }
         }
 
         .now-playing-box {
@@ -282,13 +282,16 @@
             color: #ffffff;
         }
 
-        /* מודאלים הכלליים */
+        /* מודאלים הכלליים - מוגדרים כך שלא יחסמו לחיצות ויפתחו כראוי */
         .modal-overlay {
             display: none;
             position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh;
             background: rgba(0,0,0,0.85);
-            z-index: 10000;
+            z-index: 99999;
             align-items: center;
             justify-content: center;
             backdrop-filter: blur(4px);
@@ -309,7 +312,7 @@
 
         /* מודאל "בא לי לשמוע" */
         .request-modal-card {
-            background: rgba(20, 20, 25, 0.88);
+            background: rgba(20, 20, 25, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.25);
             border-radius: 20px;
             width: 90%;
@@ -463,7 +466,7 @@
 
             </div>
 
-            <!-- מרכז המסך - גלי קול מותאמים לגובה המלא של התיבה -->
+            <!-- מרכז המסך - גלי קול רחבים וארוכים יותר -->
             <div class="center-display">
                 
                 <div class="waveform-box">
@@ -504,4 +507,82 @@
             <form id="song-request-form" onsubmit="sendWhatsAppSongRequest(event)">
                 <div class="req-form-row">
                     <input type="text" id="req-name" class="req-input" required placeholder="">
-                    <label class="req-label">שם מלא</label
+                    <label class="req-label">שם מלא</label>
+                </div>
+
+                <div class="req-form-row">
+                    <input type="text" id="req-song" class="req-input" required placeholder="">
+                    <label class="req-label">שם השיר המבוקש</label>
+                </div>
+
+                <div class="req-form-row">
+                    <input type="text" id="req-artist" class="req-input" placeholder="">
+                    <label class="req-label">שם הזמר</label>
+                </div>
+
+                <div class="req-form-row">
+                    <input type="text" id="req-note" class="req-input" placeholder="">
+                    <label class="req-label">בקשה מיוחדת</label>
+                </div>
+
+                <button type="submit" class="req-submit-btn">שליחה</button>
+            </form>
+
+            <button class="modal-back-btn" onclick="closeModal('requestModal')" title="חזרה">
+                <img src="/static/media/back.6991b3cc873ad2fe66f3.png" alt="חזרה" style="width:20px; height:20px;" onerror="this.parentNode.innerHTML='↩';">
+            </button>
+        </div>
+    </div>
+
+    <!-- מודאל אודות התחנה -->
+    <div id="aboutModal" class="modal-overlay">
+        <div class="modal-box">
+            <span class="close-modal-icon" onclick="closeModal('aboutModal')">&times;</span>
+            <h3 style="color:#d4af37; margin-bottom:18px; font-size:24px;">רדיו TIAMO MUSIC</h3>
+            <p style="line-height:1.75; color:#cbd5e1; font-size:15px; margin-bottom:12px;">
+                נועד לשדר למאזינים מוסיקה באוירה אחרת .
+            </p>
+            <p style="line-height:1.75; color:#cbd5e1; font-size:15px; margin-bottom:12px;">
+                "מוסיקה לנשמה" המיועדת לכל אלה שהמוסיקה מהווה עבורם נוסטלגיה, והערכה למלודיה מכל הסגנונות אך בדגש על מוסיקה אתנית מכל התפוצות , מוסיקה הפורצת את כל הגבולות מהמזרח, הדרום, הצפון והמערב.
+            </p>
+            <p style="line-height:1.75; color:#cbd5e1; font-size:15px; margin-bottom:12px;">
+                בתחנה תאזינו למוסיקה מכל גווני הקשת , וכמו תמיד תהיה מרוממת ומענגת , ותחבר בין אנשים תקופות ואהבה למוסיקה טובה.
+            </p>
+            <p style="line-height:1.75; color:#cbd5e1; font-size:15px; margin-bottom:25px;">
+                כל זאת, לצד תוכניות קצרות של פודקאסטים בתחומי הייעוץ לחיים לטובת קהל מאזיני התחנה
+            </p>
+            <p style="color:#ffd700; font-weight:bold; font-size:17px; margin-bottom:25px;">
+                האזנה נעימה לכולם.
+            </p>
+
+            <button class="modal-back-btn" onclick="closeModal('aboutModal')" title="חזרה">
+                <img src="/static/media/back.6991b3cc873ad2fe66f3.png" alt="חזרה" style="width:20px; height:20px;" onerror="this.parentNode.innerHTML='↩';">
+            </button>
+        </div>
+    </div>
+
+    <!-- מודאל לוח שידורים -->
+    <div id="scheduleModal" class="modal-overlay">
+        <div class="modal-box" style="max-width:650px;">
+            <span class="close-modal-icon" onclick="closeModal('scheduleModal')">&times;</span>
+            <h3 style="color:#d4af37; margin-bottom:15px; font-size:22px;">📅 לוח שידורים להיום (<span id="schedule-date-title">--/--/----</span>)</h3>
+            <div id="schedule-content" style="max-height:340px; overflow-y:auto; font-size:14px; padding-left:5px; margin-bottom:25px;">
+                טוען לוח שידורים...
+            </div>
+
+            <button class="modal-back-btn" onclick="closeModal('scheduleModal')" title="חזרה">
+                <img src="/static/media/back.6991b3cc873ad2fe66f3.png" alt="חזרה" style="width:20px; height:20px;" onerror="this.parentNode.innerHTML='↩';">
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('audio-stream');
+        const playIcon = document.getElementById('play-btn-icon');
+        let isPlaying = false;
+
+        const now = new Date();
+        const dayStr = String(now.getDate()).padStart(2, '0');
+        const monthStr = String(now.getMonth() + 1).padStart(2, '0');
+        const yearStr = now.getFullYear();
+        const todayFormatted = `${dayStr}/${month
