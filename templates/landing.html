@@ -204,7 +204,7 @@
             border-color: #d4af37;
         }
 
-        /* מרכז המסך - נגן ויזואלי רחב וארוך יותר */
+        /* מרכז המסך - נגן ויזואלי */
         .center-display {
             flex: 1;
             display: flex;
@@ -216,7 +216,7 @@
             margin-right: 60px;
         }
 
-        /* תיבת גלי קול רחבה, פסים גבוהים ובולטים שממלאים את כל התיבה */
+        /* תיבת גלי קול רחבה המציגה את האנימציה המקורית מקצה לקצה */
         .waveform-box {
             width: 100%;
             max-width: 720px;
@@ -226,7 +226,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 4px 15px;
+            padding: 5px 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
             margin-bottom: 30px;
             position: relative;
@@ -234,29 +234,11 @@
             pointer-events: none;
         }
 
-        .equalizer-bars {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            height: 75px;
+        .waves-gif {
             width: 100%;
-        }
-        .eq-bar {
-            width: 6px;
-            height: 15px;
-            background: #3b82f6;
-            border-radius: 3px;
-            animation: eqWave 1s ease-in-out infinite alternate;
-        }
-        .eq-bar:nth-child(2n) { animation-delay: 0.15s; background: #2563eb; }
-        .eq-bar:nth-child(3n) { animation-delay: 0.3s; background: #d4af37; }
-        .eq-bar:nth-child(4n) { animation-delay: 0.45s; background: #1d4ed8; }
-        .eq-bar:nth-child(5n) { animation-delay: 0.2s; background: #9333ea; }
-
-        @keyframes eqWave {
-            0% { height: 15px; }
-            100% { height: 75px; }
+            height: 100%;
+            object-fit: contain; /* שומר על פרופורציות גלי הקול המקוריים לכל אורך התיבה */
+            opacity: 0.85; /* מעניק מראה עדין ואיכותי יותר */
         }
 
         .now-playing-box {
@@ -412,9 +394,7 @@
             color: #94a3b8;
         }
 
-        /* ========================================== */
-        /* עיצוב והתאמה למסכים ניידים (Mobile Responsive) */
-        /* ========================================== */
+        /* התאמה למסכים ניידים (Mobile Responsive) */
         @media screen and (max-width: 768px) {
             body {
                 height: auto;
@@ -551,19 +531,11 @@
 
             </div>
 
-            <!-- מרכז המסך - גלי קול רחבים וגבוהים הממלאים את כל התיבה -->
+            <!-- מרכז המסך - גלי הקול המקוריים בתיבה רחבה -->
             <div class="center-display">
                 
                 <div class="waveform-box">
-                    <div class="equalizer-bars">
-                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
-                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
-                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
-                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
-                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
-                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
-                        <div class="eq-bar"></div><div class="eq-bar"></div>
-                    </div>
+                    <img src="/static/media/waves.ba97a297acb1d1a2d0c6.gif" alt="Audio Waves" class="waves-gif" onerror="this.onerror=null; this.src='/static/waves.gif';">
                 </div>
 
                 <div class="now-playing-box">
@@ -630,7 +602,7 @@
                 "מוסיקה לנשמה" המיועדת לכל אלה שהמוסיקה מהווה עבורם נוסטלגיה, והערכה למלודיה מכל הסגנונות אך בדגש על מוסיקה אתנית מכל התפוצות , מוסיקה הפורצת את כל הגבולות מהמזרח, הדרום, הצפון והמערב.
             </p>
             <p style="line-height:1.75; color:#cbd5e1; font-size:15px; margin-bottom:12px;">
-                בתחנה תאזינו למוסיקה מכל גווני הקשת , וכמו תמיד תהיה מרוממת ומענגת , ותחבר بين אנשים תקופות ואהבה למוסיקה טובה.
+                בתחנה תאזינו למוסיקה מכל גווני הקשת , וכמו תמיד תהיה מרוממת ומענגת , ותחבר בין אנשים תקופות ואהבה למוסיקה טובה.
             </p>
             <p style="line-height:1.75; color:#cbd5e1; font-size:15px; margin-bottom:25px;">
                 כל זאת, לצד תוכניות קצרות של פודקאסטים בתחומי הייעוץ לחיים לטובת קהל מאזיני התחנה
