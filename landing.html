@@ -1,8 +1,3 @@
-<!-- כפתור כניסה למערכת ניהול בפינה העליונה -->
-<div style="position: absolute; top: 20px; left: 20px;">
-    <a href="/admin" class="social-btn" style="border-color: var(--primary-gold); color: var(--primary-gold); padding: 8px 14px; font-size: 12px;">
-        ⚙️ כניסה לניהול הבוט
-    </a>
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -42,9 +37,9 @@
             direction: rtl;
             text-align: center;
             padding: 20px;
+            position: relative;
         }
 
-        /* סרגל עליון / לוגו */
         header {
             margin-top: 20px;
             margin-bottom: 30px;
@@ -64,7 +59,6 @@
             margin-top: 5px;
         }
 
-        /* כרטיס הנגן המרכזי */
         .player-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -127,7 +121,6 @@
             color: var(--text-muted);
         }
 
-        /* כפתור הפעלה מרכזי */
         .play-btn-container {
             margin: 25px 0;
         }
@@ -154,7 +147,6 @@
             box-shadow: 0 0 35px rgba(243, 198, 83, 0.7);
         }
 
-        /* בקרת עוצמת שמע */
         .volume-control {
             display: flex;
             align-items: center;
@@ -169,7 +161,6 @@
             cursor: pointer;
         }
 
-        /* כפתורי קישורים ורשתות חברתיות */
         .social-grid {
             display: flex;
             justify-content: center;
@@ -199,12 +190,6 @@
             color: var(--primary-gold);
         }
 
-        .social-btn img {
-            width: 20px;
-            height: 20px;
-        }
-
-        /* פוטר ורישיון אקו"ם */
         footer {
             margin-top: 40px;
             font-size: 12px;
@@ -225,6 +210,13 @@
     </style>
 </head>
 <body>
+
+    <!-- כפתור כניסה למערכת ניהול בפינה העליונה -->
+    <div style="position: absolute; top: 20px; left: 20px; z-index: 1000;">
+        <a href="/admin" class="social-btn" style="border-color: var(--primary-gold); color: var(--primary-gold); padding: 8px 14px; font-size: 12px;">
+            ⚙️ כניסה לניהול הבוט
+        </a>
+    </div>
 
     <header>
         <h1 class="logo-title">TIAMO MUSIC</h1>
@@ -269,7 +261,6 @@
         </div>
     </footer>
 
-    <!-- אלמנט הנגן המחובר לשרת הסטרימינג -->
     <audio id="radio-audio" src="https://liveradio.co.il:8030/stream" preload="none"></audio>
 
     <script>
@@ -309,7 +300,6 @@
                 .catch(err => console.log('שגיאה בעדכון סטטוס התוכנית'));
         }
 
-        // טעינה ראשונית ועדכון סטטוס התוכנית כל דקה
         fetchLiveStatus();
         setInterval(fetchLiveStatus, 60000);
     </script>
