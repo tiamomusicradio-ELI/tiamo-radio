@@ -216,7 +216,7 @@
             margin-right: 60px;
         }
 
-        /* תיבת גלי קול רחבה המציגה את האנימציה המקורית מקצה לקצה */
+        /* תיבת גלי קול רחבה שתופסת את כל הרוחב והגובה בצורה מלאה ומושלמת */
         .waveform-box {
             width: 100%;
             max-width: 720px;
@@ -226,19 +226,19 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 5px 15px;
+            padding: 2px 10px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
             margin-bottom: 30px;
             position: relative;
             overflow: hidden;
-            pointer-events: none;
+            pointer-events: none; /* מבטיח שהלחיצות מסביב יעבדו כרגיל */
         }
 
         .waves-gif {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* שומר על פרופורציות גלי הקול המקוריים לכל אורך התיבה */
-            opacity: 0.85; /* מעניק מראה עדין ואיכותי יותר */
+            object-fit: fill; /* ממלא את כל התיבה מקצה לקצה לגובה ולרוחב */
+            opacity: 0.9;
         }
 
         .now-playing-box {
@@ -531,7 +531,7 @@
 
             </div>
 
-            <!-- מרכז המסך - גלי הקול המקוריים בתיבה רחבה -->
+            <!-- מרכז המסך - גלי קול מקוריים פרוסים על כל התיבה -->
             <div class="center-display">
                 
                 <div class="waveform-box">
