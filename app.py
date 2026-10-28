@@ -267,16 +267,4 @@ def get_current_program_status():
             'current_week': get_current_week_of_month()
         })
     except Exception as e:
-        return jsonify({'success': False, 'program': 'שגיאה בקריאת אקסל', 'end_time': '--:--', 'current_week': 1})
-
-@app.route('/get_full_schedule')
-@requires_auth
-def get_full_schedule():
-    try:
-        df = pd.read_excel(EXCEL_FILE, sheet_name='תוכנית חודשית', header=None)
-        schedule_data = df.fillna("").values.tolist()
-        return jsonify({'success': True, 'data': schedule_data})
-    except Exception as e:
-        return jsonify({'success': False, 'data': []})
-
-@app.route('/whatsapp_webhook',
+        return jsonify({'success': False
