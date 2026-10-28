@@ -20,11 +20,11 @@ SCOPES = ['https://www.googleapis.com/auth/drive']
  
 PARENT_FOLDER_ID = os.environ.get('GOOGLE_DRIVE_FOLDER_ID', '1tAy9l49lJAbMWRVJdoK4b2uEiU6vQLH-')
  
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "tiamo123"
- 
+ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
+   ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
+
 def check_auth(username, password):
-    return username == ADMIN_USERNAME and password == ADMIN_PASSWORD
+       return bool(ADMIN_PASSWORD) and username == ADMIN_USERNAME and password == ADMIN_PASSWORD
  
 def authenticate():
     return Response(
