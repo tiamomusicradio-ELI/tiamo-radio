@@ -173,7 +173,9 @@ def get_main_programs():
         results = service.files().list(
             q=f"'{parent_folder_id}' in parents and trashed = false",
             pageSize=50,
-            fields="files(id, name, mimeType)"
+            fields="files(id, name, mimeType)",
+            supportsAllDrives=True,
+            includeItemsFromAllDrives=True
         ).execute()
         items = results.get('files', [])
         
@@ -197,7 +199,9 @@ def get_sub_items():
         results = service.files().list(
             q=f"'{folder_id}' in parents and trashed = false",
             pageSize=100,
-            fields="files(id, name, mimeType)"
+            fields="files(id, name, mimeType)",
+            supportsAllDrives=True,
+            includeItemsFromAllDrives=True
         ).execute()
         items = results.get('files', [])
         
@@ -340,10 +344,17 @@ def upload_file():
         file_mimetype = uploaded_file.mimetype or 'application/octet-stream'
         media = MediaIoBaseUpload(io.BytesIO(uploaded_file.read()), mimetype=file_mimetype, resumable=True)
         
-        service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+        # נוסף supportsAllDrives=True כדי לאפשר כתיבה תקינה לתיקיות משותפות
+        service.files().create(
+            body=file_metadata, 
+            media_body=media, 
+            fields='id',
+            supportsAllDrives=True
+        ).execute()
         
         return jsonify({'success': True})
     except Exception as e:
+        print(f"Upload Error: {str(e)}", flush=True)
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/delete_file', methods=['POST'])
@@ -353,7 +364,10 @@ def delete_file():
         data = request.get_json()
         file_id = data.get('file_id')
         service = get_drive_service()
-        service.files().delete(fileId=file_id).execute()
+        service.files().delete(
+            fileId=file_id,
+            supportsAllDrives=True
+        ).execute()
         return jsonify({'success': True})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
@@ -383,16 +397,3 @@ def search_playlist_in_drive():
             })
             
         return jsonify({'success': True, 'results': results})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
-
-@app.route('/manual_scan_whatsapp', methods=['POST'])
-@requires_auth
-def manual_scan_whatsapp():
-    try:
-        return jsonify({'success': True, 'message': 'הסריקה הושלמה בהצלחה!'})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
