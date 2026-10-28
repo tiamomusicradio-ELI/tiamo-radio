@@ -279,32 +279,4 @@ def get_full_schedule():
     except Exception as e:
         return jsonify({'success': False, 'data': []})
 
-@app.route('/whatsapp_webhook', methods=['GET', 'POST'])
-def whatsapp_webhook():
-    if request.method == 'GET':
-        VERIFY_TOKEN = "tiamo_radio_token_123"
-        mode = request.args.get('hub.mode')
-        token = request.args.get('hub.verify_token')
-        challenge = request.args.get('hub.challenge')
-        
-        if mode and token and mode == 'subscribe' and token == VERIFY_TOKEN:
-            return challenge, 200
-        return 'Forbidden', 403
-
-    elif request.method == 'POST':
-        data = request.get_json()
-        try:
-            message = data['entry'][0]['changes'][0]['value']['messages'][0]
-            sender_phone = message['from']
-            raw_text = message['text']['body']
-            
-            parsed_songs = parse_playlist_text(raw_text)
-
-            request_item = {
-                'id': len(requested_songs_list) + 1,
-                'phone': sender_phone,
-                'raw_text': raw_text,
-                'parsed_songs': parsed_songs,
-                'time': datetime.datetime.now().strftime('%H:%M - %d/%m/%Y')
-            }
-            requested_songs_list.insert(0, request_item)
+@app.route('/whatsapp_webhook',
