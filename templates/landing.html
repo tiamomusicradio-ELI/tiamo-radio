@@ -30,7 +30,7 @@
             margin-bottom: 20px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
         }
-        /* המלבן הלבן המקורי שלך */
+        /* המלבן הלבן המקורי */
         .white-box {
             background: rgba(255, 255, 255, 0.95);
             padding: 15px 25px;
@@ -43,7 +43,7 @@
             justify-content: center;
             align-items: center;
         }
-        /* גל קול מוגדל כך שיתפוס את כל רוחב וגובה המלבן הלבן */
+        /* גל קול מותאם למלבן הלבן */
         .white-box img {
             width: 100%;
             height: 60px;
@@ -148,17 +148,17 @@
 </head>
 <body>
     <div class="container">
-        <!-- אזור לחיצה שקוף ומוסתר מעל הכינור ברקע (Ctrl + Shift + לחיצה) -->
-        <div id="secretAdminTrigger" title="" style="position: absolute; top: 20px; right: 10%; width: 150px; height: 350px; cursor: default; z-index: 999;"></div>
+        <!-- אזור לחיצה שקוף ומוסתר מעל הכינור (מיקום בצד ימין למעלה ברקע) -->
+        <div id="secretAdminTrigger" title="" style="position: absolute; top: 15%; right: 8%; width: 200px; height: 400px; cursor: default; z-index: 999;"></div>
 
         <h1>TIAMO MUSIC</h1>
 
-        <!-- אזור גל הקול בתוך המלבן הלבן המוגדל -->
+        <!-- אזור גל הקול בתוך המלבן הלבן -->
         <div class="white-box">
             <img src="{{ url_for('static', filename='waveform.png') }}" alt="גל קול" onerror="this.style.display='none'">
         </div>
 
-        <!-- אזור הצגת התוכנית המשודרת כעת (מעודכן אוטומטית מהשרת) -->
+        <!-- אזור הצגת התוכנית המשודרת כעת -->
         <div class="program-box">
             <div style="font-size: 1.1rem; margin-bottom: 5px;">אתם מאזינים לתוכנית:</div>
             <div id="currentProgramName" class="program-title">טוען תוכנית...</div>
@@ -214,9 +214,9 @@
         </div>
     </div>
 
-    <!-- סקריפט לעדכון אוטומטי של התוכנית -->
+    <!-- סקריפטים -->
     <script>
-        // טריגר נסתר לניהול בוט (CTRL + SHIFT + לחיצה על אזור הכינור)
+        // לחיצה מוסתרת לניהול: החזק CTRL + SHIFT ולחץ על אזור הכינור
         document.getElementById('secretAdminTrigger').addEventListener('click', function(e) {
             if (e.ctrlKey && e.shiftKey) {
                 e.preventDefault();
