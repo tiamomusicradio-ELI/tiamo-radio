@@ -17,10 +17,8 @@ app = Flask(__name__)
 EXCEL_FILE = "עדכון תוכנית שידורים TIAMO - שבועי.xlsx"
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
-# שליפת מזהה התיקייה הראשית מתוך משתני הסביבה של Render (עם גיבוי למזהה המקורי)
 PARENT_FOLDER_ID = os.environ.get('GOOGLE_DRIVE_FOLDER_ID', '1tAy9l49lJAbMWRVJdoK4b2uEiU6vQLH-')
 
-# ----------------- הגדרות אבטחה וניהול -----------------
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "tiamo123"
 
@@ -41,7 +39,6 @@ def requires_auth(f):
             return authenticate()
         return f(*args, **kwargs)
     return decorated
-# --------------------------------------------------------
 
 requested_songs_list = [
     {
@@ -57,13 +54,11 @@ requested_songs_list = [
 ]
 
 def get_drive_service():
-    # בדיקה האם תוכן ה-JSON מוגדר במשתנה הסביבה של Render
     creds_json = os.environ.get('GOOGLE_CREDENTIALS_JSON')
     if creds_json:
         creds_info = json.loads(creds_json)
         creds = service_account.Credentials.from_service_account_info(creds_info, scopes=SCOPES)
     else:
-        # גיבוי לעבודה מקומית במחשב שלך אם הקובץ קיים פיזית
         creds = service_account.Credentials.from_service_account_file(
             'credentials.json', scopes=SCOPES
         )
@@ -115,7 +110,9 @@ def search_drive_songs(artist, song):
         results = service.files().list(
             q=search_query,
             pageSize=10,
-            fields="files(id, name, mimeType)"
+            fields="files(id, name, mimeType)",
+            supportsAllDrives=True,
+            includeItemsFromAllDrives=True
         ).execute()
 
         return results.get('files', [])
@@ -148,20 +145,15 @@ def background_whatsapp_scanner():
 scanner_thread = threading.Thread(target=background_whatsapp_scanner, daemon=True)
 scanner_thread.start()
 
-# --- עמודי המערכת ---
-
-# --- דף הבית הציבורי למאזינים (ללא צורך בסיסמה) ---
 @app.route('/')
 def index():
     return render_template('landing.html')
 
-# --- דף ניהול הבוט והרדיו (מוגן בסיסמה) ---
 @app.route('/admin')
 @requires_auth
 def admin_panel():
     return render_template('index.html')
 
-# --- שליפת התיקיות הראשיות מהדרייב (עבור דף ניהול מדיה) ---
 @app.route('/get_main_programs', methods=['GET'])
 @requires_auth
 def get_main_programs():
@@ -169,7 +161,6 @@ def get_main_programs():
         service = get_drive_service()
         parent_folder_id = os.environ.get('GOOGLE_DRIVE_FOLDER_ID', PARENT_FOLDER_ID)
         
-        print(f"DEBUG - Fetching items from Drive parent_id: {parent_folder_id}", flush=True)
         results = service.files().list(
             q=f"'{parent_folder_id}' in parents and trashed = false",
             pageSize=50,
@@ -178,8 +169,6 @@ def get_main_programs():
             includeItemsFromAllDrives=True
         ).execute()
         items = results.get('files', [])
-        
-        print("DEBUG - All items found:", items, flush=True)
 
         def natural_sort_key(s):
             return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', s['name'])]
@@ -187,7 +176,6 @@ def get_main_programs():
         items.sort(key=natural_sort_key)
         return jsonify(items)
     except Exception as e:
-        print("DEBUG - Error in get_main_programs:", str(e), flush=True)
         return jsonify([])
 
 @app.route('/get_sub_items')
@@ -223,7 +211,7 @@ def get_sub_items():
 def stream_preview(file_id):
     try:
         service = get_drive_service()
-        request_drive = service.files().get_media(fileId=file_id)
+        request_drive = service.files().get_media(fileId=file_id, supportsAllDrives=True)
         fh = io.BytesIO()
         downloader = MediaIoBaseDownload(fh, request_drive)
         done = False
@@ -234,7 +222,6 @@ def stream_preview(file_id):
     except Exception as e:
         return str(e), 500
 
-# נתיב ציבורי המאפשר לדף הנחיתה להציג את התוכנית המשודרת כעת
 @app.route('/get_current_program_status')
 def get_current_program_status():
     try:
@@ -243,157 +230,4 @@ def get_current_program_status():
         current_hour = now.hour
         
         day_column_map = {
-            'Sunday': 1, 'Monday': 3, 'Tuesday': 5, 'Wednesday': 7,
-            'Thursday': 9, 'Friday': 11, 'Saturday': 13
-        }
-        
-        current_day_en = now.strftime('%A')
-        time_col_idx = day_column_map.get(current_day_en, 1)
-        program_col_idx = time_col_idx + 1
-        
-        current_program = "לא הוגדרה תוכנית"
-        end_time_str = "00:00"
-
-        for j in range(2, len(df)):
-            time_val = str(df.iloc[j, time_col_idx]).strip()
-            if '-' in time_val and ':' in time_val:
-                try:
-                    start_time, end_time = time_val.split('-')
-                    start_h = int(start_time.split(':')[0])
-                    end_h = int(end_time.split(':')[0])
-                    
-                    actual_end_h = 24 if end_h == 0 else end_h
-                    
-                    if start_h <= current_hour < actual_end_h:
-                        prog_name = df.iloc[j, program_col_idx]
-                        if pd.notna(prog_name):
-                            current_program = str(prog_name).strip()
-                            end_time_str = end_time.strip()
-                            break
-                except:
-                    continue
-                    
-        return jsonify({
-            'success': True,
-            'program': fix_hebrew(current_program),
-            'end_time': end_time_str,
-            'current_week': get_current_week_of_month()
-        })
-    except Exception as e:
-        return jsonify({'success': False, 'program': 'שגיאה בקריאת אקסל', 'end_time': '--:--', 'current_week': 1})
-
-@app.route('/get_full_schedule')
-@requires_auth
-def get_full_schedule():
-    try:
-        df = pd.read_excel(EXCEL_FILE, sheet_name='תוכנית חודשית', header=None)
-        schedule_data = df.fillna("").values.tolist()
-        return jsonify({'success': True, 'data': schedule_data})
-    except Exception as e:
-        return jsonify({'success': False, 'data': []})
-
-@app.route('/whatsapp_webhook', methods=['GET', 'POST'])
-def whatsapp_webhook():
-    if request.method == 'GET':
-        VERIFY_TOKEN = "tiamo_radio_token_123"
-        mode = request.args.get('hub.mode')
-        token = request.args.get('hub.verify_token')
-        challenge = request.args.get('hub.challenge')
-        
-        if mode and token and mode == 'subscribe' and token == VERIFY_TOKEN:
-            return challenge, 200
-        return 'Forbidden', 403
-
-    elif request.method == 'POST':
-        data = request.get_json()
-        try:
-            message = data['entry'][0]['changes'][0]['value']['messages'][0]
-            sender_phone = message['from']
-            raw_text = message['text']['body']
-            
-            parsed_songs = parse_playlist_text(raw_text)
-
-            request_item = {
-                'id': len(requested_songs_list) + 1,
-                'phone': sender_phone,
-                'raw_text': raw_text,
-                'parsed_songs': parsed_songs,
-                'time': datetime.datetime.now().strftime('%H:%M - %d/%m/%Y')
-            }
-            requested_songs_list.insert(0, request_item)
-        except Exception as e:
-            pass
-            
-        return jsonify({'status': 'success'}), 200
-
-@app.route('/upload_file', methods=['POST'])
-@requires_auth
-def upload_file():
-    try:
-        folder_id = request.form.get('folder_id')
-        uploaded_file = request.files.get('file')
-        if not uploaded_file or not folder_id:
-            return jsonify({'success': False, 'error': 'חסרים פרטים להעלאה'})
-            
-        service = get_drive_service()
-        file_metadata = {
-            'name': uploaded_file.filename,
-            'parents': [folder_id]
-        }
-        
-        file_mimetype = uploaded_file.mimetype or 'application/octet-stream'
-        media = MediaIoBaseUpload(io.BytesIO(uploaded_file.read()), mimetype=file_mimetype, resumable=True)
-        
-        # נוסף supportsAllDrives=True כדי לאפשר כתיבה תקינה לתיקיות משותפות
-        service.files().create(
-            body=file_metadata, 
-            media_body=media, 
-            fields='id',
-            supportsAllDrives=True
-        ).execute()
-        
-        return jsonify({'success': True})
-    except Exception as e:
-        print(f"Upload Error: {str(e)}", flush=True)
-        return jsonify({'success': False, 'error': str(e)})
-
-@app.route('/delete_file', methods=['POST'])
-@requires_auth
-def delete_file():
-    try:
-        data = request.get_json()
-        file_id = data.get('file_id')
-        service = get_drive_service()
-        service.files().delete(
-            fileId=file_id,
-            supportsAllDrives=True
-        ).execute()
-        return jsonify({'success': True})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
-
-@app.route('/get_whatsapp_requests', methods=['GET'])
-@requires_auth
-def get_whatsapp_requests():
-    return jsonify({'success': True, 'requests': requested_songs_list})
-
-@app.route('/search_playlist_in_drive', methods=['POST'])
-@requires_auth
-def search_playlist_in_drive():
-    try:
-        data = request.get_json()
-        songs_to_search = data.get('songs', [])
-        
-        results = []
-        for item in songs_to_search:
-            artist = item.get('artist', '')
-            song = item.get('song', '')
-            
-            drive_files = search_drive_songs(artist, song)
-            results.append({
-                'requested_artist': artist,
-                'requested_song': song,
-                'found_in_drive': drive_files
-            })
-            
-        return jsonify({'success': True, 'results': results})
+            'Sunday': 1, 'Monday': 3
