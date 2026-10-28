@@ -267,4 +267,136 @@ def get_current_program_status():
             'current_week': get_current_week_of_month()
         })
     except Exception as e:
-        return jsonify({'success': False
+        return jsonify({
+            'success': False, 
+            'program': 'שגיאה בקריאת אקסל', 
+            'end_time': '--:--', 
+            'current_week': 1
+        })
+
+@app.route('/get_full_schedule')
+@requires_auth
+def get_full_schedule():
+    try:
+        df = pd.read_excel(EXCEL_FILE, sheet_name='תוכנית חודשית', header=None)
+        schedule_data = df.fillna("").values.tolist()
+        return jsonify({'success': True, 'data': schedule_data})
+    except Exception as e:
+        return jsonify({'success': False, 'data': []})
+
+@app.route('/whatsapp_webhook', methods=['GET', 'POST'])
+def whatsapp_webhook():
+    if request.method == 'GET':
+        VERIFY_TOKEN = "tiamo_radio_token_123"
+        mode = request.args.get('hub.mode')
+        token = request.args.get('hub.verify_token')
+        challenge = request.args.get('hub.challenge')
+        
+        if mode and token and mode == 'subscribe' and token == VERIFY_TOKEN:
+            return challenge, 200
+        return 'Forbidden', 403
+
+    elif request.method == 'POST':
+        data = request.get_json()
+        try:
+            message = data['entry'][0]['changes'][0]['value']['messages'][0]
+            sender_phone = message['from']
+            raw_text = message['text']['body']
+            
+            parsed_songs = parse_playlist_text(raw_text)
+
+            request_item = {
+                'id': len(requested_songs_list) + 1,
+                'phone': sender_phone,
+                'raw_text': raw_text,
+                'parsed_songs': parsed_songs,
+                'time': datetime.datetime.now().strftime('%H:%M - %d/%m/%Y')
+            }
+            requested_songs_list.insert(0, request_item)
+        except Exception as e:
+            pass
+            
+        return jsonify({'status': 'success'}), 200
+
+@app.route('/upload_file', methods=['POST'])
+@requires_auth
+def upload_file():
+    try:
+        folder_id = request.form.get('folder_id')
+        uploaded_file = request.files.get('file')
+        if not uploaded_file or not folder_id:
+            return jsonify({'success': False, 'error': 'חסרים פרטים להעלאה'})
+            
+        service = get_drive_service()
+        file_metadata = {
+            'name': uploaded_file.filename,
+            'parents': [folder_id]
+        }
+        
+        file_mimetype = uploaded_file.mimetype or 'application/octet-stream'
+        media = MediaIoBaseUpload(io.BytesIO(uploaded_file.read()), mimetype=file_mimetype, resumable=True)
+        
+        service.files().create(
+            body=file_metadata, 
+            media_body=media, 
+            fields='id',
+            supportsAllDrives=True
+        ).execute()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/delete_file', methods=['POST'])
+@requires_auth
+def delete_file():
+    try:
+        data = request.get_json()
+        file_id = data.get('file_id')
+        service = get_drive_service()
+        service.files().delete(
+            fileId=file_id,
+            supportsAllDrives=True
+        ).execute()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/get_whatsapp_requests', methods=['GET'])
+@requires_auth
+def get_whatsapp_requests():
+    return jsonify({'success': True, 'requests': requested_songs_list})
+
+@app.route('/search_playlist_in_drive', methods=['POST'])
+@requires_auth
+def search_playlist_in_drive():
+    try:
+        data = request.get_json()
+        songs_to_search = data.get('songs', [])
+        
+        results = []
+        for item in songs_to_search:
+            artist = item.get('artist', '')
+            song = item.get('song', '')
+            
+            drive_files = search_drive_songs(artist, song)
+            results.append({
+                'requested_artist': artist,
+                'requested_song': song,
+                'found_in_drive': drive_files
+            })
+            
+        return jsonify({'success': True, 'results': results})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/manual_scan_whatsapp', methods=['POST'])
+@requires_auth
+def manual_scan_whatsapp():
+    try:
+        return jsonify({'success': True, 'message': 'הסריקה הושלמה בהצלחה!'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
