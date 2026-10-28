@@ -230,4 +230,81 @@ def get_current_program_status():
         current_hour = now.hour
         
         day_column_map = {
-            'Sunday': 1, 'Monday': 3
+            'Sunday': 1, 'Monday': 3, 'Tuesday': 5, 'Wednesday': 7,
+            'Thursday': 9, 'Friday': 11, 'Saturday': 13
+        }
+        
+        current_day_en = now.strftime('%A')
+        time_col_idx = day_column_map.get(current_day_en, 1)
+        program_col_idx = time_col_idx + 1
+        
+        current_program = "לא הוגדרה תוכנית"
+        end_time_str = "00:00"
+
+        for j in range(2, len(df)):
+            time_val = str(df.iloc[j, time_col_idx]).strip()
+            if '-' in time_val and ':' in time_val:
+                try:
+                    start_time, end_time = time_val.split('-')
+                    start_h = int(start_time.split(':')[0])
+                    end_h = int(end_time.split(':')[0])
+                    
+                    actual_end_h = 24 if end_h == 0 else end_h
+                    
+                    if start_h <= current_hour < actual_end_h:
+                        prog_name = df.iloc[j, program_col_idx]
+                        if pd.notna(prog_name):
+                            current_program = str(prog_name).strip()
+                            end_time_str = end_time.strip()
+                            break
+                except:
+                    continue
+                    
+        return jsonify({
+            'success': True,
+            'program': fix_hebrew(current_program),
+            'end_time': end_time_str,
+            'current_week': get_current_week_of_month()
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'program': 'שגיאה בקריאת אקסל', 'end_time': '--:--', 'current_week': 1})
+
+@app.route('/get_full_schedule')
+@requires_auth
+def get_full_schedule():
+    try:
+        df = pd.read_excel(EXCEL_FILE, sheet_name='תוכנית חודשית', header=None)
+        schedule_data = df.fillna("").values.tolist()
+        return jsonify({'success': True, 'data': schedule_data})
+    except Exception as e:
+        return jsonify({'success': False, 'data': []})
+
+@app.route('/whatsapp_webhook', methods=['GET', 'POST'])
+def whatsapp_webhook():
+    if request.method == 'GET':
+        VERIFY_TOKEN = "tiamo_radio_token_123"
+        mode = request.args.get('hub.mode')
+        token = request.args.get('hub.verify_token')
+        challenge = request.args.get('hub.challenge')
+        
+        if mode and token and mode == 'subscribe' and token == VERIFY_TOKEN:
+            return challenge, 200
+        return 'Forbidden', 403
+
+    elif request.method == 'POST':
+        data = request.get_json()
+        try:
+            message = data['entry'][0]['changes'][0]['value']['messages'][0]
+            sender_phone = message['from']
+            raw_text = message['text']['body']
+            
+            parsed_songs = parse_playlist_text(raw_text)
+
+            request_item = {
+                'id': len(requested_songs_list) + 1,
+                'phone': sender_phone,
+                'raw_text': raw_text,
+                'parsed_songs': parsed_songs,
+                'time': datetime.datetime.now().strftime('%H:%M - %d/%m/%Y')
+            }
+            requested_songs_list.insert(0, request_item)
