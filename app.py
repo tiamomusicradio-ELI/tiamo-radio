@@ -7,13 +7,15 @@ import re
 import json
 import pandas as pd
 from functools import wraps
-from flask import Flask, jsonify, render_template, request, Response
+from flask import Flask, jsonify, render_template, request, Response, send_from_directory
 from google.oauth2 import service_account
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload
  
 app = Flask(__name__)
+ 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
  
 EXCEL_FILE = "עדכון תוכנית שידורים TIAMO - שבועי.xlsx"
 SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -22,7 +24,7 @@ PARENT_FOLDER_ID = os.environ.get('GOOGLE_DRIVE_FOLDER_ID', '1tAy9l49lJAbMWRVJdo
  
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
-
+ 
 def check_auth(username, password):
     return bool(ADMIN_PASSWORD) and username == ADMIN_USERNAME and password == ADMIN_PASSWORD
  
@@ -160,6 +162,10 @@ scanner_thread.start()
 @app.route('/')
 def index():
     return render_template('landing.html')
+ 
+@app.route('/googleefa053ce579bef43.html')
+def google_verify():
+    return send_from_directory(BASE_DIR, 'googleefa053ce579bef43.html')
  
 @app.route('/admin')
 @requires_auth
