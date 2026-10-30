@@ -1,3 +1,4 @@
+import pytz
 import os
 import datetime
 import io
@@ -138,8 +139,9 @@ def fix_hebrew(text):
     return text
  
 def get_current_week_of_month():
-    now = datetime.datetime.now()
-    first_day_of_month = datetime.datetime(now.year, now.month, 1)
+    israel_tz = pytz.timezone('Asia/Jerusalem')
+    now = datetime.now(israel_tz)
+    first_day_of_month = datetime(now.year, now.month, 1, tzinfo=israel_tz)
     first_day_weekday = (first_day_of_month.weekday() + 1) % 7
     day_of_month = now.day
     
@@ -243,15 +245,23 @@ def stream_preview(file_id):
         return str(e), 500
  
 @app.route('/get_current_program_status')
+@requires_auth
 def get_current_program_status():
     try:
         df = pd.read_excel(EXCEL_FILE, sheet_name='תוכנית חודשית', header=None)
-        now = datetime.datetime.now()
+        
+        israel_tz = pytz.timezone('Asia/Jerusalem')
+        now = datetime.now(israel_tz)
         current_hour = now.hour
         
         day_column_map = {
-            'Sunday': 1, 'Monday': 3, 'Tuesday': 5, 'Wednesday': 7,
-            'Thursday': 9, 'Friday': 11, 'Saturday': 13
+            'Sunday': 1,
+            'Monday': 3,
+            'Tuesday': 5,
+            'Wednesday': 7,
+            'Thursday': 11,
+            'Friday': 13,
+            'Saturday': 15
         }
         
         current_day_en = now.strftime('%A')
@@ -260,7 +270,7 @@ def get_current_program_status():
         
         current_program = "לא הוגדרה תוכנית"
         end_time_str = "00:00"
- 
+         
         for j in range(2, len(df)):
             time_val = str(df.iloc[j, time_col_idx]).strip()
             if '-' in time_val and ':' in time_val:
