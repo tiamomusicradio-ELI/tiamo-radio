@@ -13,28 +13,28 @@ from google.oauth2 import service_account
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload
- 
+
 app = Flask(__name__)
- 
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
- 
+
 EXCEL_FILE = "עדכון תוכנית שידורים TIAMO - שבועי.xlsx"
 SCOPES = ['https://www.googleapis.com/auth/drive']
- 
+
 PARENT_FOLDER_ID = os.environ.get('GOOGLE_DRIVE_FOLDER_ID', '1tAy9l49lJAbMWRVJdoK4b2uEiU6vQLH-')
- 
+
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
- 
+
 def check_auth(username, password):
     return bool(ADMIN_PASSWORD) and username == ADMIN_USERNAME and password == ADMIN_PASSWORD
- 
+
 def authenticate():
     return Response(
         'נדרשת הזנת שם משתמש וסיסמא לכניסה למערכת הרדיו', 401,
         {'WWW-Authenticate': 'Basic realm="Tiamo Radio Login Required"'}
     )
- 
+
 def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -43,7 +43,7 @@ def requires_auth(f):
             return authenticate()
         return f(*args, **kwargs)
     return decorated
- 
+
 requested_songs_list = [
     {
         'id': 1,
@@ -56,7 +56,7 @@ requested_songs_list = [
         'time': '03:17 - 22/10/2026'
     }
 ]
- 
+
 def get_drive_service():
     refresh_token = os.environ.get('GOOGLE_REFRESH_TOKEN')
     if refresh_token:
@@ -78,7 +78,7 @@ def get_drive_service():
                 'credentials.json', scopes=SCOPES
             )
     return build('drive', 'v3', credentials=creds)
- 
+
 def parse_playlist_text(raw_text):
     lines = raw_text.strip().split('\n')
     parsed_songs = []
@@ -95,33 +95,33 @@ def parse_playlist_text(raw_text):
             if artist and song:
                 parsed_songs.append({'artist': artist, 'song': song})
                 continue
- 
+
         clean_text = re.sub(r'^(שלום|היי|אהלן)?\s*,?\s*(אני\s+[\w\s]+\s+)?(מבקש|רוצה|אפשר)\s*(את\s+השיר|את)?\s*:?\s*', '', line, flags=re.IGNORECASE).strip()
- 
+
         match_of = re.search(r'(.+?)\s+של\s+(.+)', clean_text)
         if match_of:
             song = match_of.group(1).strip()
             artist = match_of.group(2).strip()
             parsed_songs.append({'artist': artist, 'song': song})
             continue
- 
+
         if ':' in line:
             parts = line.split(':', 1)
             song = parts[1].strip()
             parsed_songs.append({'artist': 'לא צוין', 'song': song})
             continue
- 
+
         parsed_songs.append({'artist': 'לא צוין', 'song': clean_text})
             
     return parsed_songs
- 
+
 def search_drive_songs(artist, song):
     try:
         service = get_drive_service()
         search_query = f"name contains '{song}' and trashed = false"
         if artist and artist != 'לא צוין':
             search_query += f" and name contains '{artist}'"
- 
+
         results = service.files().list(
             q=search_query,
             pageSize=10,
@@ -129,19 +129,19 @@ def search_drive_songs(artist, song):
             supportsAllDrives=True,
             includeItemsFromAllDrives=True
         ).execute()
- 
+
         return results.get('files', [])
     except Exception as e:
         print(f"Drive Search Error: {e}", flush=True)
         return []
- 
+
 def fix_hebrew(text):
     return text
- 
+
 def get_current_week_of_month():
     israel_tz = pytz.timezone('Asia/Jerusalem')
-    now = datetime.now(israel_tz)
-    first_day_of_month = datetime(now.year, now.month, 1, tzinfo=israel_tz)
+    now = datetime.datetime.now(israel_tz)
+    first_day_of_month = datetime.datetime(now.year, now.month, 1, tzinfo=israel_tz)
     first_day_weekday = (first_day_of_month.weekday() + 1) % 7
     day_of_month = now.day
     
@@ -149,7 +149,7 @@ def get_current_week_of_month():
     if week_number > 4:
         week_number = 4
     return week_number
- 
+
 def background_whatsapp_scanner():
     while True:
         try:
@@ -157,23 +157,23 @@ def background_whatsapp_scanner():
         except Exception as e:
             pass
         time.sleep(60)
- 
+
 scanner_thread = threading.Thread(target=background_whatsapp_scanner, daemon=True)
 scanner_thread.start()
- 
+
 @app.route('/')
 def index():
     return render_template('landing.html')
- 
+
 @app.route('/googleefa053ce579bef43.html')
 def google_verify():
     return send_from_directory(BASE_DIR, 'googleefa053ce579bef43.html')
- 
+
 @app.route('/admin')
 @requires_auth
 def admin_panel():
     return render_template('index.html')
- 
+
 @app.route('/get_main_programs', methods=['GET'])
 @requires_auth
 def get_main_programs():
@@ -189,7 +189,7 @@ def get_main_programs():
             includeItemsFromAllDrives=True
         ).execute()
         items = results.get('files', [])
- 
+
         def natural_sort_key(s):
             return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', s['name'])]
         
@@ -198,7 +198,7 @@ def get_main_programs():
     except Exception as e:
         print(f"get_main_programs Error: {e}", flush=True)
         return jsonify([])
- 
+
 @app.route('/get_sub_items')
 @requires_auth
 def get_sub_items():
@@ -227,7 +227,7 @@ def get_sub_items():
     except Exception as e:
         print(f"get_sub_items Error: {e}", flush=True)
         return jsonify({'folders': [], 'files': []})
- 
+
 @app.route('/stream_preview/<file_id>')
 @requires_auth
 def stream_preview(file_id):
@@ -243,7 +243,7 @@ def stream_preview(file_id):
         return Response(fh.read(), mimetype="audio/mpeg")
     except Exception as e:
         return str(e), 500
- 
+
 @app.route('/get_current_program_status')
 @requires_auth
 def get_current_program_status():
@@ -251,7 +251,7 @@ def get_current_program_status():
         df = pd.read_excel(EXCEL_FILE, sheet_name='תוכנית חודשית', header=None)
         
         israel_tz = pytz.timezone('Asia/Jerusalem')
-        now = datetime.now(israel_tz)
+        now = datetime.datetime.now(israel_tz)
         current_hour = now.hour
         
         day_column_map = {
@@ -259,13 +259,13 @@ def get_current_program_status():
             'Monday': 2,
             'Tuesday': 4,
             'Wednesday': 6,
-            'Thursday': 10,
-            'Friday': 12,
-            'Saturday': 14
+            'Thursday': 8,
+            'Friday': 10,
+            'Saturday': 12
         }
         
         current_day_en = now.strftime('%A')
-        time_col_idx = day_column_map.get(current_day_en, 1)
+        time_col_idx = day_column_map.get(current_day_en, 0)
         program_col_idx = time_col_idx + 1
         
         current_program = "לא הוגדרה תוכנית"
@@ -289,7 +289,7 @@ def get_current_program_status():
                             break
                 except:
                     continue
-                    
+                
         return jsonify({
             'success': True,
             'program': fix_hebrew(current_program),
@@ -303,7 +303,7 @@ def get_current_program_status():
             'end_time': '--:--', 
             'current_week': 1
         })
- 
+
 @app.route('/get_full_schedule')
 @requires_auth
 def get_full_schedule():
@@ -313,7 +313,7 @@ def get_full_schedule():
         return jsonify({'success': True, 'data': schedule_data})
     except Exception as e:
         return jsonify({'success': False, 'data': []})
- 
+
 @app.route('/whatsapp_webhook', methods=['GET', 'POST'])
 def whatsapp_webhook():
     if request.method == 'GET':
@@ -325,7 +325,7 @@ def whatsapp_webhook():
         if mode and token and mode == 'subscribe' and token == VERIFY_TOKEN:
             return challenge, 200
         return 'Forbidden', 403
- 
+
     elif request.method == 'POST':
         data = request.get_json()
         try:
@@ -334,7 +334,7 @@ def whatsapp_webhook():
             raw_text = message['text']['body']
             
             parsed_songs = parse_playlist_text(raw_text)
- 
+
             request_item = {
                 'id': len(requested_songs_list) + 1,
                 'phone': sender_phone,
@@ -347,7 +347,7 @@ def whatsapp_webhook():
             pass
             
         return jsonify({'status': 'success'}), 200
- 
+
 @app.route('/upload_file', methods=['POST'])
 @requires_auth
 def upload_file():
@@ -376,7 +376,7 @@ def upload_file():
         return jsonify({'success': True})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
- 
+
 @app.route('/delete_file', methods=['POST'])
 @requires_auth
 def delete_file():
@@ -391,12 +391,12 @@ def delete_file():
         return jsonify({'success': True})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
- 
+
 @app.route('/get_whatsapp_requests', methods=['GET'])
 @requires_auth
 def get_whatsapp_requests():
     return jsonify({'success': True, 'requests': requested_songs_list})
- 
+
 @app.route('/search_playlist_in_drive', methods=['POST'])
 @requires_auth
 def search_playlist_in_drive():
@@ -419,7 +419,7 @@ def search_playlist_in_drive():
         return jsonify({'success': True, 'results': results})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
- 
+
 @app.route('/manual_scan_whatsapp', methods=['POST'])
 @requires_auth
 def manual_scan_whatsapp():
@@ -427,6 +427,6 @@ def manual_scan_whatsapp():
         return jsonify({'success': True, 'message': 'הסריקה הושלמה בהצלחה!'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
- 
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
