@@ -265,7 +265,7 @@
 
                 <div id="schedule" class="page-view">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h3 style="color: var(--primary-gold); font-size: 16px;">📅 לוח שידורים שבועי מפורט</h3>
+                        <h3 id="schedule-title" style="color: var(--primary-gold); font-size: 16px;">📅 לוח שידורים שבועי מפורט</h3>
                         <button class="btn btn-secondary" onclick="loadFullSchedule()" style="font-size: 11px;">🔄 רענן לוח שידורים</button>
                     </div>
                     
@@ -523,6 +523,26 @@
         }
 
         function loadFullSchedule() {
+            // עדכון כותרת דינמית ליום ולתאריך הנוכחי
+            const dayNamesHe = {
+                'Sunday': 'ראשון',
+                'Monday': 'שני',
+                'Tuesday': 'שלישי',
+                'Wednesday': 'רביעי',
+                'Thursday': 'חמישי',
+                'Friday': 'שישי',
+                'Saturday': 'שבת'
+            };
+            const now = new Date();
+            const options = { weekday: 'long', timeZone: 'Asia/Jerusalem' };
+            let englishDay = new Intl.DateTimeFormat('en-US', options).format(now);
+            let hebrewDay = dayNamesHe[englishDay] || 'היום';
+            let dateStr = now.toLocaleDateString('he-IL', { timeZone: 'Asia/Jerusalem' });
+            
+            let titleEl = document.getElementById('schedule-title');
+            if (titleEl) {
+                titleEl.innerText = `לוח השידורים ליום ${hebrewDay} תאריך: ${dateStr}`;
+            }
             let tbody = document.getElementById('schedule-table-body');
             tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px; color: var(--text-muted);">טוען לוח שידורים...</td></tr>';
             
