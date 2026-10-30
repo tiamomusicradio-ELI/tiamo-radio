@@ -253,6 +253,9 @@ def get_current_program_status():
         israel_tz = pytz.timezone('Asia/Jerusalem')
         now = datetime.datetime.now(israel_tz)
         current_hour = now.hour
+        current_day_en = now.strftime('%A')
+        
+        print(f"DEBUG: Today is {current_day_en}, Hour is {current_hour}", flush=True)
         
         day_column_map = {
             'Sunday': 0,
@@ -264,7 +267,6 @@ def get_current_program_status():
             'Saturday': 12
         }
         
-        current_day_en = now.strftime('%A')
         time_col_idx = day_column_map.get(current_day_en, 0)
         program_col_idx = time_col_idx + 1
         
@@ -297,13 +299,13 @@ def get_current_program_status():
             'current_week': get_current_week_of_month()
         })
     except Exception as e:
+        print(f"ERROR in get_current_program_status: {e}", flush=True)
         return jsonify({
             'success': False, 
             'program': 'שגיאה בקריאת אקסל', 
             'end_time': '--:--', 
             'current_week': 1
         })
-
 @app.route('/get_full_schedule')
 @requires_auth
 def get_full_schedule():
