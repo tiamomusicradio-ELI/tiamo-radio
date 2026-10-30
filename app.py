@@ -250,8 +250,13 @@ def get_current_program_status():
         current_hour = now.hour
         
         day_column_map = {
-            'Sunday': 1, 'Monday': 3, 'Tuesday': 5, 'Wednesday': 7,
-            'Thursday': 9, 'Friday': 11, 'Saturday': 13
+            'Sunday': 1,
+            'Monday': 3,
+            'Tuesday': 5,
+            'Wednesday': 7,
+            'Thursday': 11,
+            'Friday': 13,
+            'Saturday': 15
         }
         
         current_day_en = now.strftime('%A')
