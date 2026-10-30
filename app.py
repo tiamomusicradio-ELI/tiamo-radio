@@ -275,6 +275,9 @@ def get_current_program_status():
 
         for j in range(2, len(df)):
             time_val = str(df.iloc[j, time_col_idx]).strip()
+            prog_name = df.iloc[j, program_col_idx]
+            print(f"Row {j} | Time: '{time_val}' | Program: '{prog_name}'", flush=True)
+            
             if '-' in time_val and ':' in time_val:
                 try:
                     start_time, end_time = time_val.split('-')
@@ -284,7 +287,6 @@ def get_current_program_status():
                     actual_end_h = 24 if end_h == 0 else end_h
                     
                     if start_h <= current_hour < actual_end_h:
-                        prog_name = df.iloc[j, program_col_idx]
                         if pd.notna(prog_name):
                             current_program = str(prog_name).strip()
                             end_time_str = end_time.strip()
