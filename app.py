@@ -255,13 +255,13 @@ def get_current_program_status():
         current_hour = now.hour
         
         day_column_map = {
-            'Sunday': 1,
-            'Monday': 3,
-            'Tuesday': 5,
-            'Wednesday': 7,
-            'Thursday': 11,
-            'Friday': 13,
-            'Saturday': 15
+            'Sunday': 0,
+            'Monday': 2,
+            'Tuesday': 4,
+            'Wednesday': 6,
+            'Thursday': 10,
+            'Friday': 12,
+            'Saturday': 14
         }
         
         current_day_en = now.strftime('%A')
@@ -270,7 +270,7 @@ def get_current_program_status():
         
         current_program = "לא הוגדרה תוכנית"
         end_time_str = "00:00"
-         
+
         for j in range(2, len(df)):
             time_val = str(df.iloc[j, time_col_idx]).strip()
             if '-' in time_val and ':' in time_val:
