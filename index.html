@@ -524,8 +524,8 @@
             alert(`הפלייליסט שויך בהצלחה לשבועות: ${selectedWeeks.join(', ')} בחודש!`);
         }
 
-        function loadFullSchedule() {
-            // עדכון כותרת דינמית הכוללת את שם היום והתאריך
+function loadFullSchedule() {
+            // עדכון כותרת דינמית הכוללת את שם היום המלא והתאריך
             const dayNamesHe = {
                 'Sunday': 'ראשון',
                 'Monday': 'שני',
@@ -562,19 +562,25 @@
                     
                     const now = new Date();
                     let jsDay = now.getDay(); // 0=Sunday, 1=Monday... 6=Saturday
-                    // מיפוי מדויק של עמודות הימים לפי מבנה האקסל (ראשון=0, שני=2, ..., שבת=12)
-                    let currentDayColIdx = (jsDay === 0) ? 0 : 
-                                           (jsDay === 1) ? 2 : 
-                                           (jsDay === 2) ? 4 : 
-                                           (jsDay === 3) ? 6 : 
-                                           (jsDay === 4) ? 8 : 
-                                           (jsDay === 5) ? 10 : 12;
                     let currentHour = now.getHours();
 
                     for (let i = 2; i < rows.length; i++) {
                         let row = rows[i];
-                        // בדיקת עמודת הזמן הנכונה בשורה
-                        let timeVal = row[currentDayColIdx + 1] || row[1] || ''; 
+                        
+                        // הגדרת עמודות מדויקות באקסל: ביום שבת (dayIdx: 6) השעות בעמודה 12 ושם התוכנית בעמודה 13, וביתר הימים להיפך
+                        let colIndices = [
+                            { progCol: 1, timeCol: 0, dayIdx: 0 },   // ראשון
+                            { progCol: 3, timeCol: 2, dayIdx: 1 },   // שני
+                            { progCol: 5, timeCol: 4, dayIdx: 2 },   // שלישי
+                            { progCol: 7, timeCol: 6, dayIdx: 3 },   // רביעי
+                            { progCol: 9, timeCol: 8, dayIdx: 4 },   // חמישי
+                            { progCol: 11, timeCol: 10, dayIdx: 5 }, // שישי
+                            { progCol: 13, timeCol: 12, dayIdx: 6 }  // שבת
+                        ];
+
+                        // שליפת עמודת הזמן של היום הנוכחי עבור השורה הנוכחית
+                        let todayColInfo = colIndices.find(item => item.dayIdx === jsDay) || colIndices[0];
+                        let timeVal = row[todayColInfo.timeCol] || ''; 
                         if (!timeVal) continue;
                         
                         let isCurrentTimeSlot = false;
@@ -593,17 +599,6 @@
                         html += `<tr style="border-bottom: 1px solid var(--card-border); transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">`;
                         html += `<td style="padding: 8px 10px; font-weight: bold; color: var(--primary-gold); border-left: 1px solid var(--card-border); background: rgba(0,0,0,0.1);">${timeVal}</td>`;
                         
-                        // הגדרת אינדקסים מדויקים לכל יום בשבוע (תוכנית, שעה)
-                        let colIndices = [
-                            { progCol: 0, timeCol: 1, dayIdx: 0 },   // ראשון
-                            { progCol: 2, timeCol: 3, dayIdx: 1 },   // שני
-                            { progCol: 4, timeCol: 5, dayIdx: 2 },   // שלישי
-                            { progCol: 6, timeCol: 7, dayIdx: 3 },   // רביעי
-                            { progCol: 8, timeCol: 9, dayIdx: 4 },   // חמישי
-                            { progCol: 10, timeCol: 11, dayIdx: 5 }, // שישי
-                            { progCol: 12, timeCol: 13, dayIdx: 6 }  // שבת
-                        ];
-
                         colIndices.forEach(item => {
                             let progName = row[item.progCol] || '';
                             let isLiveCell = isCurrentTimeSlot && (item.dayIdx === jsDay);
@@ -630,7 +625,7 @@
                     tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px; color: var(--danger-red);">שגיאה בתקשורת עם השרת</td></tr>';
                 });
         }
-
+        
         function loadWhatsappRequests() {
             let tbody = document.getElementById('whatsapp-requests-tbody');
             tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px; color: var(--text-muted);">טוען בקשות שירים...</td></tr>';
