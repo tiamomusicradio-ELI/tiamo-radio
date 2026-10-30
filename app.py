@@ -267,8 +267,8 @@ def get_current_program_status():
             'Saturday': 12
         }
         
-        time_col_idx = day_column_map.get(current_day_en, 0)
-        program_col_idx = time_col_idx + 1
+        program_col_idx = day_column_map.get(current_day_en, 0)
+        time_col_idx = program_col_idx + 1
         
         current_program = "לא הוגדרה תוכנית"
         end_time_str = "00:00"
