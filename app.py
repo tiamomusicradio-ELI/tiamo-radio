@@ -249,15 +249,19 @@ def get_current_program_status():
         now = datetime.datetime.now()
         current_hour = now.hour
         
-        day_column_map = {
-            'Sunday': 1, 'Monday': 3, 'Tuesday': 5, 'Wednesday': 7,
-            'Thursday': 9, 'Friday': 11, 'Saturday': 13
+day_column_map = {
+            'Sunday': 1,
+            'Monday': 3,
+            'Tuesday': 5,
+            'Wednesday': 7,
+            'Thursday': 9,
+            'Friday': 11,
+            'Saturday': 13,
         }
-        
+
         current_day_en = now.strftime('%A')
         time_col_idx = day_column_map.get(current_day_en, 1)
-        program_col_idx = time_col_idx + 1
-        
+        program_col_idx = time_col_idx + 1        
         current_program = "לא הוגדרה תוכנית"
         end_time_str = "00:00"
  
