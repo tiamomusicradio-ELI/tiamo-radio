@@ -119,9 +119,6 @@
     </style>
 </head>
 <body>
-<!-- אזור לחיצה מוסתר המותאם לחלק הלבן של הכינור -->
-    <div id="hidden-violin-click-area" style="position: absolute; top: 15%; right: 12%; width: 22%; height: 70%; z-index: 999; cursor: default;"></div>
-
     <!-- מסך התחברות מאובטח -->
     <div id="login-overlay" style="display: none;">
         <div class="login-card">
@@ -159,7 +156,6 @@
                 <span>🎵 שירים מבוקשים</span>
             </div>
 
-            <!-- כפתור בקשות פלייליסט מתחת לשירים מבוקשים -->
             <div class="menu-item" onclick="openPlaylistModal()" style="color: #00e676; font-weight: bold;">
                 <span>📋 בקשות פלייליסט</span>
             </div>
@@ -176,7 +172,6 @@
                     </select>
                 </div>
                 <div class="top-actions">
-                    <!-- כפתור עצירת ניגון מקומי -->
                     <button class="btn btn-danger" onclick="stopGlobalPreview()" title="עצור השמעה מקומית של שיר">⏹️ עצור ניגון מקומי</button>
                     <button class="btn btn-secondary" onclick="alert('התחנה הופעלה מחדש!')" title="הפעל מחדש">🔄 אתחול</button>
                     <button class="btn btn-secondary" onclick="alert('Spotify פעיל')" title="Spotify Seamless">🟢 Spotify</button>
@@ -333,33 +328,7 @@
         </div>
     </div>
 
-    <!-- חלון קופץ מוסתר מראש - נפתח בלחיצה על 'בקשות פלייליסט' -->
-    <div id="playlistModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:9999; align-items:center; justify-content:center;">
-        <div style="background:var(--card-bg); color:var(--text-main); padding:25px; border-radius:12px; width:90%; max-width:650px; direction:rtl; text-align:right; border:1px solid var(--card-border); margin:5% auto;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--card-border); padding-bottom:12px; margin-bottom:15px;">
-                <h3 style="margin:0; color:#00e676;">📋 רשימת בקשות שירים ממאזינים</h3>
-                <span onclick="closePlaylistModal()" style="font-size:24px; cursor:pointer; color:var(--text-muted);">&times;</span>
-            </div>
-            
-            <div style="max-height:400px; overflow-y:auto;">
-                <table style="width:100%; border-collapse:collapse; text-align:right; font-size:13px;">
-                    <thead>
-                        <tr style="background:rgba(212,175,55,0.15); color:var(--primary-gold);">
-                            <th style="padding:12px; border:1px solid var(--card-border);">שם הזמר</th>
-                            <th style="padding:12px; border:1px solid var(--card-border);">שם השיר המבוקש</th>
-                        </tr>
-                    </thead>
-                    <tbody id="requestsTableBody">
-                        <!-- השורות ייטענו לכאן בלבד בלחיצה -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- נגן אודיו נסתר -->
-    <audio id="preview-player" style="display: none;"></audio>
-
+    <!-- סקריפט מערכת -->
     <script>
         let folderHistory = [];
         let currentActiveFolderId = '';
@@ -524,8 +493,8 @@
             alert(`הפלייליסט שויך בהצלחה לשבועות: ${selectedWeeks.join(', ')} בחודש!`);
         }
 
+        // פונקציית טעינת לוח השידורים המתאימה אוטומטית ליום הנוכחי מתוך האקסל
         function loadFullSchedule() {
-            // הגדרת שמות הימים בעברית
             const dayNamesHe = {
                 'Sunday': 'ראשון',
                 'Monday': 'שני',
@@ -541,7 +510,6 @@
             let hebrewDay = dayNamesHe[englishDay] || 'היום';
             let dateStr = now.toLocaleDateString('he-IL', { timeZone: 'Asia/Jerusalem' });
             
-            // עדכון הכותרת המדויקת בדיוק בפורמט שביקשת
             let titleEl = document.getElementById('schedule-title');
             if (titleEl) {
                 titleEl.innerText = `לוח שידורים ליום ${hebrewDay} תאריך : ${dateStr}`;
@@ -561,10 +529,10 @@
                     let rows = response.data;
                     let html = '';
                     
-                    let jsDay = now.getDay(); // 0=Sunday, 1=Monday... 6=Saturday (שבת = 6)
+                    let jsDay = now.getDay(); // 0=Sunday, 1=Monday... 6=Saturday
                     let currentHour = now.getHours();
 
-                    // מיפוי מדויק של עמודות באקסל לפי היום בשבוע (תואם לשרת ב-app.py)
+                    // מיפוי עמודות באקסל לפי היום הנוכחי בשבוע
                     let dayBaseColMap = {
                         0: 0,   // ראשון
                         1: 2,   // שני
@@ -576,13 +544,11 @@
                     };
                     
                     let baseCol = dayBaseColMap[jsDay] !== undefined ? dayBaseColMap[jsDay] : 0;
-                    let timeColIdx = baseCol + 1;     // עמודת השעות באקסל ליום הנוכחי
-                    let progColIdx = baseCol;         // עמודת שם התוכנית באקסל ליום הנוכחי
+                    let progColIdx = baseCol;         // שם התוכנית (מימין)
+                    let timeColIdx = baseCol + 1;     // שעות השידור (משמאל)
 
-                    // מעבר על שורות האקסל החל משורה 2 (דילוג על שורות הכותרת)
                     for (let i = 2; i < rows.length; i++) {
                         let row = rows[i];
-                        
                         let timeVal = row[timeColIdx] ? String(row[timeColIdx]).trim() : '';
                         let progName = row[progColIdx] ? String(row[progColIdx]).trim() : '';
 
@@ -604,24 +570,22 @@
                         let cellStyle = '';
                         let badgeHtml = '';
                         if (isCurrentTimeSlot) {
-                            cellStyle = 'background: rgba(212, 175, 55, 0.25); color: var(--primary-gold); font-weight: bold; border: 2px solid var(--primary-gold); box-shadow: inset 0 0 10px rgba(212,175,55,0.4);';
-                            badgeHtml = `<span style="font-size:10px; background:var(--primary-gold); color:#111; padding:1px 5px; border-radius:4px; margin-right:5px; display:inline-block;">LIVE 🔴</span>`;
+                            cellStyle = 'background: rgba(212, 175, 55, 0.25); color: var(--primary-gold); font-weight: bold; border: 2px solid var(--primary-gold);';
+                            badgeHtml = `<span style="font-size:10px; background:var(--primary-gold); color:#111; padding:1px 5px; border-radius:4px; margin-left:5px; display:inline-block;">LIVE 🔴</span>`;
                         } else if (progName) {
                             cellStyle = 'color: var(--text-main); font-weight: 500;';
                         } else {
                             cellStyle = 'color: var(--text-muted); opacity: 0.4;';
                         }
 
-                        html += `<tr style="border-bottom: 1px solid var(--card-border); transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">`;
-                        // הצגת השעות והתוכנית המותאמות בדיוק ליום הנוכחי
-                        html += `<td style="padding: 10px; font-weight: bold; color: var(--primary-gold); border-left: 1px solid var(--card-border); background: rgba(0,0,0,0.1); width: 30%;">${timeVal || '-'}</td>`;
+                        html += `<tr style="border-bottom: 1px solid var(--card-border);">`;
+                        // שם התוכנית מימין, השעות משמאל בפורמט LTR
                         html += `<td style="padding: 10px; border-left: 1px solid var(--card-border); ${cellStyle}">${badgeHtml}${progName || '-'}</td>`;
+                        html += `<td style="padding: 10px; font-weight: bold; color: var(--primary-gold); background: rgba(0,0,0,0.1); width: 30%; text-align: left; direction: ltr;">${timeVal || '-'}</td>`;
                         
-                        // השלמת תאים ריקים כדי להתאים לטבלה בת 8 עמודות במידה ומוצגת בטבלה השבועית
                         for(let c = 1; c < 7; c++) {
                             html += `<td style="display:none;"></td>`;
                         }
-
                         html += `</tr>`;
                     }
                     
@@ -679,7 +643,6 @@
         }
 
         function openFolder(folderId, folderName, isBackNav = false) {
-            // הוספה להיסטוריה רק אם מדובר בניווט קדימה
             if (!isBackNav) {
                 folderHistory.push({id: folderId, name: folderName});
             }
@@ -853,7 +816,6 @@
             stopGlobalPreview();
         }
 
-        // פונקציה לעצירת הניגון המקומי מכל מקום באתר
         function stopGlobalPreview() {
             let player = document.getElementById('preview-player');
             if (player) {
@@ -868,7 +830,6 @@
             }
         }
 
-        // פתיחת החלון הקופץ וטעינת טבלת 2 העמודות בלחיצה בלבד
         async function openPlaylistModal() {
             document.getElementById('playlistModal').style.display = 'flex';
             const tableBody = document.getElementById('requestsTableBody');
@@ -902,12 +863,10 @@
                     tableBody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:15px; color:var(--text-muted);">אין בקשות שירים כרגע</td></tr>';
                 }
             } catch (error) {
-                console.error('שגיאה בטעינת הבקשות:', error);
                 tableBody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:15px; color:var(--danger-red);">שגיאה בטעינת הנתונים מהשרת</td></tr>';
             }
         }
 
-        // סגירת החלון הקופץ
         function closePlaylistModal() {
             document.getElementById('playlistModal').style.display = 'none';
         }
