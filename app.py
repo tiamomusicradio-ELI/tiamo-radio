@@ -266,25 +266,24 @@ def get_current_program_status():
         current_program = 'לא הוגדרה תוכנית'
         end_time_str = '00:00'
 
-        for j in range(1, len(df)):
-            time_val = str(df.iloc[j, time_col_idx]).strip()
-                    if '-' in time_val and ':' in time_val:
-                try:
-                    start_time, end_time = time_val.split('-')
-                    start_h = int(start_time.split(':')[0])
-                    end_h = int(end_time.split(':')[0])
-                    
-                    actual_end_h = 24 if end_h == 0 else end_h
-                    
-                    if start_h <= current_hour < actual_end_h:
-                        prog_name = df.iloc[j, program_col_idx]
-                        if pd.notna(prog_name):
-                            current_program = str(prog_name).strip()
-                            end_time_str = end_time.strip()
-                            break
-                except:
-                    continue
-                    
+for j in range(1, len(df)):
+        time_val = str(df.iloc[j, time_col_idx]).strip()
+        if '-' in time_val and ':' in time_val:
+            try:
+                start_time, end_time = time_val.split('-')
+                start_h = int(start_time.split(':')[0])
+                end_h = int(end_time.split(':')[0])
+                
+                actual_end_h = 24 if end_h == 0 else end_h
+                
+                if start_h <= current_hour < actual_end_h:
+                    prog_name = df.iloc[j, program_col_idx]
+                    if pd.notna(prog_name):
+                        current_program = str(prog_name).strip()
+                        end_time_str = end_time.strip()
+                        break
+            except:
+                continue                    
         return jsonify({
             'success': True,
             'program': fix_hebrew(current_program),
