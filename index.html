@@ -512,8 +512,7 @@
             
             let titleEl = document.getElementById('schedule-title');
             if (titleEl) {
-                titleEl.innerText = `לוח שידורים ליום ${hebrewDay} תאריך : ${dateStr}`;
-            }
+scheduleTitleEl.innerText = `לוח שידורים ל${hebrewDay} - תאריך : ${dateStr}`;            }
             
             let tbody = document.getElementById('schedule-table-body');
             tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px; color: var(--text-muted);">טוען לוח שידורים מהאקסל...</td></tr>';

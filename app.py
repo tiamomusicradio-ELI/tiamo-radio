@@ -270,7 +270,11 @@ def get_current_program_status():
             time_val = str(df.iloc[j, time_col_idx]).strip()
             if '-' in time_val and ':' in time_val:
                 try:
-                    start_time, end_time = time_val.split('-')
+                    # פיצול השעות לפי המקף בלי תלות ברווחים
+                    parts = time_val.split('-')
+                    start_time = parts[0].strip()
+                    end_time = parts[1].strip()
+                    
                     start_h = int(start_time.split(':')[0])
                     end_h = int(end_time.split(':')[0])
                     
@@ -299,7 +303,7 @@ def get_current_program_status():
             'end_time': '--:--', 
             'current_week': 1
         })
-         
+
 @app.route('/get_full_schedule')
 @requires_auth
 def get_full_schedule():
