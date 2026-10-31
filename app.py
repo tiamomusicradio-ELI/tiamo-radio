@@ -248,8 +248,8 @@ def get_current_program_status():
         df = pd.read_excel(EXCEL_FILE, sheet_name='תוכנית חודשית', header=None)
         now = datetime.datetime.now()
         current_hour = now.hour
-        
-day_column_map = {
+
+        day_column_map = {
             'Sunday': 1,
             'Monday': 3,
             'Tuesday': 5,
@@ -261,13 +261,14 @@ day_column_map = {
 
         current_day_en = now.strftime('%A')
         time_col_idx = day_column_map.get(current_day_en, 1)
-        program_col_idx = time_col_idx + 1        
-        current_program = "לא הוגדרה תוכנית"
-        end_time_str = "00:00"
- 
-        for j in range(2, len(df)):
+        program_col_idx = time_col_idx + 1
+
+        current_program = 'לא הוגדרה תוכנית'
+        end_time_str = '00:00'
+
+        for j in range(1, len(df)):
             time_val = str(df.iloc[j, time_col_idx]).strip()
-            if '-' in time_val and ':' in time_val:
+                        if '-' in time_val and ':' in time_val:
                 try:
                     start_time, end_time = time_val.split('-')
                     start_h = int(start_time.split(':')[0])
