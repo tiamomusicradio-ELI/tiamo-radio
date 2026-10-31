@@ -524,7 +524,7 @@
             alert(`הפלייליסט שויך בהצלחה לשבועות: ${selectedWeeks.join(', ')} בחודש!`);
         }
 
-function loadFullSchedule() {
+        function loadFullSchedule() {
             // הגדרת שמות הימים בעברית
             const dayNamesHe = {
                 'Sunday': 'ראשון',
@@ -541,14 +541,14 @@ function loadFullSchedule() {
             let hebrewDay = dayNamesHe[englishDay] || 'היום';
             let dateStr = now.toLocaleDateString('he-IL', { timeZone: 'Asia/Jerusalem' });
             
-            // עדכון הכותרת המדויקת כפי שביקשת
+            // עדכון הכותרת המדויקת בדיוק בפורמט שביקשת
             let titleEl = document.getElementById('schedule-title');
             if (titleEl) {
-                titleEl.innerText = `📅 לוח שידורים ליום ${hebrewDay} תאריך : ${dateStr}`;
+                titleEl.innerText = `לוח שידורים ליום ${hebrewDay} תאריך : ${dateStr}`;
             }
             
             let tbody = document.getElementById('schedule-table-body');
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px; color: var(--text-muted);">טוען לוח שידורים...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px; color: var(--text-muted);">טוען לוח שידורים מהאקסל...</td></tr>';
             
             fetch('/get_full_schedule')
                 .then(res => res.json())
@@ -561,30 +561,30 @@ function loadFullSchedule() {
                     let rows = response.data;
                     let html = '';
                     
-                    const now = new Date();
                     let jsDay = now.getDay(); // 0=Sunday, 1=Monday... 6=Saturday (שבת = 6)
                     let currentHour = now.getHours();
 
-                    // מיפוי מדויק של עמודות באקסל לפי ימים (index מותאם לזמן ולשם התוכנית של כל יום)
-                    // שים לב: לפי מה שהגדרנו בשרת, לכל יום יש עמודת זמן ועמודת שם תוכנית
-                    let dayColMap = {
-                        0: { timeCol: 0, progCol: 1 },   // ראשון
-                        1: { timeCol: 2, progCol: 3 },   // שני
-                        2: { timeCol: 4, progCol: 5 },   // שלישי
-                        3: { timeCol: 6, progCol: 7 },   // רביעי
-                        4: { timeCol: 8, progCol: 9 },   // חמישי
-                        5: { timeCol: 10, progCol: 11 }, // שישי
-                        6: { timeCol: 12, progCol: 13 }  // שבת
+                    // מיפוי מדויק של עמודות באקסל לפי היום בשבוע (תואם לשרת ב-app.py)
+                    let dayBaseColMap = {
+                        0: 0,   // ראשון
+                        1: 2,   // שני
+                        2: 4,   // שלישי
+                        3: 6,   // רביעי
+                        4: 8,   // חמישי
+                        5: 10,  // שישי
+                        6: 12   // שבת
                     };
+                    
+                    let baseCol = dayBaseColMap[jsDay] !== undefined ? dayBaseColMap[jsDay] : 0;
+                    let timeColIdx = baseCol + 1;     // עמודת השעות באקסל ליום הנוכחי
+                    let progColIdx = baseCol;         // עמודת שם התוכנית באקסל ליום הנוכחי
 
-                    let activeDayCols = dayColMap[jsDay] || dayColMap[0];
-
-                    // מעבר על שורות האקסל החל משורה 2 (דילוג על כותרות)
+                    // מעבר על שורות האקסל החל משורה 2 (דילוג על שורות הכותרת)
                     for (let i = 2; i < rows.length; i++) {
                         let row = rows[i];
                         
-                        let timeVal = row[activeDayCols.timeCol] ? String(row[activeDayCols.timeCol]).trim() : '';
-                        let progName = row[activeDayCols.progCol] ? String(row[activeDayCols.progCol]).trim() : '';
+                        let timeVal = row[timeColIdx] ? String(row[timeColIdx]).trim() : '';
+                        let progName = row[progColIdx] ? String(row[progColIdx]).trim() : '';
 
                         if (!timeVal && !progName) continue;
                         
@@ -613,17 +613,22 @@ function loadFullSchedule() {
                         }
 
                         html += `<tr style="border-bottom: 1px solid var(--card-border); transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">`;
-                        // הצגת עמודת השעות של היום הנוכחי
+                        // הצגת השעות והתוכנית המותאמות בדיוק ליום הנוכחי
                         html += `<td style="padding: 10px; font-weight: bold; color: var(--primary-gold); border-left: 1px solid var(--card-border); background: rgba(0,0,0,0.1); width: 30%;">${timeVal || '-'}</td>`;
-                        // הצגת עמודת שם התוכנית של היום הנוכחי תואם בול לל"ז
                         html += `<td style="padding: 10px; border-left: 1px solid var(--card-border); ${cellStyle}">${badgeHtml}${progName || '-'}</td>`;
+                        
+                        // השלמת תאים ריקים כדי להתאים לטבלה בת 8 עמודות במידה ומוצגת בטבלה השבועית
+                        for(let c = 1; c < 7; c++) {
+                            html += `<td style="display:none;"></td>`;
+                        }
+
                         html += `</tr>`;
                     }
                     
-                    tbody.innerHTML = html || '<tr><td colspan="2" style="text-align: center; padding: 20px; color: var(--text-muted);">אין נתונים להצגה היום</td></tr>';
+                    tbody.innerHTML = html || '<tr><td colspan="8" style="text-align: center; padding: 20px; color: var(--text-muted);">אין נתונים להצגה היום</td></tr>';
                 })
                 .catch(err => {
-                    tbody.innerHTML = '<tr><td colspan="2" style="text-align: center; padding: 20px; color: var(--danger-red);">שגיאה בתקשורת עם השרת</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px; color: var(--danger-red);">שגיאה בתקשורת עם השרת</td></tr>';
                 });
         }
 
