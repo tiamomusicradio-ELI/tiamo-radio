@@ -268,7 +268,7 @@ def get_current_program_status():
 
         for j in range(1, len(df)):
             time_val = str(df.iloc[j, time_col_idx]).strip()
-                        if '-' in time_val and ':' in time_val:
+                    if '-' in time_val and ':' in time_val:
                 try:
                     start_time, end_time = time_val.split('-')
                     start_h = int(start_time.split(':')[0])
