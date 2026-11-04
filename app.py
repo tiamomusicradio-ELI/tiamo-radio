@@ -6,6 +6,7 @@ import threading
 import re
 import json
 import pandas as pd
+from zoneinfo import ZoneInfo
 from functools import wraps
 from flask import Flask, jsonify, render_template, request, Response, send_from_directory
 from google.oauth2 import service_account
@@ -138,7 +139,7 @@ def fix_hebrew(text):
     return text
  
 def get_current_week_of_month():
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(ZoneInfo('Asia/Jerusalem'))
     first_day_of_month = datetime.datetime(now.year, now.month, 1)
     first_day_weekday = (first_day_of_month.weekday() + 1) % 7
     day_of_month = now.day
@@ -246,10 +247,14 @@ def stream_preview(file_id):
 def get_current_program_status():
     try:
         df = pd.read_excel(EXCEL_FILE, sheet_name='תוכנית חודשית', header=None)
-        now = datetime.datetime.now()
+        
+        try:
+            now = datetime.datetime.now(ZoneInfo('Asia/Jerusalem'))
+        except:
+            now = datetime.datetime.now()
+            
         current_hour = now.hour
 
-        # מיפוי עמודות מותאם למבנה האקסל שלך (עמודת שעות ועמודת תוכנית מימינה)
         day_column_map = {
             'Sunday': 1,
             'Monday': 3,
@@ -267,8 +272,11 @@ def get_current_program_status():
         current_program = 'לא הוגדרה תוכנית'
         end_time_str = '00:00'
 
-        for j in range(2, len(df)):
-            time_val = str(df.iloc[j, time_col_idx]).strip()
+        for j in range(len(df)):
+            cell_val = df.iloc[j, time_col_idx]
+            if pd.isna(cell_val):
+                continue
+            time_val = str(cell_val).strip()
             if '-' in time_val and ':' in time_val:
                 try:
                     parts = time_val.split('-')
@@ -340,7 +348,7 @@ def whatsapp_webhook():
                 'phone': sender_phone,
                 'raw_text': raw_text,
                 'parsed_songs': parsed_songs,
-                'time': datetime.datetime.now().strftime('%H:%M - %d/%m/%Y')
+                'time': datetime.datetime.now(ZoneInfo('Asia/Jerusalem')).strftime('%H:%M - %d/%m/%Y')
             }
             requested_songs_list.insert(0, request_item)
         except Exception as e:
