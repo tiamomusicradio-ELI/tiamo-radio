@@ -157,7 +157,6 @@
                 <span>🎵 שירים מבוקשים</span>
             </div>
 
-            <!-- כפתור בקשות פלייליסט מתחת לשירים מבוקשים -->
             <div class="menu-item" onclick="openPlaylistModal()" style="color: #00e676; font-weight: bold;">
                 <span>📋 בקשות פלייליסט</span>
             </div>
@@ -174,7 +173,6 @@
                     </select>
                 </div>
                 <div class="top-actions">
-                    <!-- כפתור עצירת ניגון מקומי -->
                     <button class="btn btn-danger" onclick="stopGlobalPreview()" title="עצור השמעה מקומית של שיר">⏹️ עצור ניגון מקומי</button>
                     <button class="btn btn-secondary" onclick="alert('התחנה הופעלה מחדש!')" title="הפעל מחדש">🔄 אתחול</button>
                     <button class="btn btn-secondary" onclick="alert('Spotify פעיל')" title="Spotify Seamless">🟢 Spotify</button>
@@ -331,7 +329,7 @@
         </div>
     </div>
 
-    <!-- חלון קופץ מוסתר מראש - נפתח בלחיצה על 'בקשות פלייליסט' -->
+    <!-- חלון קופץ מוסתר מראש -->
     <div id="playlistModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:9999; align-items:center; justify-content:center;">
         <div style="background:var(--card-bg); color:var(--text-main); padding:25px; border-radius:12px; width:90%; max-width:650px; direction:rtl; text-align:right; border:1px solid var(--card-border); margin:5% auto;">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--card-border); padding-bottom:12px; margin-bottom:15px;">
@@ -348,14 +346,12 @@
                         </tr>
                     </thead>
                     <tbody id="requestsTableBody">
-                        <!-- השורות ייטענו לכאן בלבד בלחיצה -->
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- נגן אודיו נסתר -->
     <audio id="preview-player" style="display: none;"></audio>
 
     <script>
@@ -512,7 +508,7 @@
             if (!programId) {
                 alert("נא לבחור פלייליסט/תוכנית.");
                 return;
-            }scheduleTitleEl.innerText = `לוח שידורים ל${hebrewDay} - תאריך : ${dateStr}`;
+            }
 
             if (selectedWeeks.length === 0) {
                 alert("נא לבחור לפחות שבוע אחד בחודש.");
@@ -523,7 +519,6 @@
         }
 
         function loadFullSchedule() {
-            // עדכון כותרת דינמית ליום ולתאריך הנוכחי
             const dayNamesHe = {
                 'Sunday': 'ראשון',
                 'Monday': 'שני',
@@ -562,9 +557,10 @@
                     let currentDayColIdx = (jsDay === 0) ? 1 : (jsDay === 1) ? 2 : (jsDay === 2) ? 3 : (jsDay === 3) ? 4 : (jsDay === 4) ? 5 : (jsDay === 5) ? 6 : 7;
                     let currentHour = now.getHours();
 
+                    // לולאה שעוברת על כל שורות הטבלה מהשורה השלישית ואילך (אינדקס 2)
                     for (let i = 2; i < rows.length; i++) {
                         let row = rows[i];
-                        let timeVal = row[1] || ''; 
+                        let timeVal = row[0] || row[6] || ''; 
                         if (!timeVal) continue;
                         
                         let isCurrentTimeSlot = false;
@@ -584,13 +580,13 @@
                         html += `<td style="padding: 8px 10px; font-weight: bold; color: var(--primary-gold); border-left: 1px solid var(--card-border); background: rgba(0,0,0,0.1);">${timeVal}</td>`;
                         
                         let colIndices = [
-                            { col: 2, dayIdx: 1 }, 
-                            { col: 4, dayIdx: 2 }, 
-                            { col: 6, dayIdx: 3 }, 
-                            { col: 8, dayIdx: 4 }, 
-                            { col: 10, dayIdx: 5 }, 
-                            { col: 12, dayIdx: 6 }, 
-                            { col: 14, dayIdx: 7 }  
+                            { col: 1, dayIdx: 1 }, 
+                            { col: 3, dayIdx: 2 }, 
+                            { col: 5, dayIdx: 3 }, 
+                            { col: 7, dayIdx: 4 }, 
+                            { col: 9, dayIdx: 5 }, 
+                            { col: 11, dayIdx: 6 }, 
+                            { col: 13, dayIdx: 7 }  
                         ];
 
                         colIndices.forEach(item => {
@@ -667,7 +663,6 @@
         }
 
         function openFolder(folderId, folderName, isBackNav = false) {
-            // הוספה להיסטוריה רק אם מדובר בניווט קדימה
             if (!isBackNav) {
                 folderHistory.push({id: folderId, name: folderName});
             }
@@ -841,7 +836,6 @@
             stopGlobalPreview();
         }
 
-        // פונקציה לעצירת הניגון המקומי מכל מקום באתר
         function stopGlobalPreview() {
             let player = document.getElementById('preview-player');
             if (player) {
@@ -856,7 +850,6 @@
             }
         }
 
-        // פתיחת החלון הקופץ וטעינת טבלת 2 העמודות בלחיצה בלבד
         async function openPlaylistModal() {
             document.getElementById('playlistModal').style.display = 'flex';
             const tableBody = document.getElementById('requestsTableBody');
@@ -890,12 +883,10 @@
                     tableBody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:15px; color:var(--text-muted);">אין בקשות שירים כרגע</td></tr>';
                 }
             } catch (error) {
-                console.error('שגיאה בטעינת הבקשות:', error);
                 tableBody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:15px; color:var(--danger-red);">שגיאה בטעינת הנתונים מהשרת</td></tr>';
             }
         }
 
-        // סגירת החלון הקופץ
         function closePlaylistModal() {
             document.getElementById('playlistModal').style.display = 'none';
         }
