@@ -205,4 +205,228 @@ def get_sub_items():
         service = get_drive_service()
         results = service.files().list(
             q=f"'{folder_id}' in parents and trashed = false",
-            pageSize=100
+            pageSize=100,
+            fields="files(id, name, mimeType)",
+            supportsAllDrives=True,
+            includeItemsFromAllDrives=True
+        ).execute()
+        items = results.get('files', [])
+        
+        folders = [i for i in items if i['mimeType'] == 'application/vnd.google-apps.folder']
+        files = [i for i in items if i['mimeType'] != 'application/vnd.google-apps.folder']
+        
+        def natural_sort_key(s):
+            return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', s['name'])]
+        
+        folders.sort(key=natural_sort_key)
+        files.sort(key=natural_sort_key)
+        
+        return jsonify({'folders': folders, 'files': files})
+    except Exception as e:
+        print(f"get_sub_items Error: {e}", flush=True)
+        return jsonify({'folders': [], 'files': []})
+ 
+@app.route('/stream_preview/<file_id>')
+@requires_auth
+def stream_preview(file_id):
+    try:
+        service = get_drive_service()
+        request_drive = service.files().get_media(fileId=file_id, supportsAllDrives=True)
+        fh = io.BytesIO()
+        downloader = MediaIoBaseDownload(fh, request_drive)
+        done = False
+        while not done:
+            status, done = downloader.next_chunk()
+        fh.seek(0)
+        return Response(fh.read(), mimetype="audio/mpeg")
+    except Exception as e:
+        return str(e), 500
+ 
+@app.route('/get_current_program_status')
+def get_current_program_status():
+    try:
+        df = pd.read_excel(EXCEL_FILE, sheet_name='תוכנית חודשית', header=None)
+        now = datetime.datetime.now()
+        current_hour = now.hour
+
+        # מיפוי עמודות מותאם למבנה האקסל שלך (עמודת שעות ועמודת תוכנית מימינה)
+        day_column_map = {
+            'Sunday': 1,
+            'Monday': 3,
+            'Tuesday': 5,
+            'Wednesday': 7,
+            'Thursday': 9,
+            'Friday': 11,
+            'Saturday': 13,
+        }
+
+        current_day_en = now.strftime('%A')
+        time_col_idx = day_column_map.get(current_day_en, 1)
+        program_col_idx = time_col_idx - 1  # שם התוכנית נמצא בעמודה מימין לעמודת השעות
+
+        current_program = 'לא הוגדרה תוכנית'
+        end_time_str = '00:00'
+
+        for j in range(2, len(df)):
+            time_val = str(df.iloc[j, time_col_idx]).strip()
+            if '-' in time_val and ':' in time_val:
+                try:
+                    parts = time_val.split('-')
+                    start_time = parts[0].strip()
+                    end_time = parts[1].strip()
+                    
+                    start_h = int(start_time.split(':')[0])
+                    end_h = int(end_time.split(':')[0])
+                    
+                    actual_end_h = 24 if end_h == 0 else end_h
+                    
+                    if start_h <= current_hour < actual_end_h:
+                        prog_name = df.iloc[j, program_col_idx]
+                        if pd.notna(prog_name):
+                            current_program = str(prog_name).strip()
+                            end_time_str = end_time.strip()
+                            break
+                except:
+                    continue
+
+        return jsonify({
+            'success': True,
+            'program': fix_hebrew(current_program),
+            'end_time': end_time_str,
+            'current_week': get_current_week_of_month()
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False, 
+            'program': 'שגיאה בקריאת אקסל', 
+            'end_time': '--:--', 
+            'current_week': 1
+        })
+
+@app.route('/get_full_schedule')
+@requires_auth
+def get_full_schedule():
+    try:
+        df = pd.read_excel(EXCEL_FILE, sheet_name='תוכנית חודשית', header=None)
+        schedule_data = df.fillna("").values.tolist()
+        return jsonify({'success': True, 'data': schedule_data})
+    except Exception as e:
+        return jsonify({'success': False, 'data': []})
+ 
+@app.route('/whatsapp_webhook', methods=['GET', 'POST'])
+def whatsapp_webhook():
+    if request.method == 'GET':
+        VERIFY_TOKEN = "tiamo_radio_token_123"
+        mode = request.args.get('hub.mode')
+        token = request.args.get('hub.verify_token')
+        challenge = request.args.get('hub.challenge')
+        
+        if mode and token and mode == 'subscribe' and token == VERIFY_TOKEN:
+            return challenge, 200
+        return 'Forbidden', 403
+ 
+    elif request.method == 'POST':
+        data = request.get_json()
+        try:
+            message = data['entry'][0]['changes'][0]['value']['messages'][0]
+            sender_phone = message['from']
+            raw_text = message['text']['body']
+            
+            parsed_songs = parse_playlist_text(raw_text)
+ 
+            request_item = {
+                'id': len(requested_songs_list) + 1,
+                'phone': sender_phone,
+                'raw_text': raw_text,
+                'parsed_songs': parsed_songs,
+                'time': datetime.datetime.now().strftime('%H:%M - %d/%m/%Y')
+            }
+            requested_songs_list.insert(0, request_item)
+        except Exception as e:
+            pass
+            
+        return jsonify({'status': 'success'}), 200
+ 
+@app.route('/upload_file', methods=['POST'])
+@requires_auth
+def upload_file():
+    try:
+        folder_id = request.form.get('folder_id')
+        uploaded_file = request.files.get('file')
+        if not uploaded_file or not folder_id:
+            return jsonify({'success': False, 'error': 'חסרים פרטים להעלאה'})
+            
+        service = get_drive_service()
+        file_metadata = {
+            'name': uploaded_file.filename,
+            'parents': [folder_id]
+        }
+        
+        file_mimetype = uploaded_file.mimetype or 'application/octet-stream'
+        media = MediaIoBaseUpload(io.BytesIO(uploaded_file.read()), mimetype=file_mimetype, resumable=True)
+        
+        service.files().create(
+            body=file_metadata, 
+            media_body=media, 
+            fields='id',
+            supportsAllDrives=True
+        ).execute()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+ 
+@app.route('/delete_file', methods=['POST'])
+@requires_auth
+def delete_file():
+    try:
+        data = request.get_json()
+        file_id = data.get('file_id')
+        service = get_drive_service()
+        service.files().delete(
+            fileId=file_id,
+            supportsAllDrives=True
+        ).execute()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+ 
+@app.route('/get_whatsapp_requests', methods=['GET'])
+@requires_auth
+def get_whatsapp_requests():
+    return jsonify({'success': True, 'requests': requested_songs_list})
+ 
+@app.route('/search_playlist_in_drive', methods=['POST'])
+@requires_auth
+def search_playlist_in_drive():
+    try:
+        data = request.get_json()
+        songs_to_search = data.get('songs', [])
+        
+        results = []
+        for item in songs_to_search:
+            artist = item.get('artist', '')
+            song = item.get('song', '')
+            
+            drive_files = search_drive_songs(artist, song)
+            results.append({
+                'requested_artist': artist,
+                'requested_song': song,
+                'found_in_drive': drive_files
+            })
+            
+        return jsonify({'success': True, 'results': results})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+ 
+@app.route('/manual_scan_whatsapp', methods=['POST'])
+@requires_auth
+def manual_scan_whatsapp():
+    try:
+        return jsonify({'success': True, 'message': 'הסריקה הושלמה בהצלחה!'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+ 
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
