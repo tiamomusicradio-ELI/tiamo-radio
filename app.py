@@ -255,19 +255,22 @@ def get_current_program_status():
             
         current_hour = now.hour
 
+        # מיפוי מדויק לפי עמודות האקסל:
         day_column_map = {
-            'Sunday': 1,
-            'Monday': 3,
-            'Tuesday': 5,
-            'Wednesday': 7,
-            'Thursday': 9,
-            'Friday': 11,
-            'Saturday': 13,
+            'Sunday': {'program': 1, 'time': 2},
+            'Monday': {'program': 3, 'time': 4},
+            'Tuesday': {'program': 5, 'time': 6},
+            'Wednesday': {'program': 7, 'time': 8},
+            'Thursday': {'program': 9, 'time': 10},
+            'Friday': {'program': 11, 'time': 12},
+            'Saturday': {'program': 13, 'time': 14},
         }
 
         current_day_en = now.strftime('%A')
-        time_col_idx = day_column_map.get(current_day_en, 1)
-        program_col_idx = time_col_idx - 1  # שם התוכנית נמצא בעמודה מימין לעמודת השעות
+        cols = day_column_map.get(current_day_en, {'program': 7, 'time': 8})
+        
+        program_col_idx = cols['program']
+        time_col_idx = cols['time']
 
         current_program = 'לא הוגדרה תוכנית'
         end_time_str = '00:00'
