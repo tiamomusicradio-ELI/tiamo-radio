@@ -255,27 +255,28 @@ def get_current_program_status():
             
         current_hour = now.hour
 
-        # מיפוי מדויק לפי עמודות האקסל:
+        # מיפוי מדויק לפי מבנה האקסל האמיתי:
+        # כל יום מורכב משתי עמודות: [שעת השידור, שם התוכנית]
         day_column_map = {
-            'Sunday': {'program': 1, 'time': 2},
-            'Monday': {'program': 3, 'time': 4},
-            'Tuesday': {'program': 5, 'time': 6},
-            'Wednesday': {'program': 7, 'time': 8},
-            'Thursday': {'program': 9, 'time': 10},
-            'Friday': {'program': 11, 'time': 12},
-            'Saturday': {'program': 13, 'time': 14},
+            'Sunday': {'time': 0, 'program': 1},
+            'Monday': {'time': 2, 'program': 3},
+            'Tuesday': {'time': 4, 'program': 5},
+            'Wednesday': {'time': 6, 'program': 7},
+            'Thursday': {'time': 8, 'program': 9},
+            'Friday': {'time': 10, 'program': 11},
+            'Saturday': {'time': 12, 'program': 13},
         }
 
         current_day_en = now.strftime('%A')
-        cols = day_column_map.get(current_day_en, {'program': 7, 'time': 8})
+        cols = day_column_map.get(current_day_en, {'time': 6, 'program': 7})
         
-        program_col_idx = cols['program']
         time_col_idx = cols['time']
+        program_col_idx = cols['program']
 
         current_program = 'לא הוגדרה תוכנית'
         end_time_str = '00:00'
 
-        # מתחילים משורה 3 ומעלה (מדלגים על שורות הכותרת הראשונות באקסל)
+        # מעבר על כל שורות התוכניות (החל משורה 2 באקסל)
         for j in range(2, len(df)):
             cell_val = df.iloc[j, time_col_idx]
             if pd.isna(cell_val):
