@@ -242,6 +242,34 @@ def stream_preview(file_id):
         return Response(fh.read(), mimetype="audio/mpeg")
     except Exception as e:
         return str(e), 500
+
+@app.route('/stream')
+def live_stream():
+    """
+    נתיב הזרמת אודיו ישירה למאזינים (Auto DJ Stream).
+    השרת משדר את קובץ האודיו או את רשימת השירים ברציפות בלי דיליי.
+    """
+    def generate():
+        sample_audio_path = os.path.join(BASE_DIR, 'songs', 'default_track.mp3')
+        
+        if not os.path.exists(sample_audio_path):
+            while True:
+                yield b''
+                time.sleep(1)
+                
+        while True:
+            try:
+                with open(sample_audio_path, 'rb') as f:
+                    while True:
+                        chunk = f.read(4096)
+                        if not chunk:
+                            break
+                        yield chunk
+            except Exception as e:
+                print(f"Stream Error: {e}", flush=True)
+                break
+
+    return Response(generate(), mimetype='audio/mpeg')
  
 @app.route('/get_current_program_status')
 def get_current_program_status():
