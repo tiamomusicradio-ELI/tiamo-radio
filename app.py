@@ -255,7 +255,6 @@ def get_current_program_status():
             
         current_hour = now.hour
 
-        # מיפוי נכון של עמודות האקסל לכל יום (זוגות: שעה ואז שם התוכנית)
         day_column_map = {
             'Sunday': {'time': 0, 'program': 1},
             'Monday': {'time': 2, 'program': 3},
@@ -275,7 +274,6 @@ def get_current_program_status():
         current_program = 'לא הוגדרה תוכנית'
         end_time_str = '00:00'
 
-        # מעבר על כל שורות הטבלה החל משורה 2 (מדלגים על כותרות)
         for j in range(2, len(df)):
             cell_val = df.iloc[j, time_col_idx]
             if pd.isna(cell_val):
@@ -324,6 +322,54 @@ def get_current_program_status():
             'end_time': '--:--', 
             'current_week': 1
         })
+
+@app.route('/get_daily_schedule')
+def get_daily_schedule():
+    try:
+        df = pd.read_excel(EXCEL_FILE, sheet_name='תוכנית חודשית', header=None)
+        
+        try:
+            now = datetime.datetime.now(ZoneInfo('Asia/Jerusalem'))
+        except:
+            now = datetime.datetime.now()
+
+        day_column_map = {
+            'Sunday': {'time': 0, 'program': 1},
+            'Monday': {'time': 2, 'program': 3},
+            'Tuesday': {'time': 4, 'program': 5},
+            'Wednesday': {'time': 6, 'program': 7},
+            'Thursday': {'time': 8, 'program': 9},
+            'Friday': {'time': 10, 'program': 11},
+            'Saturday': {'time': 12, 'program': 13},
+        }
+
+        current_day_en = now.strftime('%A')
+        cols = day_column_map.get(current_day_en, {'time': 6, 'program': 7})
+        
+        time_col_idx = cols['time']
+        program_col_idx = cols['program']
+
+        schedule_items = []
+        for j in range(2, len(df)):
+            time_val = df.iloc[j, time_col_idx]
+            prog_val = df.iloc[j, program_col_idx]
+            
+            if pd.isna(time_val):
+                continue
+                
+            if isinstance(time_val, datetime.time):
+                t_str = time_val.strftime('%H:%M')
+            else:
+                t_str = str(time_val).strip()
+                
+            p_str = str(prog_val).strip() if pd.notna(prog_val) else '-'
+            
+            if t_str:
+                schedule_items.append({'time': t_str, 'program': p_str})
+
+        return jsonify({'success': True, 'schedule': schedule_items})
+    except Exception as e:
+        return jsonify({'success': False, 'schedule': []})
 
 @app.route('/get_full_schedule')
 @requires_auth
