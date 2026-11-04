@@ -276,15 +276,24 @@ def get_current_program_status():
             cell_val = df.iloc[j, time_col_idx]
             if pd.isna(cell_val):
                 continue
-            time_val = str(cell_val).strip()
-            if '-' in time_val and ':' in time_val:
+            
+            if isinstance(cell_val, datetime.time):
+                time_val = cell_val.strftime('%H:%M')
+            else:
+                time_val = str(cell_val).strip()
+
+            if '-' in time_val or ':' in time_val:
                 try:
-                    parts = time_val.split('-')
-                    start_time = parts[0].strip()
-                    end_time = parts[1].strip()
-                    
+                    if '-' in time_val:
+                        parts = time_val.split('-')
+                        start_time = parts[0].strip()
+                        end_time = parts[1].strip()
+                    else:
+                        start_time = time_val
+                        end_time = "00:00"
+
                     start_h = int(start_time.split(':')[0])
-                    end_h = int(end_time.split(':')[0])
+                    end_h = int(end_time.split(':')[0]) if ':' in end_time else start_h + 1
                     
                     actual_end_h = 24 if end_h == 0 else end_h
                     
@@ -294,7 +303,7 @@ def get_current_program_status():
                             current_program = str(prog_name).strip()
                             end_time_str = end_time.strip()
                             break
-                except:
+                except Exception as inner_e:
                     continue
 
         return jsonify({
