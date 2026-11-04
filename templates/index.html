@@ -528,11 +528,11 @@
                 'Friday': 'שישי',
                 'Saturday': 'שבת'
             };
-            const scheduleNow = new Date();
+            const now = new Date();
             const options = { weekday: 'long', timeZone: 'Asia/Jerusalem' };
-            let englishDay = new Intl.DateTimeFormat('en-US', options).format(scheduleNow);
+            let englishDay = new Intl.DateTimeFormat('en-US', options).format(now);
             let hebrewDay = dayNamesHe[englishDay] || 'היום';
-            let dateStr = scheduleNow.toLocaleDateString('he-IL', { timeZone: 'Asia/Jerusalem' });
+            let dateStr = now.toLocaleDateString('he-IL', { timeZone: 'Asia/Jerusalem' });
             
             let titleEl = document.getElementById('schedule-title');
             if (titleEl) {
@@ -549,4 +549,347 @@
                         return;
                     }
                     
-                    let
+                    let rows = response.data;
+                    let html = '';
+                    
+                    const now = new Date();
+                    let jsDay = now.getDay(); 
+                    let currentDayColIdx = (jsDay === 0) ? 1 : (jsDay === 1) ? 2 : (jsDay === 2) ? 3 : (jsDay === 3) ? 4 : (jsDay === 4) ? 5 : (jsDay === 5) ? 6 : 7;
+                    let currentHour = now.getHours();
+
+                    // לולאה שעוברת על כל שורות הטבלה מהשורה השלישית ואילך (אינדקס 2)
+                    for (let i = 2; i < rows.length; i++) {
+                        let row = rows[i];
+                        let timeVal = row[0] || row[6] || ''; 
+                        if (!timeVal) continue;
+                        
+                        let isCurrentTimeSlot = false;
+                        if (timeVal.includes('-')) {
+                            try {
+                                let parts = timeVal.split('-');
+                                let startH = parseInt(parts[0].trim().split(':')[0]);
+                                let endH = parseInt(parts[1].trim().split(':')[0]);
+                                if (endH === 0) endH = 24;
+                                if (startH <= currentHour && currentHour < endH) {
+                                    isCurrentTimeSlot = true;
+                                }
+                            } catch (e) {}
+                        }
+
+                        html += `<tr style="border-bottom: 1px solid var(--card-border); transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">`;
+                        html += `<td style="padding: 8px 10px; font-weight: bold; color: var(--primary-gold); border-left: 1px solid var(--card-border); background: rgba(0,0,0,0.1);">${timeVal}</td>`;
+                        
+                        let colIndices = [
+                            { col: 1, dayIdx: 1 }, 
+                            { col: 3, dayIdx: 2 }, 
+                            { col: 5, dayIdx: 3 }, 
+                            { col: 7, dayIdx: 4 }, 
+                            { col: 9, dayIdx: 5 }, 
+                            { col: 11, dayIdx: 6 }, 
+                            { col: 13, dayIdx: 7 }  
+                        ];
+
+                        colIndices.forEach(item => {
+                            let progName = row[item.col] || '';
+                            let isLiveCell = isCurrentTimeSlot && (item.dayIdx === currentDayColIdx);
+                            
+                            let cellStyle = '';
+                            if (isLiveCell) {
+                                cellStyle = 'background: rgba(212, 175, 55, 0.25); color: var(--primary-gold); font-weight: bold; border: 2px solid var(--primary-gold); box-shadow: inset 0 0 10px rgba(212,175,55,0.4);';
+                            } else if (progName) {
+                                cellStyle = 'color: var(--text-main); font-weight: 500;';
+                            } else {
+                                cellStyle = 'color: var(--text-muted); opacity: 0.4;';
+                            }
+
+                            let badgeHtml = isLiveCell ? `<span style="font-size:10px; background:var(--primary-gold); color:#111; padding:1px 5px; border-radius:4px; margin-right:5px; display:inline-block;">LIVE 🔴</span>` : '';
+                            html += `<td style="padding: 8px 10px; border-left: 1px solid var(--card-border); ${cellStyle}">${badgeHtml}${progName || '-'}</td>`;
+                        });
+                        
+                        html += `</tr>`;
+                    }
+                    
+                    tbody.innerHTML = html;
+                })
+                .catch(err => {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px; color: var(--danger-red);">שגיאה בתקשורת עם השרת</td></tr>';
+                });
+        }
+
+        function loadWhatsappRequests() {
+            let tbody = document.getElementById('whatsapp-requests-tbody');
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px; color: var(--text-muted);">טוען בקשות שירים...</td></tr>';
+            
+            fetch('/get_whatsapp_requests')
+                .then(res => res.json())
+                .then(response => {
+                    if (!response.success || response.requests.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px; color: var(--text-muted);">אין בקשות שירים חדשות כרגע</td></tr>';
+                        return;
+                    }
+                    
+                    let html = '';
+                    response.requests.forEach(req => {
+                        html += `<tr style="border-bottom: 1px solid var(--card-border);">
+                            <td style="padding: 10px; border-left: 1px solid var(--card-border); color: var(--primary-gold);">${req.time}</td>
+                            <td style="padding: 10px; border-left: 1px solid var(--card-border);">${req.phone}</td>
+                            <td style="padding: 10px; font-weight: bold;">${req.song}</td>
+                        </tr>`;
+                    });
+                    tbody.innerHTML = html;
+                })
+                .catch(err => {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px; color: var(--danger-red);">שגיאה בטעינת הבקשות</td></tr>';
+                });
+        }
+
+        function loadMainPrograms() {
+            folderHistory = [];
+            let container = document.getElementById('content');
+            container.innerHTML = '<p style="color:var(--text-muted);">טוען חודשים ותיקיות מהענן...</p>';
+            
+            fetch('/get_main_programs')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        container.innerHTML = '<p style="color:var(--danger-red);">לא נמצאו תיקיות בדרייב.</p>';
+                        return;
+                    }
+                    renderFolderList(data, "תיקיות ראשיות (חודשים / תוכניות)");
+                })
+                .catch(err => {
+                    container.innerHTML = '<p style="color:var(--danger-red);">שגיאה בטעינת נתונים מהענן.</p>';
+                });
+        }
+
+        function openFolder(folderId, folderName, isBackNav = false) {
+            if (!isBackNav) {
+                folderHistory.push({id: folderId, name: folderName});
+            }
+
+            let container = document.getElementById('content');
+            container.innerHTML = `<p style="color:var(--text-muted);">טוען את תכולת התיקייה "${folderName}"...</p>`;
+            
+            fetch(`/get_sub_items?folder_id=${folderId}`)
+                .then(response => response.json())
+                .then(data => {
+                    renderSubItems(data, folderId);
+                })
+                .catch(err => {
+                    container.innerHTML = '<p style="color:var(--danger-red);">שגיאה בטעינת תתי-התיקיות.</p>';
+                });
+        }
+
+        function renderBreadcrumbs() {
+            let html = `<div class="breadcrumb-bar"><span>📍 מיקום:</span> <span class="breadcrumb-item" onclick="jumpToBreadcrumb(-1)">תיקיות ראשיות</span>`;
+            folderHistory.forEach((item, index) => {
+                html += ` / <span class="breadcrumb-item" onclick="jumpToBreadcrumb(${index})">${item.name}</span>`;
+            });
+            html += `</div>`;
+            return html;
+        }
+
+        function jumpToBreadcrumb(index) {
+            if (index === -1) {
+                folderHistory = [];
+                loadMainPrograms();
+            } else {
+                folderHistory = folderHistory.slice(0, index + 1);
+                let target = folderHistory[folderHistory.length - 1];
+                openFolder(target.id, target.name, true);
+            }
+        }
+
+        function renderFolderList(folders, title) {
+            let container = document.getElementById('content');
+            let html = renderBreadcrumbs();
+            html += `<h4 style="color: var(--primary-gold); margin-bottom: 12px;">📁 ${title}</h4>`;
+            
+            folders.forEach(prog => {
+                html += `<div class="folder-row" onclick="openFolder('${prog.id}', '${prog.name}')">
+                    <span style="font-weight:bold; color:var(--primary-gold);">📁 ${prog.name}</span>
+                    <span style="color: var(--text-muted); font-size: 12px;">פתח ➔</span>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderSubItems(data, folderId) {
+            let container = document.getElementById('content');
+            let currentFolderName = folderHistory.length > 0 ? folderHistory[folderHistory.length - 1].name : '';
+            
+            let html = renderBreadcrumbs();
+            if (currentFolderName) {
+                html += `<h4 style="color: var(--primary-gold); margin-bottom: 12px;">📁 ${currentFolderName}</h4>`;
+            }
+
+            let isFilesOnlyLevel = (data.folders.length === 0);
+            
+            if (isFilesOnlyLevel) {
+                html += `<div style="background:var(--main-bg); padding:12px; margin-bottom:15px; border-radius:6px; border:1px dashed var(--primary-gold); display:flex; gap:10px; align-items:center;">
+                    <input type="file" id="file-upload-input" style="color:var(--text-main); font-size:12px; flex:1;">
+                    <button class="btn btn-success" onclick="uploadFileToFolder('${folderId}')" style="font-size:12px;">📤 העלה קובץ לתיקייה זו</button>
+                </div>`;
+            }
+
+            if (data.folders.length === 0 && data.files.length === 0) {
+                html += `<p style="color: var(--text-muted);">התיקייה ריקה.</p>`;
+            }
+
+            data.folders.forEach(folder => {
+                html += `<div class="folder-row" onclick="openFolder('${folder.id}', '${folder.name}')">
+                    <span style="font-weight:bold; color:var(--primary-gold);">📁 ${folder.name}</span>
+                    <span style="color: var(--text-muted); font-size: 12px;">פתח ➔</span>
+                </div>`;
+            });
+
+            data.files.forEach(file => {
+                html += `<div style="background:var(--main-bg); padding:10px 15px; margin:8px 0; border-radius:6px; border:1px solid var(--card-border); display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:var(--text-main);">🎵 ${file.name}</span>
+                    <div style="display:flex; gap:8px;">
+                        <button id="btn-play-${file.id}" class="btn btn-success" onclick="playPreview('${file.id}', this); event.stopPropagation();">▶️ הפעלה</button>
+                        <button class="btn btn-danger" onclick="stopPreview('${file.id}'); event.stopPropagation();">⏹️ עצור</button>
+                        <button class="btn btn-danger" onclick="deleteFile('${file.id}', '${folderId}'); event.stopPropagation();">🗑️ מחק</button>
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function uploadFileToFolder(folderId) {
+            let input = document.getElementById('file-upload-input');
+            if (!input.files || input.files.length === 0) {
+                alert("נא לבחור קובץ להעלאה.");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append('file', input.files[0]);
+            formData.append('folder_id', folderId);
+
+            alert("מעלה קובץ ל-Google Drive, אנא המתן מספר שניות...");
+
+            fetch('/upload_file', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert("הקובץ הועלה בהצלחה!");
+                    let currentFolder = folderHistory[folderHistory.length - 1];
+                    openFolder(currentFolder.id, currentFolder.name, true);
+                } else {
+                    alert("שגיאה בהעלאת הקובץ: " + (data.error || ''));
+                }
+            })
+            .catch(err => alert("שגיאה בתקשורת עם השרת"));
+        }
+
+        function deleteFile(fileId, folderId) {
+            if (!confirm("האם אתה בטוח שברצונך למחוק קובץ זה מהדרייב?")) return;
+
+            fetch('/delete_file', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ file_id: fileId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert("הקובץ נמחק בהצלחה!");
+                    let currentFolder = folderHistory[folderHistory.length - 1];
+                    openFolder(currentFolder.id, currentFolder.name, true);
+                } else {
+                    alert("שגיאה במחיקת הקובץ.");
+                }
+            })
+            .catch(err => alert("שגיאה בתקשורת עם השרת"));
+        }
+
+        function playPreview(fileId, btnElement) {
+            let player = document.getElementById('preview-player');
+            
+            if (currentPlayingBtn) {
+                currentPlayingBtn.className = "btn btn-success";
+                currentPlayingBtn.innerText = "▶️ הפעלה";
+            }
+
+            currentPlayingBtn = btnElement;
+            currentPlayingBtn.className = "btn btn-warning";
+            currentPlayingBtn.innerText = "🔊 מנגן...";
+
+            player.src = `/stream_preview/${fileId}`;
+            player.play();
+
+            player.onended = function() {
+                if (currentPlayingBtn) {
+                    currentPlayingBtn.className = "btn btn-success";
+                    currentPlayingBtn.innerText = "▶️ הפעלה";
+                    currentPlayingBtn = null;
+                }
+            };
+        }
+
+        function stopPreview(fileId) {
+            stopGlobalPreview();
+        }
+
+        function stopGlobalPreview() {
+            let player = document.getElementById('preview-player');
+            if (player) {
+                player.pause();
+                player.currentTime = 0;
+            }
+
+            if (currentPlayingBtn) {
+                currentPlayingBtn.className = "btn btn-success";
+                currentPlayingBtn.innerText = "▶️ הפעלה";
+                currentPlayingBtn = null;
+            }
+        }
+
+        async function openPlaylistModal() {
+            document.getElementById('playlistModal').style.display = 'flex';
+            const tableBody = document.getElementById('requestsTableBody');
+            tableBody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:15px; color:var(--text-muted);">טוען בקשות...</td></tr>';
+
+            try {
+                const response = await fetch('/get_whatsapp_requests');
+                const data = await response.json();
+
+                if (data.success && data.requests.length > 0) {
+                    tableBody.innerHTML = '';
+
+                    data.requests.forEach(req => {
+                        if (req.parsed_songs && req.parsed_songs.length > 0) {
+                            req.parsed_songs.forEach(item => {
+                                const row = document.createElement('tr');
+                                row.style.borderBottom = '1px solid var(--card-border)';
+                                row.innerHTML = `
+                                    <td style="padding:10px; border:1px solid var(--card-border); color:var(--text-main); font-weight:600;">${item.artist || 'לא צוין'}</td>
+                                    <td style="padding:10px; border:1px solid var(--card-border); color:var(--primary-gold); font-weight:bold;">${item.song || 'לא צוין'}</td>
+                                `;
+                                tableBody.appendChild(row);
+                            });
+                        }
+                    });
+
+                    if (tableBody.children.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:15px; color:var(--text-muted);">לא נמצאו שירים בפורמט תקין</td></tr>';
+                    }
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:15px; color:var(--text-muted);">אין בקשות שירים כרגע</td></tr>';
+                }
+            } catch (error) {
+                tableBody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:15px; color:var(--danger-red);">שגיאה בטעינת הנתונים מהשרת</td></tr>';
+            }
+        }
+
+        function closePlaylistModal() {
+            document.getElementById('playlistModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
