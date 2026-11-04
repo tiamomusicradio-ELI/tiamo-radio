@@ -275,7 +275,8 @@ def get_current_program_status():
         current_program = 'לא הוגדרה תוכנית'
         end_time_str = '00:00'
 
-        for j in range(len(df)):
+        # מתחילים משורה 3 ומעלה (מדלגים על שורות הכותרת הראשונות באקסל)
+        for j in range(2, len(df)):
             cell_val = df.iloc[j, time_col_idx]
             if pd.isna(cell_val):
                 continue
