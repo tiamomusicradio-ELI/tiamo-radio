@@ -1,772 +1,1138 @@
 <!DOCTYPE html>
-<html lang="he" dir="ltr">
+<html lang="he" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TIAMO MUSIC - מוזיקה באווירה אחרת</title>
-    <style>
-        :root {
-            --bg-deep: #07090f;
-            --card-bg: rgba(16, 22, 35, 0.78);
-            --gold: #d4af37;
-            --gold-light: #f3c653;
-            --text-main: #ffffff;
-            --text-muted: #94a3b8;
-            --border-gold: rgba(212, 175, 55, 0.28);
-            --live-green: #10b981;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TIAMO MUSIC</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+  <style>
+    /* עיגון מלא ויציב של הרקע החדש */
+    .bg-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -2;
+      overflow: hidden;
+      background-color: #1a1a1a;
+    }
 
-        body {
-            background-color: var(--bg-deep);
-            /* תמונת הרקע המקורית עם כלים מוזיקליים: כינור, עוד ובגלמה */
-            background-image: radial-gradient(circle at 50% 15%, rgba(212, 175, 55, 0.08) 0%, transparent 60%),
-                              url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1920&q=80');
-            background-size: cover;
-            background-position: center;
-            background-blend-mode: overlay;
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 25px 50px;
-        }
+    .bg-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center bottom; 
+      filter: brightness(1.02) contrast(1.08);
+    }
 
-        header {
-            width: 100%;
-            max-width: 1350px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
+    .bg-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(1px);
+    }
 
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--gold);
-            font-size: 18px;
-            font-weight: 900;
-            letter-spacing: 2px;
-            text-decoration: none;
-        }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 15px 120px 15px;
+      position: relative;
+      font-family: Arial, sans-serif;
+    }
+  
+    header, .grid-container, footer, .modal {
+      position: relative;
+      z-index: 1;
+    }
+  
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      margin-top: 15px;
+      max-width: 700px;
+    }
+  
+    h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-shadow: 0 6px 20px rgba(0,0,0,0.9);
+      margin-bottom: 8px;
+    }
 
-        .brand-logo span {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 2px solid var(--gold);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(212, 175, 55, 0.15);
-            font-size: 14px;
-        }
+    @keyframes blinkTip {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.98); }
+    }
 
-        nav ul {
-            display: flex;
-            gap: 30px;
-            list-style: none;
-        }
+    .intro-tip {
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.95);
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 8px 16px;
+      border-radius: 30px;
+      display: inline-block;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      animation: blinkTip 2s infinite ease-in-out;
+    }
 
-        nav ul li a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            transition: 0.3s;
-            cursor: pointer;
-        }
+    .sub-credits {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.85);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      margin-bottom: 20px;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+    }
 
-        nav ul li a:hover, nav ul li a.active {
-            color: var(--gold);
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-        }
+    .top-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+  
+    .admin-btn {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(255, 255, 255, 0.4);
+      border-left: 1px solid rgba(255, 255, 255, 0.3);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
 
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
+    .admin-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
 
-        .search-icon {
-            color: var(--text-muted);
-            font-size: 16px;
-            cursor: pointer;
-        }
+    .global-stop-btn {
+      background: linear-gradient(135deg, rgba(231, 76, 60, 0.45) 0%, rgba(192, 57, 43, 0.25) 100%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(255, 255, 255, 0.5);
+      border-left: 1px solid rgba(255, 255, 255, 0.4);
+      border-right: 1px solid rgba(231, 76, 60, 0.3);
+      border-bottom: 1px solid rgba(231, 76, 60, 0.3);
+      color: #ffffff;
+      padding: 10px 22px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 0 8px 25px rgba(231, 76, 60, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-        .listen-live-btn {
-            background: linear-gradient(135deg, #d4af37, #aa820a);
-            color: #000;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 30px;
-            font-weight: 800;
-            font-size: 13px;
-            letter-spacing: 1px;
-            cursor: pointer;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
-            transition: 0.3s;
-            text-decoration: none;
-        }
+    .global-stop-btn i {
+      color: #ff6b6b;
+      font-size: 1rem;
+    }
 
-        .listen-live-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.7);
-        }
+    .global-stop-btn:hover {
+      background: linear-gradient(135deg, rgba(231, 76, 60, 0.65) 0%, rgba(192, 57, 43, 0.45) 100%);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 12px 30px rgba(231, 76, 60, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+  
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 25px;
+      width: 100%;
+      max-width: 1050px;
+    }
+  
+    /* עיצוב כרטיסי השירים בזכוכית תלת-מימדית בולטת */
+    .card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.05) 100%);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-top: 1px solid rgba(255, 255, 255, 0.45);
+      border-left: 1px solid rgba(255, 255, 255, 0.35);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 22px;
+      padding: 22px 18px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s;
+      position: relative;
+      cursor: grab;
+    }
 
-        .dashboard-container {
-            width: 100%;
-            max-width: 1350px;
-            margin: 20px auto;
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 30px;
-        }
+    .card:active {
+      cursor: grabbing;
+    }
 
-        .section-title {
-            font-size: 11px;
-            letter-spacing: 2px;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            font-weight: 700;
-            text-align: left;
-        }
+    .card.dragging {
+      opacity: 0.3;
+    }
+  
+    .card.active {
+      border-color: #2ecc71;
+      box-shadow: 0 0 35px rgba(46, 204, 113, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+  
+    .song-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 12px;
+    }
 
-        .now-playing-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(25px);
-            border: 1px solid var(--border-gold);
-            border-radius: 24px;
-            padding: 35px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-        }
+    .song-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+      word-break: break-word;
+      text-align: right;
+      flex-grow: 1;
+    }
 
-        .now-playing-content {
-            display: grid;
-            grid-template-columns: 200px 1fr;
-            gap: 25px;
-            align-items: center;
-            margin-bottom: 30px;
-        }
+    .move-btns {
+      display: flex;
+      gap: 5px;
+    }
 
-        .album-art-box {
-            width: 100%;
-            aspect-ratio: 1;
-            border-radius: 18px;
-            background: radial-gradient(circle, #1a2233 0%, #05070a 100%);
-            border: 2px solid var(--gold);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-            padding: 15px;
-            text-align: center;
-        }
+    /* כפתורי הזזה בתלת מימד */
+    .move-btn {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+      border-top: 1px solid rgba(255, 255, 255, 0.4);
+      border-left: 1px solid rgba(255, 255, 255, 0.3);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
 
-        .live-badge {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            font-size: 10px;
-            font-weight: 800;
-            color: var(--live-green);
-            background: rgba(16, 185, 129, 0.15);
-            padding: 3px 10px;
-            border-radius: 10px;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
+    .move-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.15));
+      transform: scale(1.1);
+    }
 
-        .rotating-coin {
-            width: 75px;
-            height: 75px;
-            border-radius: 50%;
-            border: 2px solid var(--gold);
-            background: radial-gradient(circle, #111522 0%, #05070a 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            animation: coinRotate 12s linear infinite;
-            box-shadow: 0 0 15px rgba(212,175,55,0.3);
-            margin-bottom: 10px;
-        }
+    .card-footer-feedback {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+      gap: 5px;
+    }
 
-        @keyframes coinRotate {
-            0% { transform: perspective(600px) rotateY(0deg); }
-            100% { transform: perspective(600px) rotateY(360deg); }
-        }
+    /* כפתור לייק זכוכית תלת ממדי */
+    .like-btn {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+      border-top: 1px solid rgba(255, 255, 255, 0.35);
+      border-left: 1px solid rgba(255, 255, 255, 0.25);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      padding: 6px 12px;
+      border-radius: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
 
-        .track-details h2 {
-            font-size: 24px;
-            font-weight: 900;
-            color: #fff;
-            margin-bottom: 4px;
-        }
+    .like-btn i {
+      color: #ffffff;
+      transition: color 0.2s;
+    }
 
-        .track-details .artist {
-            font-size: 14px;
-            color: var(--gold);
-            margin-bottom: 20px;
-        }
+    .like-btn.liked {
+      background: linear-gradient(135deg, rgba(231, 76, 60, 0.35), rgba(192, 57, 43, 0.2));
+      border-color: rgba(231, 76, 60, 0.5);
+      color: #ff6b6b;
+    }
 
-        .waveform-img {
-            width: 100%;
-            height: 45px;
-            background: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80') center/cover;
-            border-radius: 6px;
-            opacity: 0.85;
-            filter: sepia(100%) hue-rotate(10deg) saturate(300%);
-            margin-bottom: 12px;
-        }
+    .like-btn.liked i {
+      color: #ff6b6b;
+    }
 
-        .current-track-meta {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
+    .like-btn:hover {
+      transform: scale(1.05);
+    }
 
-        .player-controls-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-top: 1px solid rgba(255,255,255,0.08);
-            padding-top: 25px;
-        }
+    .main-envelope-badge {
+      background: rgba(52, 152, 219, 0.3);
+      border: 1px solid rgba(52, 152, 219, 0.5);
+      color: #3498db;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    }
 
-        .control-buttons-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+    /* כפתור השארת תגובה זכוכית */
+    .comment-open-btn {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+      border-top: 1px solid rgba(255, 255, 255, 0.35);
+      border-left: 1px solid rgba(255, 255, 255, 0.25);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
 
-        .main-play-btn {
-            width: 52px;
-            height: 52px;
-            background: var(--gold);
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: #000;
-            box-shadow: 0 0 20px rgba(212,175,55,0.5);
-            transition: 0.2s;
-        }
+    .comment-open-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.1));
+    }
 
-        .main-play-btn:hover {
-            transform: scale(1.1);
-            background: var(--gold-light);
-        }
+    .seek-slider {
+      width: 95%;
+      margin: 10px 0;
+      accent-color: #2ecc71;
+      cursor: pointer;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(0, 0, 0, 0.6);
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.9);
+      appearance: none;
+      -webkit-appearance: none;
+    }
 
-        .mini-ctrl-icon {
-            color: var(--text-muted);
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .mini-ctrl-icon:hover { color: var(--gold); }
+    .seek-slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #ffffff;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.6);
+      transition: transform 0.2s;
+    }
 
-        .action-chips-group {
-            display: flex;
-            gap: 12px;
-        }
+    .seek-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
 
-        .chip-btn {
-            background: rgba(212, 175, 55, 0.12);
-            border: 1px solid var(--border-gold);
-            color: var(--text-main);
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            transition: 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
+    .controls-group {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      justify-content: center;
+      margin-top: 8px;
+    }
+  
+    /* כפתורי הפעלה, הקפאה ועצירה בתלת ממד בולט */
+    .action-btn {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%);
+      backdrop-filter: blur(10px);
+      color: #ffffff;
+      border-top: 1px solid rgba(255, 255, 255, 0.45);
+      border-left: 1px solid rgba(255, 255, 255, 0.35);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
 
-        .chip-btn.whatsapp {
-            background: rgba(37, 211, 102, 0.15);
-            border-color: rgba(37, 211, 102, 0.4);
-            color: #25d366;
-        }
+    .action-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.12) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
 
-        .chip-btn:hover {
-            background: var(--gold);
-            color: #000;
-            border-color: var(--gold);
-        }
+    .action-btn.play-active {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      border-top-color: rgba(255, 255, 255, 0.6);
+      border-left-color: rgba(255, 255, 255, 0.5);
+      border-right-color: #27ae60;
+      border-bottom-color: #27ae60;
+      color: #fff;
+      box-shadow: 0 8px 25px rgba(46, 204, 113, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+  
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(12px);
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 100;
+    }
+  
+    .modal-content {
+      background: linear-gradient(135deg, rgba(40, 40, 40, 0.95), rgba(20, 20, 20, 0.95));
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 24px;
+      padding: 30px;
+      width: 100%;
+      max-width: 500px;
+      color: #fff;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+    }
+  
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 12px;
+    }
+  
+    .close-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
 
-        .chip-btn.whatsapp:hover {
-            background: #25d366;
-            color: #fff;
-        }
+    .close-btn:hover {
+      color: #2ecc71;
+    }
+  
+    .form-section {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 18px;
+      border-radius: 14px;
+      margin-bottom: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  
+    .form-group input[type="text"], .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-top: 5px;
+      font-family: Arial, sans-serif;
+    }
 
-        .schedule-panel {
-            background: var(--card-bg);
-            backdrop-filter: blur(25px);
-            border: 1px solid var(--border-gold);
-            border-radius: 24px;
-            padding: 25px 30px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-            max-height: 420px;
-            overflow-y: auto;
-        }
+    .form-group input[type="text"]:focus, .form-group textarea:focus {
+      border-color: #2ecc71;
+    }
+  
+    .save-btn {
+      width: 100%;
+      background: #2ecc71;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s, transform 0.2s;
+      box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+    }
 
-        .schedule-item {
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-        }
+    .save-btn:hover {
+      background: #27ae60;
+      transform: translateY(-2px);
+    }
+  
+    .admin-song-list {
+      margin-top: 25px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 15px;
+    }
+  
+    .admin-song-item {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 14px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
 
-        .schedule-item:last-child { border-bottom: none; }
+    .admin-song-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
 
-        .schedule-time {
-            font-size: 12px;
-            color: var(--gold);
-            font-weight: 700;
-        }
+    .envelope-badge {
+      background: rgba(52, 152, 219, 0.25);
+      border: 1px solid rgba(52, 152, 219, 0.5);
+      color: #3498db;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-        .schedule-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #fff;
-        }
+    .admin-comments-box {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-top: 8px;
+      max-height: 140px;
+      overflow-y: auto;
+      border-right: 3px solid #2ecc71;
+    }
 
-        .bottom-grid-row {
-            width: 100%;
-            max-width: 1350px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 380px 1fr;
-            gap: 30px;
-            align-items: center;
-        }
+    .comment-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 6px;
+      gap: 10px;
+    }
 
-        .next-up-box {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-gold);
-            border-radius: 20px;
-            padding: 20px 25px;
-        }
+    .delete-comment-btn {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 3px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
 
-        .podcasts-row {
-            display: flex;
-            gap: 15px;
-            overflow-x: auto;
-            align-items: center;
-        }
+    .delete-comment-btn:hover {
+      background: #c0392b;
+    }
+  
+    .delete-btn {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.2s, transform 0.2s;
+    }
 
-        .podcast-thumb {
-            min-width: 110px;
-            height: 70px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            border: 1px solid var(--border-gold);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--gold);
-            text-align: center;
-            padding: 5px;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            transition: 0.2s;
-        }
-
-        .podcast-thumb:hover {
-            border-color: var(--gold);
-            transform: translateY(-3px);
-        }
-
-        footer {
-            width: 100%;
-            max-width: 1350px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 25px;
-        }
-
-        .footer-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .footer-links a:hover { color: var(--gold); }
-
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
-            direction: rtl;
-        }
-
-        .modal-content {
-            background: #111827;
-            border: 1px solid var(--gold);
-            padding: 35px;
-            border-radius: 24px;
-            width: 90%;
-            max-width: 540px;
-            text-align: right;
-            position: relative;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.9);
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            left: 20px;
-            color: var(--text-muted);
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .close-modal:hover { color: var(--gold); }
-
-        .req-form-row {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .req-label {
-            font-size: 14px;
-            font-weight: bold;
-            color: #fff;
-            min-width: 120px;
-        }
-
-        .req-input {
-            flex: 1;
-            background: rgba(0,0,0,0.5);
-            border: 1.5px solid rgba(255,255,255,0.3);
-            border-radius: 8px;
-            padding: 10px 14px;
-            color: #fff;
-            font-size: 14px;
-            outline: none;
-            direction: rtl;
-        }
-
-        .req-input:focus { border-color: var(--gold); }
-
-        .req-submit-btn {
-            width: 100%;
-            background: var(--gold);
-            color: #000;
-            border: none;
-            padding: 12px 0;
-            border-radius: 25px;
-            font-weight: 800;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: 0.2s;
-        }
-
-        .req-submit-btn:hover { background: var(--gold-light); }
-    </style>
+    .delete-btn:hover {
+      background: #c0392b;
+      transform: scale(1.05);
+    }
+  </style>
 </head>
 <body>
 
-    <header>
-        <a href="#" class="brand-logo">
-            <span>T</span> TIAMO MUSIC - מוזיקה באווירה אחרת
-        </a>
-        <nav>
-            <ul>
-                <li><a href="#" class="active">ראשי</a></li>
-                <li><a href="javascript:void(0);" onclick="openScheduleModal()">לוח שידורים</a></li>
-                <li><a href="javascript:void(0);" onclick="openAboutModal()">פודקאסטים</a></li>
-                <li><a href="javascript:void(0);" onclick="openAboutModal()">אודות</a></li>
-                <li><a href="/admin">ניהול</a></li>
-            </ul>
-        </nav>
-        <div class="header-right">
-            <span class="search-icon">🔍</span>
-            <a href="javascript:void(0);" onclick="openRequestModal()" class="listen-live-btn">האזנה חינם</a>
-        </div>
-    </header>
+  <!-- תמונת הרקע החדשה של האולפן -->
+  <div class="bg-container">
+    <img src="studio-bg.jpg" alt="Background">
+  </div>
+  <div class="bg-overlay"></div>
 
-    <div class="dashboard-container">
-        
-        <div>
-            <div class="section-title">NOW PLAYING & TRACK INFO</div>
-            <div class="now-playing-card">
-                <div class="now-playing-content">
-                    <div class="album-art-box">
-                        <div class="live-badge">שידור חי</div>
-                        <div class="rotating-coin">
-                            <span style="font-size: 11px; font-weight: 900; color: var(--gold);">TIAMO</span>
-                            <span style="font-size: 5px; color: var(--text-muted); letter-spacing: 1px;">MUSIC</span>
-                        </div>
-                        <div style="font-size: 11px; font-weight: 800; color: #fff;">TIAMO RADIO</div>
-                        <div style="font-size: 8px; color: var(--gold);">STREAM 24/7</div>
-                    </div>
-
-                    <div class="track-details">
-                        <h2 id="live-program-title">טוען תוכנית...</h2>
-                        <div class="artist">מוזיקה באווירה אחרת</div>
-                        <div class="waveform-img"></div>
-                        <div class="current-track-meta" id="live-program-time">שידור חי רציף</div>
-                    </div>
-                </div>
-
-                <div class="player-controls-row">
-                    <div class="control-buttons-left">
-                        <button onclick="togglePlay()" class="main-play-btn" id="play-btn">▶</button>
-                        <span class="mini-ctrl-icon" title="השתק">🔊</span>
-                        <span class="mini-ctrl-icon" title="ערבוב">🔀</span>
-                        <span class="mini-ctrl-icon" title="חזרה">🔁</span>
-                    </div>
-                    
-                    <div class="action-chips-group">
-                        <button onclick="openRequestModal()" class="chip-btn whatsapp">
-                            💬 בא לי לשמוע
-                        </button>
-                        <a href="https://wa.me/972538550511?text=היי%2C%20אשמח%20לבקש%20פלייליסט%20אישי%20לתחנה:" target="_blank" class="chip-btn">
-                            🎵 בקשת פלייליסט
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div>
-            <div class="section-title">DAILY SCHEDULE</div>
-            <div class="schedule-panel" id="side-schedule-box">
-                <div class="schedule-item">
-                    <div class="schedule-time">08:00 - 12:00</div>
-                    <div class="schedule-name">בוקר רגוע עם מיטב הקלאסיקות</div>
-                </div>
-                <div class="schedule-item">
-                    <div class="schedule-time">12:00 - 16:00</div>
-                    <div class="schedule-name">צהריים קצביים מכל הזמנים</div>
-                </div>
-                <div class="schedule-item">
-                    <div class="schedule-time">16:00 - 20:00</div>
-                    <div class="schedule-name">שעה של להיטים חמים</div>
-                </div>
-                <div class="schedule-item">
-                    <div class="schedule-time">20:00 - 00:00</div>
-                    <div class="schedule-name">שעת לילה חלומית (שידור חי)</div>
-                </div>
-            </div>
-        </div>
-
+  <header>
+    <h1>🎼 TIAMO MUSIC 🎻</h1>
+    <div class="intro-tip">
+      <i class="fas fa-hand-pointer"></i> <b>טיפ:</b> ניתן לגרור כל כרטיס שיר בקלות לכל מיקום שתרצה (כולל גלילה אוטומטית לקצוות המסך), והנגן ימשיך לנגן ברצף!
+    </div><br>
+    <div class="sub-credits">כל הזכויות שמורות ליוצרי הלחנים המקוריים בלבד ! נוצר בעזרת Ai , עריכה ועיצוב - אלי מזרחי</div>
+    
+    <div class="top-actions">
+      <button class="global-stop-btn" onclick="stopSong()"><i class="fas fa-stop-circle"></i> עצירת ניגון</button>
+      <button class="admin-btn" onclick="checkAdminPassword()"><i class="fas fa-cog"></i> ניהול שירים</button>
     </div>
+  </header>
 
-    <div class="bottom-grid-row">
-        <div>
-            <div class="section-title">NEXT UP</div>
-            <div class="next-up-box">
-                <div style="font-size: 13px; font-weight: 700; color: #fff;" id="next-up-text">20:00 - שעת לילה חלומית | 00:00 - לילה לבן</div>
-            </div>
-        </div>
+  <div class="grid-container" id="songsContainer"></div>
 
-        <div>
-            <div class="section-title">FEATURED PODCASTS</div>
-            <div class="podcasts-row">
-                <div class="podcast-thumb" onclick="openAboutModal()">נוסטלגיה מזרחית</div>
-                <div class="podcast-thumb" onclick="openAboutModal()">צלילי הלב</div>
-                <div class="podcast-thumb" onclick="openAboutModal()">ייעוץ לחיים</div>
-                <div class="podcast-thumb" onclick="openAboutModal()">קלאסיקות עולמיות</div>
-                <div class="podcast-thumb" onclick="openAboutModal()">שובו של הגרוב</div>
-            </div>
+  <!-- Modal Admin Panel -->
+  <div class="modal" id="adminModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>ניהול שירים ופידבקים ממאזינים</h3>
+        <button class="close-btn" onclick="closeAdmin()">&times;</button>
+      </div>
+
+      <div class="form-section">
+        <h4>הוספת שיר אוטומטית בענן</h4>
+        <div class="form-group">
+          <input type="text" id="songUrlInput" placeholder="הדבק כאן את הקישור מ-GitHub...">
         </div>
+        <button class="save-btn" onclick="addSongAutomatic()">הוסף שיר</button>
+      </div>
+
+      <div class="admin-song-list">
+        <h4>שירים, לייקים והודעות ממאזינים</h4>
+        <div id="adminSongList"></div>
+      </div>
     </div>
+  </div>
 
-    <audio id="audio-stream" src="https://liveradio.co.il:8030/stream" preload="none"></audio>
-
-    <footer>
-        <div class="footer-links">
-            <a onclick="openAboutModal()">אודות</a>
-            <a onclick="openScheduleModal()">לוח שידורים</a>
-            <a href="/admin">ניהול מערכת</a>
+  <!-- Modal Comment Form -->
+  <div class="modal" id="commentModal">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 id="commentModalTitle">השארת פידבק אישי</h3>
+        <button class="close-btn" onclick="closeCommentModal()">&times;</button>
+      </div>
+      <div class="form-section">
+        <div class="form-group">
+          <label>שם המאזין (אופציונלי):</label>
+          <input type="text" id="commentAuthor" placeholder="הכנס את שמך...">
         </div>
-        <div>© 2026 TIAMO MUSIC - מוזיקה באווירה אחרת. כל הזכויות שמורות.</div>
-        <div>+972 53-855-0511</div>
-    </footer>
-
-    <div id="requestModal" class="modal-overlay">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('requestModal')">&times;</span>
-            <h2 style="color:var(--gold); margin-bottom:20px; font-size:22px; text-align:center;">בא לי לשמוע - בקשת שיר</h2>
-            <form onsubmit="sendWhatsAppSongRequest(event)">
-                <div class="req-form-row">
-                    <label class="req-label">שם מלא:</label>
-                    <input type="text" id="req-name" class="req-input" required>
-                </div>
-                <div class="req-form-row">
-                    <label class="req-label">שם השיר המבוקש:</label>
-                    <input type="text" id="req-song" class="req-input" required>
-                </div>
-                <div class="req-form-row">
-                    <label class="req-label">שם הזמר:</label>
-                    <input type="text" id="req-artist" class="req-input">
-                </div>
-                <div class="req-form-row">
-                    <label class="req-label">מוקדש ל:</label>
-                    <input type="text" id="req-note" class="req-input">
-                </div>
-                <button type="submit" class="req-submit-btn">שליחה בוואצאפ</button>
-            </form>
+        <div class="form-group" style="margin-top: 10px;">
+          <label>התגובה שלך (מוסתרת מהציבור):</label>
+          <textarea id="commentText" rows="3" placeholder="כתוב את דעתך על הרצועה..."></textarea>
         </div>
+        <button class="save-btn" onclick="submitComment()">שלח פידבק</button>
+      </div>
     </div>
+  </div>
 
-    <div id="aboutModal" class="modal-overlay">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('aboutModal')">&times;</span>
-            <h3 style="color:var(--gold); margin-bottom:15px; font-size:20px;">רדיו TIAMO MUSIC</h3>
-            <p style="line-height:1.7; color:#cbd5e1; font-size:14px; margin-bottom:10px;">נועד לשדר למאזינים מוסיקה באוירה אחרת.</p>
-            <p style="line-height:1.7; color:#cbd5e1; font-size:14px; margin-bottom:10px;">"מוסיקה לנשמה" המיועדת לכל אלה שהמוסיקה מהווה עבורם נוסטלגיה, והערכה למלודיה מכל הסגנונות אך בדגש על מוסיקה אתנית מכל התפוצות, מוסיקה הפורצת את כל הגבולות מהמזרח, הדרום, הצפון והמערב.</p>
-            <p style="color:var(--gold); font-weight:bold; margin-top:15px;">האזנה נעימה לכולם.</p>
-        </div>
-    </div>
+  <audio id="audioPlayer"></audio>
 
-    <div id="scheduleModal" class="modal-overlay">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('scheduleModal')">&times;</span>
-            <h3 style="color:var(--gold); margin-bottom:15px; font-size:20px;">📅 לוח שידורים מלא להיום</h3>
-            <div id="schedule-content" style="max-height:300px; overflow-y:auto; font-size:14px; color:#cbd5e1;">
-                טוען לוח שידורים...
-            </div>
-        </div>
-    </div>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlApQsdFF5iIrcswhtn_jSATvwYUJiz4U",
+      authDomain: "neimot-eli.firebaseapp.com",
+      projectId: "neimot-eli",
+      storageBucket: "neimot-eli.appspot.com",
+      messagingSenderId: "1098881478531",
+      appId: "1:1098881478531:web:e91c6acsb1872d56ea78b6"
+    };
 
-    <script>
-        const audio = document.getElementById('audio-stream');
-        let isPlaying = false;
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-        function togglePlay() {
-            if (isPlaying) {
-                audio.pause();
-                document.getElementById('play-btn').innerText = "▶";
-                isPlaying = false;
-            } else {
-                audio.play().then(() => {
-                    document.getElementById('play-btn').innerText = "❚❚";
-                    isPlaying = true;
-                }).catch(err => alert("לא ניתן להתחבר לשידור כרגע."));
+    let songs = [];
+    let currentAudio = document.getElementById('audioPlayer');
+    let currentPlayingIndex = null;
+    let currentlyPlayingSongId = null;
+    let activeCommentSongId = null;
+
+    const ADMIN_ENCODED = "VEFMSTIwMjY=";
+
+    db.collection("songs").orderBy("createdAt", "asc").onSnapshot((snapshot) => {
+      let serverSongs = [];
+      snapshot.forEach((doc) => {
+        let data = doc.data();
+        serverSongs.push({ 
+          id: doc.id, 
+          name: data.name || "ללא שם",
+          url: data.url || "",
+          likes: data.likes || 0,
+          comments: data.comments || [],
+          createdAt: data.createdAt
+        });
+      });
+
+      let savedOrder = localStorage.getItem('tiamo_user_song_order');
+      if (savedOrder) {
+        try {
+          let orderIds = JSON.parse(savedOrder);
+          songs = [];
+          orderIds.forEach(id => {
+            let found = serverSongs.find(s => s.id === id);
+            if (found) songs.push(found);
+          });
+          serverSongs.forEach(s => {
+            if (!songs.some(existing => existing.id === s.id)) {
+              songs.push(s);
             }
+          });
+        } catch (e) {
+          songs = serverSongs;
+        }
+      } else {
+        songs = serverSongs;
+      }
+
+      if (currentlyPlayingSongId) {
+        currentPlayingIndex = songs.findIndex(s => s.id === currentlyPlayingSongId);
+        if (currentPlayingIndex === -1) currentPlayingIndex = null;
+      }
+
+      renderSongs();
+      renderAdminList();
+    });
+
+    let autoScrollInterval = null;
+
+    function handleAutoScroll(clientY) {
+      const threshold = 80;
+      const speed = 15;
+
+      clearInterval(autoScrollInterval);
+
+      if (clientY < threshold) {
+        autoScrollInterval = setInterval(() => {
+          window.scrollBy(0, -speed);
+        }, 20);
+      } else if (clientY > window.innerHeight - threshold) {
+        autoScrollInterval = setInterval(() => {
+          window.scrollBy(0, speed);
+        }, 20);
+      }
+    }
+
+    function stopAutoScroll() {
+      clearInterval(autoScrollInterval);
+    }
+
+    function renderSongs() {
+      const container = document.getElementById('songsContainer');
+      container.innerHTML = '';
+      songs.forEach((song, index) => {
+        const isPlaying = currentPlayingIndex === index && !currentAudio.paused;
+        const card = document.createElement('div');
+        card.className = `card ${isPlaying ? 'active' : ''}`;
+        
+        card.setAttribute('draggable', 'true');
+        card.dataset.index = index;
+
+        card.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', index);
+          setTimeout(() => card.classList.add('dragging'), 0);
+        });
+
+        card.addEventListener('drag', (e) => {
+          if (e.clientY > 0) handleAutoScroll(e.clientY);
+        });
+
+        card.addEventListener('dragend', () => {
+          card.classList.remove('dragging');
+          stopAutoScroll();
+        });
+
+        let touchStartY = 0;
+        card.addEventListener('touchstart', (e) => {
+          touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        card.addEventListener('touchmove', (e) => {
+          const touchY = e.touches[0].clientY;
+          handleAutoScroll(touchY);
+        }, { passive: true });
+
+        card.addEventListener('touchend', () => {
+          stopAutoScroll();
+        });
+
+        card.addEventListener('dragover', (e) => {
+          e.preventDefault();
+        });
+
+        card.addEventListener('drop', (e) => {
+          e.preventDefault();
+          const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+          const toIndex = index;
+          if (fromIndex !== toIndex && !isNaN(fromIndex)) {
+            reorderSongs(fromIndex, toIndex);
+          }
+          stopAutoScroll();
+        });
+
+        let commentsCount = song.comments ? song.comments.length : 0;
+        let mainEnvelopeHtml = commentsCount > 0 ? `
+          <div class="main-envelope-badge" title="ישנן ${commentsCount} הודעות כתובות">
+            <i class="fas fa-envelope"></i> ${commentsCount}
+          </div>
+        ` : '';
+
+        let likedSongs = JSON.parse(localStorage.getItem('tiamo_liked_songs') || '{}');
+        let isLiked = likedSongs[song.id] === true;
+
+        card.innerHTML = `
+          <div class="song-header">
+            <div class="song-title">${song.name}</div>
+            <div class="move-btns">
+              <button class="move-btn" onclick="moveSong(${index}, -1)" title="העבר קדימה"><i class="fas fa-arrow-right"></i></button>
+              <button class="move-btn" onclick="moveSong(${index}, 1)" title="העבר אחורה"><i class="fas fa-arrow-left"></i></button>
+            </div>
+          </div>
+          <div class="card-footer-feedback">
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike('${song.id}')">
+                <i class="fas fa-heart"></i> <span>${song.likes || 0}</span>
+              </button>
+              ${mainEnvelopeHtml}
+            </div>
+            <button class="comment-open-btn" onclick="openCommentModal('${song.id}', '${song.name}')">
+              <i class="fas fa-comment-alt"></i> השאר תגובה
+            </button>
+          </div>
+          <input type="range" class="seek-slider" id="slider-${index}" value="0" max="100" oninput="seekAudio(this, ${index})">
+          <div class="controls-group">
+            <button class="action-btn ${isPlaying ? 'play-active' : ''}" onclick="playSong(${index})" title="הפעלה">
+              <i class="fas fa-play"></i>
+            </button>
+            <button class="action-btn" onclick="pauseSong()" title="הקפאה">
+              <i class="fas fa-pause"></i>
+            </button>
+            <button class="action-btn" onclick="stopSong()" title="עצירה">
+              <i class="fas fa-stop"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    async function toggleLike(songId) {
+      let likedSongs = JSON.parse(localStorage.getItem('tiamo_liked_songs') || '{}');
+      let isCurrentlyLiked = likedSongs[songId] === true;
+      let songRef = db.collection("songs").doc(songId);
+
+      await db.runTransaction(async (transaction) => {
+        let doc = await transaction.get(songRef);
+        if (!doc.exists) return;
+        let currentLikes = doc.data().likes || 0;
+        
+        if (isCurrentlyLiked) {
+          let newLikes = Math.max(0, currentLikes - 1);
+          transaction.update(songRef, { likes: newLikes });
+          likedSongs[songId] = false;
+        } else {
+          let newLikes = currentLikes + 1;
+          transaction.update(songRef, { likes: newLikes });
+          likedSongs[songId] = true;
+        }
+      });
+
+      localStorage.setItem('tiamo_liked_songs', JSON.stringify(likedSongs));
+    }
+
+    function openCommentModal(songId, songName) {
+      activeCommentSongId = songId;
+      document.getElementById('commentModalTitle').innerText = `תגובה עבור: ${songName}`;
+      document.getElementById('commentAuthor').value = '';
+      document.getElementById('commentText').value = '';
+      document.getElementById('commentModal').style.display = 'flex';
+    }
+
+    function closeCommentModal() {
+      document.getElementById('commentModal').style.display = 'none';
+    }
+
+    async function submitComment() {
+      let author = document.getElementById('commentAuthor').value.trim() || "מאזין אנונימי";
+      let text = document.getElementById('commentText').value.trim();
+      if (!text) {
+        alert("אנא כתוב תוכן לתגובה");
+        return;
+      }
+
+      let songRef = db.collection("songs").doc(activeCommentSongId);
+      let newComment = {
+        author: author,
+        text: text,
+        date: new Date().toLocaleString('he-IL')
+      };
+
+      await db.runTransaction(async (transaction) => {
+        let doc = await transaction.get(songRef);
+        if (!doc.exists) return;
+        let comments = doc.data().comments || [];
+        comments.push(newComment);
+        transaction.update(songRef, { comments: comments });
+      });
+
+      closeCommentModal();
+      alert("הפידבק נשלח בהצלחה ונשמר בפרטיות במערכת!");
+    }
+
+    async function deleteComment(songId, commentIndex) {
+      if (!confirm("האם למחוק הודעה זו?")) return;
+
+      let songRef = db.collection("songs").doc(songId);
+      await db.runTransaction(async (transaction) => {
+        let doc = await transaction.get(songRef);
+        if (!doc.exists) return;
+        let comments = doc.data().comments || [];
+        comments.splice(commentIndex, 1);
+        transaction.update(songRef, { comments: comments });
+      });
+    }
+
+    function reorderSongs(fromIndex, toIndex) {
+      const movedSong = songs.splice(fromIndex, 1)[0];
+      songs.splice(toIndex, 0, movedSong);
+
+      if (currentlyPlayingSongId) {
+        currentPlayingIndex = songs.findIndex(s => s.id === currentlyPlayingSongId);
+        if (currentPlayingIndex === -1) currentPlayingIndex = null;
+      }
+
+      const orderIds = songs.map(s => s.id);
+      localStorage.setItem('tiamo_user_song_order', JSON.stringify(orderIds));
+
+      renderSongs();
+    }
+
+    function moveSong(index, direction) {
+      const newIndex = index + direction;
+      if (newIndex < 0 || newIndex >= songs.length) return;
+
+      const temp = songs[index];
+      songs[index] = songs[newIndex];
+      songs[newIndex] = temp;
+
+      if (currentlyPlayingSongId) {
+        currentPlayingIndex = songs.findIndex(s => s.id === currentlyPlayingSongId);
+        if (currentPlayingIndex === -1) currentPlayingIndex = null;
+      }
+
+      const orderIds = songs.map(s => s.id);
+      localStorage.setItem('tiamo_user_song_order', JSON.stringify(orderIds));
+
+      renderSongs();
+    }
+
+    function playSong(index) {
+      currentAudio.src = songs[index].url;
+      currentPlayingIndex = index;
+      currentlyPlayingSongId = songs[index].id;
+      
+      currentAudio.play().catch(error => {
+        console.log("דפדפן מנע הפעלה אוטומטית:", error);
+      });
+      renderSongs();
+    }
+
+    function pauseSong() {
+      currentAudio.pause();
+      renderSongs();
+    }
+
+    function stopSong() {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      if (currentPlayingIndex !== null) {
+        let slider = document.getElementById(`slider-${currentPlayingIndex}`);
+        if (slider) slider.value = 0;
+      }
+      currentPlayingIndex = null;
+      currentlyPlayingSongId = null;
+      renderSongs();
+    }
+
+    currentAudio.addEventListener('timeupdate', () => {
+      if (currentPlayingIndex !== null && currentAudio.duration) {
+        let slider = document.getElementById(`slider-${currentPlayingIndex}`);
+        if (slider) {
+          slider.max = currentAudio.duration;
+          slider.value = currentAudio.currentTime;
+        }
+      }
+    });
+
+    function seekAudio(slider, index) {
+      if (currentPlayingIndex === index) {
+        currentAudio.currentTime = slider.value;
+      } else {
+        currentAudio.src = songs[index].url;
+        currentPlayingIndex = index;
+        currentlyPlayingSongId = songs[index].id;
+        currentAudio.currentTime = slider.value;
+        currentAudio.play().catch(error => {
+          console.log("דפדפן מנע הפעלה אוטומטית:", error);
+        });
+        renderSongs();
+      }
+    }
+
+    currentAudio.addEventListener('ended', () => {
+      if (currentPlayingIndex !== null) {
+        let slider = document.getElementById(`slider-${currentPlayingIndex}`);
+        if (slider) slider.value = 0;
+        
+        let nextIndex = currentPlayingIndex + 1;
+        if (nextIndex < songs.length) {
+          currentAudio.src = songs[nextIndex].url;
+          currentPlayingIndex = nextIndex;
+          currentlyPlayingSongId = songs[nextIndex].id;
+          currentAudio.play().then(() => {
+            renderSongs();
+          }).catch(error => {
+            console.log("מעבר אוטומטי נחסם על ידי הדפדפן:", error);
+            currentPlayingIndex = null;
+            currentlyPlayingSongId = null;
+            renderSongs();
+          });
+        } else {
+          currentPlayingIndex = null;
+          currentlyPlayingSongId = null;
+          renderSongs();
+        }
+      }
+    });
+
+    function checkAdminPassword() {
+      let password = prompt("אנא הזן סיסמת ניהול:");
+      if (password === null) return;
+      
+      if (btoa(password.trim()) === ADMIN_ENCODED) {
+        openAdmin();
+      } else {
+        alert("סיסמה שגויה!");
+      }
+    }
+
+    function openAdmin() {
+      document.getElementById('adminModal').style.display = 'flex';
+      renderAdminList();
+    }
+
+    function closeAdmin() {
+      document.getElementById('adminModal').style.display = 'none';
+    }
+
+    async function addSongAutomatic() {
+      let inputUrl = document.getElementById('songUrlInput').value.trim();
+      if (!inputUrl) {
+        alert('אנא הדבק קישור');
+        return;
+      }
+
+      let rawUrl = inputUrl
+        .replace('github.com', 'raw.githubusercontent.com')
+        .replace('/blob/', '/');
+
+      let parts = rawUrl.split('/');
+      let encodedFileName = parts[parts.length - 1];
+      let decodedFileName = decodeURIComponent(encodedFileName);
+      let cleanSongName = decodedFileName.replace(/\.mp3$/i, '');
+
+      await db.collection("songs").add({
+        name: cleanSongName,
+        url: rawUrl,
+        likes: 0,
+        comments: [],
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      document.getElementById('songUrlInput').value = '';
+      alert(`השיר "${cleanSongName}" נוסף בהצלחה ויתעדכן מיידית בכל המכשירים!`);
+    }
+
+    async function deleteSong(id) {
+      if (confirm("האם אתה בטוח שברצונך למחוק שיר זה ואת כל הפידבקים שלו?")) {
+        await db.collection("songs").doc(id).delete();
+      }
+    }
+
+    function renderAdminList() {
+      const list = document.getElementById('adminSongList');
+      list.innerHTML = '';
+      songs.forEach((song) => {
+        let commentsCount = song.comments ? song.comments.length : 0;
+        
+        let commentsHtml = '';
+        if (commentsCount > 0) {
+          song.comments.forEach((c, cIndex) => {
+            commentsHtml += `
+              <div class="comment-item">
+                <div><b>${c.author} (${c.date}):</b> ${c.text}</div>
+                <button class="delete-comment-btn" onclick="deleteComment('${song.id}', ${cIndex})">מחק הודעה</button>
+              </div>
+            `;
+          });
+        } else {
+          commentsHtml = '<div style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">אין עדיין הודעות לשיר זה</div>';
         }
 
-        function fetchLiveStatus() {
-            fetch('/get_current_program_status')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('live-program-title').innerText = data.program;
-                        document.getElementById('live-program-time').innerText = data.end_time ? `עד ${data.end_time}` : 'שידור חי 24/7';
-                    }
-                })
-                .catch(err => console.log('שגיאה בטעינת תוכנית'));
-        }
-
-        function openRequestModal() { document.getElementById('requestModal').style.display = 'flex'; }
-        function openAboutModal() { document.getElementById('aboutModal').style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        function sendWhatsAppSongRequest(e) {
-            e.preventDefault();
-            const name = document.getElementById('req-name').value.trim();
-            const song = document.getElementById('req-song').value.trim();
-            const artist = document.getElementById('req-artist').value.trim();
-            const note = document.getElementById('req-note').value.trim();
-
-            let message = `שלום TIAMO MUSIC! 👋\nאני רוצה לבקש שיר:\n`;
-            message += `👤 *שם מלא:* ${name}\n`;
-            message += `🎵 *שיר מבוקש:* ${song}\n`;
-            if (artist) message += `🎤 *זמר/ת:* ${artist}\n`;
-            if (note) message += `💬 *מוקדש ל:* ${note}\n`;
-
-            const encodedMsg = encodeURIComponent(message);
-            window.open(`https://wa.me/972538550511?text=${encodedMsg}`, '_blank');
-            closeModal('requestModal');
-        }
-
-        function openScheduleModal() {
-            const modal = document.getElementById('scheduleModal');
-            const content = document.getElementById('schedule-content');
-            modal.style.display = 'flex';
-            content.innerHTML = 'טוען לוח שידורים...';
-
-            fetch('/get_full_schedule')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.data && data.data.length > 0) {
-                        let html = '<table style="width:100%; text-align:left; border-collapse:collapse;">';
-                        let sideHtml = '';
-                        data.data.forEach((row, idx) => {
-                            if (idx >= 2 && row && (row[1] || row[2])) {
-                                const timeStr = row[1] || '';
-                                const nameStr = row[2] || '-';
-                                html += `<tr style="border-bottom:1px solid #334155;">
-                                    <td style="padding:8px; color:var(--gold); font-weight:bold;">${timeStr}</td>
-                                    <td style="padding:8px; color:#fff;">${nameStr}</td>
-                                </tr>`;
-                                sideHtml += `<div class="schedule-item">
-                                    <div class="schedule-time">${timeStr}</div>
-                                    <div class="schedule-name">${nameStr}</div>
-                                </div>`;
-                            }
-                        });
-                        html += '</table>';
-                        content.innerHTML = html;
-                        if (sideHtml) {
-                            document.getElementById('side-schedule-box').innerHTML = sideHtml;
-                        }
-                    } else {
-                        content.innerHTML = 'לא נמצאו שידורים כרגע.';
-                    }
-                })
-                .catch(err => { content.innerHTML = 'שגיאה בטעינת לוח השידורים.'; });
-        }
-
-        fetchLiveStatus();
-        setInterval(fetchLiveStatus, 30000);
-    </script>
+        list.innerHTML += `
+          <div class="admin-song-item">
+            <div class="admin-song-top">
+              <div>
+                <span><b>${song.name}</b></span>
+                <span style="margin-right: 10px; color: #ff6b6b; font-size: 0.85rem;">(❤️ ${song.likes || 0})</span>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <div class="envelope-badge">
+                  <i class="fas fa-envelope"></i> ${commentsCount} הודעות
+                </div>
+                <button class="delete-btn" onclick="deleteSong('${song.id}')">מחק שיר</button>
+              </div>
+            </div>
+            <div class="admin-comments-box">
+              <div style="font-weight: bold; margin-bottom: 4px; color: #2ecc71;">הודעות מוסתרות מהמאזינים:</div>
+              ${commentsHtml}
+            </div>
+          </div>
+        `;
+      });
+    }
+  </script>
 </body>
 </html>
