@@ -38,7 +38,6 @@
             padding: 25px 50px;
         }
 
-        /* Top Navigation Bar */
         header {
             width: 100%;
             max-width: 1400px;
@@ -126,7 +125,6 @@
             box-shadow: 0 0 25px rgba(212, 175, 55, 0.7);
         }
 
-        /* Main Dashboard Container */
         .dashboard-container {
             width: 100%;
             max-width: 1400px;
@@ -145,7 +143,6 @@
             text-align: left;
         }
 
-        /* Now Playing Card (Left) */
         .now-playing-card {
             background: var(--card-bg);
             backdrop-filter: blur(25px);
@@ -240,7 +237,6 @@
             color: var(--text-muted);
         }
 
-        /* Player Controls Row */
         .player-controls-row {
             display: flex;
             align-items: center;
@@ -322,7 +318,6 @@
             color: #fff;
         }
 
-        /* Daily Schedule Card (Right) */
         .schedule-panel {
             background: var(--card-bg);
             backdrop-filter: blur(25px);
@@ -356,7 +351,6 @@
             color: #fff;
         }
 
-        /* Bottom Row: Next Up & Featured Podcasts */
         .bottom-grid-row {
             width: 100%;
             max-width: 1400px;
@@ -411,7 +405,6 @@
             transform: translateY(-3px);
         }
 
-        /* Footer Section */
         footer {
             width: 100%;
             max-width: 1400px;
@@ -439,7 +432,6 @@
 
         .footer-links a:hover { color: var(--gold); }
 
-        /* Modals */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -523,7 +515,6 @@
 </head>
 <body>
 
-    <!-- Header Navigation Bar -->
     <header>
         <a href="#" class="brand-logo">
             <span>T</span> TIAMO MUSIC - מוזיקה באווירה אחרת
@@ -543,12 +534,9 @@
         </div>
     </header>
 
-    <!-- Main Dashboard Container -->
     <div class="dashboard-container">
-        
-        <!-- NOW PLAYING & TRACK INFO (Left Side) -->
         <div>
-            <div class="section-title">מתנגן כעת ופרטי שידור</div>
+            <div class="section-title">NOW PLAYING & TRACK INFO</div>
             <div class="now-playing-card">
                 <div class="now-playing-content">
                     <div class="album-art-box">
@@ -589,9 +577,8 @@
             </div>
         </div>
 
-        <!-- DAILY SCHEDULE (Right Side) -->
         <div>
-            <div class="section-title">לוח שידורים יומי</div>
+            <div class="section-title">DAILY SCHEDULE</div>
             <div class="schedule-panel" id="side-schedule-box">
                 <div class="schedule-item">
                     <div class="schedule-time">08:00 - 12:00</div>
@@ -611,20 +598,18 @@
                 </div>
             </div>
         </div>
-
     </div>
 
-    <!-- Bottom Row: Next Up & Featured Podcasts -->
     <div class="bottom-grid-row">
         <div>
-            <div class="section-title">הבא בתור</div>
+            <div class="section-title">NEXT UP</div>
             <div class="next-up-box">
                 <div style="font-size: 13px; font-weight: 700; color: #fff;" id="next-up-text">20:00 - שעת לילה חלומית | 00:00 - לילה לבן</div>
             </div>
         </div>
 
         <div>
-            <div class="section-title">פודקאסטים מומלצים</div>
+            <div class="section-title">FEATURED PODCASTS</div>
             <div class="podcasts-container">
                 <div class="podcasts-row">
                     <div class="podcast-thumb" onclick="openAboutModal()">נוסטלגיה מזרחית</div>
@@ -637,10 +622,8 @@
         </div>
     </div>
 
-    <!-- Audio Stream Element -->
     <audio id="audio-stream" src="https://liveradio.co.il:8030/stream" preload="none"></audio>
 
-    <!-- Footer Section -->
     <footer>
         <div class="footer-links">
             <a onclick="openAboutModal()">אודות</a>
@@ -651,7 +634,6 @@
         <div>+972 53-855-0511</div>
     </footer>
 
-    <!-- Modal: Request Song ("בא לי לשמוע") -->
     <div id="requestModal" class="modal-overlay">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('requestModal')">&times;</span>
@@ -678,7 +660,6 @@
         </div>
     </div>
 
-    <!-- Modal: About Full Text -->
     <div id="aboutModal" class="modal-overlay">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('aboutModal')">&times;</span>
@@ -691,7 +672,6 @@
         </div>
     </div>
 
-    <!-- Modal: Schedule Full -->
     <div id="scheduleModal" class="modal-overlay">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('scheduleModal')">&times;</span>
