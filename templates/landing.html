@@ -1,3 +1,4 @@
+HTML
 <!DOCTYPE html>
 <html lang="he" dir="ltr">
 <head>
@@ -38,7 +39,6 @@
             padding: 25px 50px;
         }
 
-        /* Top Header Bar */
         header {
             width: 100%;
             max-width: 1350px;
@@ -126,7 +126,6 @@
             box-shadow: 0 0 25px rgba(212, 175, 55, 0.7);
         }
 
-        /* Main Dashboard Grid (Left: Player, Right: Schedule) */
         .dashboard-container {
             width: 100%;
             max-width: 1350px;
@@ -145,7 +144,6 @@
             text-align: left;
         }
 
-        /* Now Playing Card (Left) */
         .now-playing-card {
             background: var(--card-bg);
             backdrop-filter: blur(25px);
@@ -240,7 +238,6 @@
             color: var(--text-muted);
         }
 
-        /* Player Controls */
         .player-controls-row {
             display: flex;
             align-items: center;
@@ -322,7 +319,6 @@
             color: #fff;
         }
 
-        /* Daily Schedule Panel (Right) */
         .schedule-panel {
             background: var(--card-bg);
             backdrop-filter: blur(25px);
@@ -356,7 +352,6 @@
             color: #fff;
         }
 
-        /* Bottom Row (Next Up & Podcasts) */
         .bottom-grid-row {
             width: 100%;
             max-width: 1350px;
@@ -406,7 +401,6 @@
             transform: translateY(-3px);
         }
 
-        /* Footer */
         footer {
             width: 100%;
             max-width: 1350px;
@@ -434,7 +428,6 @@
 
         .footer-links a:hover { color: var(--gold); }
 
-        /* Modals */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -518,7 +511,6 @@
 </head>
 <body>
 
-    <!-- Header -->
     <header>
         <a href="#" class="brand-logo">
             <span>T</span> TIAMO MUSIC - מוזיקה באווירה אחרת
@@ -538,10 +530,8 @@
         </div>
     </header>
 
-    <!-- Main Dashboard -->
     <div class="dashboard-container">
         
-        <!-- Now Playing (Left) -->
         <div>
             <div class="section-title">NOW PLAYING & TRACK INFO</div>
             <div class="now-playing-card">
@@ -584,7 +574,6 @@
             </div>
         </div>
 
-        <!-- Daily Schedule (Right) -->
         <div>
             <div class="section-title">DAILY SCHEDULE</div>
             <div class="schedule-panel" id="side-schedule-box">
@@ -609,7 +598,6 @@
 
     </div>
 
-    <!-- Bottom Row: Next Up & Featured Podcasts -->
     <div class="bottom-grid-row">
         <div>
             <div class="section-title">NEXT UP</div>
@@ -630,10 +618,8 @@
         </div>
     </div>
 
-    <!-- Audio Stream -->
     <audio id="audio-stream" src="https://liveradio.co.il:8030/stream" preload="none"></audio>
 
-    <!-- Footer -->
     <footer>
         <div class="footer-links">
             <a onclick="openAboutModal()">אודות</a>
@@ -644,7 +630,6 @@
         <div>+972 53-855-0511</div>
     </footer>
 
-    <!-- Modals -->
     <div id="requestModal" class="modal-overlay">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('requestModal')">&times;</span>
@@ -691,7 +676,6 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script>
         const audio = document.getElementById('audio-stream');
         let isPlaying = false;
