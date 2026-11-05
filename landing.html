@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="he" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIAMO MUSIC - מוזיקה באווירה אחרת</title>
+    <style>
+        :root {
+            --bg-deep: #07090f;
+            --card-bg: rgba(16, 22, 35, 0.78);
+            --gold: #d4af37;
+            --gold-light: #f3c653;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --border-gold: rgba(212, 175, 55, 0.28);
+            --live-green: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            /* תמונת הרקע המקורית עם כלים מוזיקליים: כינור, עוד ובגלמה */
+            background-image: radial-gradient(circle at 50% 15%, rgba(212, 175, 55, 0.08) 0%, transparent 60%),
+                              url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 25px 50px;
+        }
+
+        header {
+            width: 100%;
+            max-width: 1350px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-decoration: none;
+        }
+
+        .brand-logo span {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(212, 175, 55, 0.15);
+            font-size: 14px;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        nav ul li a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .search-icon {
+            color: var(--text-muted);
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .listen-live-btn {
+            background: linear-gradient(135deg, #d4af37, #aa820a);
+            color: #000;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .listen-live-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.7);
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 1350px;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            font-weight: 700;
+            text-align: left;
+        }
+
+        .now-playing-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--border-gold);
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+        }
+
+        .now-playing-content {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 25px;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .album-art-box {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 18px;
+            background: radial-gradient(circle, #1a2233 0%, #05070a 100%);
+            border: 2px solid var(--gold);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            padding: 15px;
+            text-align: center;
+        }
+
+        .live-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--live-green);
+            background: rgba(16, 185, 129, 0.15);
+            padding: 3px 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .rotating-coin {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            border: 2px solid var(--gold);
+            background: radial-gradient(circle, #111522 0%, #05070a 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: coinRotate 12s linear infinite;
+            box-shadow: 0 0 15px rgba(212,175,55,0.3);
+            margin-bottom: 10px;
+        }
+
+        @keyframes coinRotate {
+            0% { transform: perspective(600px) rotateY(0deg); }
+            100% { transform: perspective(600px) rotateY(360deg); }
+        }
+
+        .track-details h2 {
+            font-size: 24px;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .track-details .artist {
+            font-size: 14px;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+
+        .waveform-img {
+            width: 100%;
+            height: 45px;
+            background: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80') center/cover;
+            border-radius: 6px;
+            opacity: 0.85;
+            filter: sepia(100%) hue-rotate(10deg) saturate(300%);
+            margin-bottom: 12px;
+        }
+
+        .current-track-meta {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .player-controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 25px;
+        }
+
+        .control-buttons-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .main-play-btn {
+            width: 52px;
+            height: 52px;
+            background: var(--gold);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #000;
+            box-shadow: 0 0 20px rgba(212,175,55,0.5);
+            transition: 0.2s;
+        }
+
+        .main-play-btn:hover {
+            transform: scale(1.1);
+            background: var(--gold-light);
+        }
+
+        .mini-ctrl-icon {
+            color: var(--text-muted);
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .mini-ctrl-icon:hover { color: var(--gold); }
+
+        .action-chips-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .chip-btn {
+            background: rgba(212, 175, 55, 0.12);
+            border: 1px solid var(--border-gold);
+            color: var(--text-main);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chip-btn.whatsapp {
+            background: rgba(37, 211, 102, 0.15);
+            border-color: rgba(37, 211, 102, 0.4);
+            color: #25d366;
+        }
+
+        .chip-btn:hover {
+            background: var(--gold);
+            color: #000;
+            border-color: var(--gold);
+        }
+
+        .chip-btn.whatsapp:hover {
+            background: #25d366;
+            color: #fff;
+        }
+
+        .schedule-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--border-gold);
+            border-radius: 24px;
+            padding: 25px 30px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            max-height: 420px;
+            overflow-y: auto;
+        }
+
+        .schedule-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .schedule-item:last-child { border-bottom: none; }
+
+        .schedule-time {
+            font-size: 12px;
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .schedule-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .bottom-grid-row {
+            width: 100%;
+            max-width: 1350px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .next-up-box {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-gold);
+            border-radius: 20px;
+            padding: 20px 25px;
+        }
+
+        .podcasts-row {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            align-items: center;
+        }
+
+        .podcast-thumb {
+            min-width: 110px;
+            height: 70px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 1px solid var(--border-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--gold);
+            text-align: center;
+            padding: 5px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            transition: 0.2s;
+        }
+
+        .podcast-thumb:hover {
+            border-color: var(--gold);
+            transform: translateY(-3px);
+        }
+
+        footer {
+            width: 100%;
+            max-width: 1350px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .footer-links a:hover { color: var(--gold); }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            direction: rtl;
+        }
+
+        .modal-content {
+            background: #111827;
+            border: 1px solid var(--gold);
+            padding: 35px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 540px;
+            text-align: right;
+            position: relative;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .close-modal:hover { color: var(--gold); }
+
+        .req-form-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .req-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            min-width: 120px;
+        }
+
+        .req-input {
+            flex: 1;
+            background: rgba(0,0,0,0.5);
+            border: 1.5px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            direction: rtl;
+        }
+
+        .req-input:focus { border-color: var(--gold); }
+
+        .req-submit-btn {
+            width: 100%;
+            background: var(--gold);
+            color: #000;
+            border: none;
+            padding: 12px 0;
+            border-radius: 25px;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.2s;
+        }
+
+        .req-submit-btn:hover { background: var(--gold-light); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#" class="brand-logo">
+            <span>T</span> TIAMO MUSIC - מוזיקה באווירה אחרת
+        </a>
+        <nav>
+            <ul>
+                <li><a href="#" class="active">ראשי</a></li>
+                <li><a href="javascript:void(0);" onclick="openScheduleModal()">לוח שידורים</a></li>
+                <li><a href="javascript:void(0);" onclick="openAboutModal()">פודקאסטים</a></li>
+                <li><a href="javascript:void(0);" onclick="openAboutModal()">אודות</a></li>
+                <li><a href="/admin">ניהול</a></li>
+            </ul>
+        </nav>
+        <div class="header-right">
+            <span class="search-icon">🔍</span>
+            <a href="javascript:void(0);" onclick="openRequestModal()" class="listen-live-btn">האזנה חינם</a>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        
+        <div>
+            <div class="section-title">NOW PLAYING & TRACK INFO</div>
+            <div class="now-playing-card">
+                <div class="now-playing-content">
+                    <div class="album-art-box">
+                        <div class="live-badge">שידור חי</div>
+                        <div class="rotating-coin">
+                            <span style="font-size: 11px; font-weight: 900; color: var(--gold);">TIAMO</span>
+                            <span style="font-size: 5px; color: var(--text-muted); letter-spacing: 1px;">MUSIC</span>
+                        </div>
+                        <div style="font-size: 11px; font-weight: 800; color: #fff;">TIAMO RADIO</div>
+                        <div style="font-size: 8px; color: var(--gold);">STREAM 24/7</div>
+                    </div>
+
+                    <div class="track-details">
+                        <h2 id="live-program-title">טוען תוכנית...</h2>
+                        <div class="artist">מוזיקה באווירה אחרת</div>
+                        <div class="waveform-img"></div>
+                        <div class="current-track-meta" id="live-program-time">שידור חי רציף</div>
+                    </div>
+                </div>
+
+                <div class="player-controls-row">
+                    <div class="control-buttons-left">
+                        <button onclick="togglePlay()" class="main-play-btn" id="play-btn">▶</button>
+                        <span class="mini-ctrl-icon" title="השתק">🔊</span>
+                        <span class="mini-ctrl-icon" title="ערבוב">🔀</span>
+                        <span class="mini-ctrl-icon" title="חזרה">🔁</span>
+                    </div>
+                    
+                    <div class="action-chips-group">
+                        <button onclick="openRequestModal()" class="chip-btn whatsapp">
+                            💬 בא לי לשמוע
+                        </button>
+                        <a href="https://wa.me/972538550511?text=היי%2C%20אשמח%20לבקש%20פלייליסט%20אישי%20לתחנה:" target="_blank" class="chip-btn">
+                            🎵 בקשת פלייליסט
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="section-title">DAILY SCHEDULE</div>
+            <div class="schedule-panel" id="side-schedule-box">
+                <div class="schedule-item">
+                    <div class="schedule-time">08:00 - 12:00</div>
+                    <div class="schedule-name">בוקר רגוע עם מיטב הקלאסיקות</div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-time">12:00 - 16:00</div>
+                    <div class="schedule-name">צהריים קצביים מכל הזמנים</div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-time">16:00 - 20:00</div>
+                    <div class="schedule-name">שעה של להיטים חמים</div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-time">20:00 - 00:00</div>
+                    <div class="schedule-name">שעת לילה חלומית (שידור חי)</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="bottom-grid-row">
+        <div>
+            <div class="section-title">NEXT UP</div>
+            <div class="next-up-box">
+                <div style="font-size: 13px; font-weight: 700; color: #fff;" id="next-up-text">20:00 - שעת לילה חלומית | 00:00 - לילה לבן</div>
+            </div>
+        </div>
+
+        <div>
+            <div class="section-title">FEATURED PODCASTS</div>
+            <div class="podcasts-row">
+                <div class="podcast-thumb" onclick="openAboutModal()">נוסטלגיה מזרחית</div>
+                <div class="podcast-thumb" onclick="openAboutModal()">צלילי הלב</div>
+                <div class="podcast-thumb" onclick="openAboutModal()">ייעוץ לחיים</div>
+                <div class="podcast-thumb" onclick="openAboutModal()">קלאסיקות עולמיות</div>
+                <div class="podcast-thumb" onclick="openAboutModal()">שובו של הגרוב</div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audio-stream" src="https://liveradio.co.il:8030/stream" preload="none"></audio>
+
+    <footer>
+        <div class="footer-links">
+            <a onclick="openAboutModal()">אודות</a>
+            <a onclick="openScheduleModal()">לוח שידורים</a>
+            <a href="/admin">ניהול מערכת</a>
+        </div>
+        <div>© 2026 TIAMO MUSIC - מוזיקה באווירה אחרת. כל הזכויות שמורות.</div>
+        <div>+972 53-855-0511</div>
+    </footer>
+
+    <div id="requestModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('requestModal')">&times;</span>
+            <h2 style="color:var(--gold); margin-bottom:20px; font-size:22px; text-align:center;">בא לי לשמוע - בקשת שיר</h2>
+            <form onsubmit="sendWhatsAppSongRequest(event)">
+                <div class="req-form-row">
+                    <label class="req-label">שם מלא:</label>
+                    <input type="text" id="req-name" class="req-input" required>
+                </div>
+                <div class="req-form-row">
+                    <label class="req-label">שם השיר המבוקש:</label>
+                    <input type="text" id="req-song" class="req-input" required>
+                </div>
+                <div class="req-form-row">
+                    <label class="req-label">שם הזמר:</label>
+                    <input type="text" id="req-artist" class="req-input">
+                </div>
+                <div class="req-form-row">
+                    <label class="req-label">מוקדש ל:</label>
+                    <input type="text" id="req-note" class="req-input">
+                </div>
+                <button type="submit" class="req-submit-btn">שליחה בוואצאפ</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="aboutModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('aboutModal')">&times;</span>
+            <h3 style="color:var(--gold); margin-bottom:15px; font-size:20px;">רדיו TIAMO MUSIC</h3>
+            <p style="line-height:1.7; color:#cbd5e1; font-size:14px; margin-bottom:10px;">נועד לשדר למאזינים מוסיקה באוירה אחרת.</p>
+            <p style="line-height:1.7; color:#cbd5e1; font-size:14px; margin-bottom:10px;">"מוסיקה לנשמה" המיועדת לכל אלה שהמוסיקה מהווה עבורם נוסטלגיה, והערכה למלודיה מכל הסגנונות אך בדגש על מוסיקה אתנית מכל התפוצות, מוסיקה הפורצת את כל הגבולות מהמזרח, הדרום, הצפון והמערב.</p>
+            <p style="color:var(--gold); font-weight:bold; margin-top:15px;">האזנה נעימה לכולם.</p>
+        </div>
+    </div>
+
+    <div id="scheduleModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('scheduleModal')">&times;</span>
+            <h3 style="color:var(--gold); margin-bottom:15px; font-size:20px;">📅 לוח שידורים מלא להיום</h3>
+            <div id="schedule-content" style="max-height:300px; overflow-y:auto; font-size:14px; color:#cbd5e1;">
+                טוען לוח שידורים...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('audio-stream');
+        let isPlaying = false;
+
+        function togglePlay() {
+            if (isPlaying) {
+                audio.pause();
+                document.getElementById('play-btn').innerText = "▶";
+                isPlaying = false;
+            } else {
+                audio.play().then(() => {
+                    document.getElementById('play-btn').innerText = "❚❚";
+                    isPlaying = true;
+                }).catch(err => alert("לא ניתן להתחבר לשידור כרגע."));
+            }
+        }
+
+        function fetchLiveStatus() {
+            fetch('/get_current_program_status')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('live-program-title').innerText = data.program;
+                        document.getElementById('live-program-time').innerText = data.end_time ? `עד ${data.end_time}` : 'שידור חי 24/7';
+                    }
+                })
+                .catch(err => console.log('שגיאה בטעינת תוכנית'));
+        }
+
+        function openRequestModal() { document.getElementById('requestModal').style.display = 'flex'; }
+        function openAboutModal() { document.getElementById('aboutModal').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function sendWhatsAppSongRequest(e) {
+            e.preventDefault();
+            const name = document.getElementById('req-name').value.trim();
+            const song = document.getElementById('req-song').value.trim();
+            const artist = document.getElementById('req-artist').value.trim();
+            const note = document.getElementById('req-note').value.trim();
+
+            let message = `שלום TIAMO MUSIC! 👋\nאני רוצה לבקש שיר:\n`;
+            message += `👤 *שם מלא:* ${name}\n`;
+            message += `🎵 *שיר מבוקש:* ${song}\n`;
+            if (artist) message += `🎤 *זמר/ת:* ${artist}\n`;
+            if (note) message += `💬 *מוקדש ל:* ${note}\n`;
+
+            const encodedMsg = encodeURIComponent(message);
+            window.open(`https://wa.me/972538550511?text=${encodedMsg}`, '_blank');
+            closeModal('requestModal');
+        }
+
+        function openScheduleModal() {
+            const modal = document.getElementById('scheduleModal');
+            const content = document.getElementById('schedule-content');
+            modal.style.display = 'flex';
+            content.innerHTML = 'טוען לוח שידורים...';
+
+            fetch('/get_full_schedule')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data && data.data.length > 0) {
+                        let html = '<table style="width:100%; text-align:left; border-collapse:collapse;">';
+                        let sideHtml = '';
+                        data.data.forEach((row, idx) => {
+                            if (idx >= 2 && row && (row[1] || row[2])) {
+                                const timeStr = row[1] || '';
+                                const nameStr = row[2] || '-';
+                                html += `<tr style="border-bottom:1px solid #334155;">
+                                    <td style="padding:8px; color:var(--gold); font-weight:bold;">${timeStr}</td>
+                                    <td style="padding:8px; color:#fff;">${nameStr}</td>
+                                </tr>`;
+                                sideHtml += `<div class="schedule-item">
+                                    <div class="schedule-time">${timeStr}</div>
+                                    <div class="schedule-name">${nameStr}</div>
+                                </div>`;
+                            }
+                        });
+                        html += '</table>';
+                        content.innerHTML = html;
+                        if (sideHtml) {
+                            document.getElementById('side-schedule-box').innerHTML = sideHtml;
+                        }
+                    } else {
+                        content.innerHTML = 'לא נמצאו שידורים כרגע.';
+                    }
+                })
+                .catch(err => { content.innerHTML = 'שגיאה בטעינת לוח השידורים.'; });
+        }
+
+        fetchLiveStatus();
+        setInterval(fetchLiveStatus, 30000);
+    </script>
+</body>
+</html>
