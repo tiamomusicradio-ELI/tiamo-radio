@@ -17,7 +17,7 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
-            background: #000 url('/static/media/bg.jpg') no-repeat center center / cover;
+            background: #000 url('/static/media/background.740792a413912a029ca7.jpg') no-repeat center center / cover;
             color: #fff;
             direction: rtl;
             position: relative;
@@ -205,14 +205,12 @@
             margin-right: 60px;
         }
 
-        /* תיבת גלי קול רחבה שקופה ומעוצבת */
+        /* תיבת גלי קול רחבה שתופסת את כל הרוחב והגובה בצורה מלאה ומושלמת */
         .waveform-box {
             width: 100%;
             max-width: 720px;
             height: 85px;
-            background: rgba(20, 20, 25, 0.75);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.94);
             border-radius: 16px;
             display: flex;
             align-items: center;
@@ -515,7 +513,7 @@
 
             </div>
 
-            <!-- מרכז המסך - גלי קול מקוריים מעוצבים -->
+            <!-- מרכז המסך - גלי קול מקוריים פרוסים על כל התיבה -->
             <div class="center-display">
                 
                 <div class="waveform-box">
@@ -585,4 +583,193 @@
             <p style="line-height:1.75; color:#cbd5e1; font-size:15px; margin-bottom:12px;">
                 "מוסיקה לנשמה" המיועדת לכל אלה שהמוסיקה מהווה עבורם נוסטלגיה, והערכה למלודיה מכל הסגנונות אך בדגש על מוסיקה אתנית מכל התפוצות , מוסיקה הפורצת את כל הגבולות מהמזרח, הדרום, הצפון והמערב.
             </p>
-            <p style="line-height:1.75; color
+            <p style="line-height:1.75; color:#cbd5e1; font-size:15px; margin-bottom:12px;">
+                בתחנה תאזינו למוסיקה מכל גווני הקשת , וכמו תמיד תהיה מרוממת ומענגת , ותחבר בין אנשים תקופות ואהבה למוזיקה טובה.
+            </p>
+            <p style="line-height:1.75; color:#cbd5e1; font-size:15px; margin-bottom:25px;">
+                כל זאת, לצד תוכניות קצרות של פודקאסטים בתחומי הייעוץ לחיים לטובת קהל מאזיני התחנה
+            </p>
+            <p style="color:#ffd700; font-weight:bold; font-size:17px; margin-bottom:25px;">
+                האזנה נעימה לכולם.
+            </p>
+
+            <button class="modal-back-btn" onclick="closeModal('aboutModal')" title="חזרה">
+                <img src="/static/media/back.6991b3cc873ad2fe66f3.png" alt="חזרה" style="width:20px; height:20px;" onerror="this.parentNode.innerHTML='↩';">
+            </button>
+        </div>
+    </div>
+
+    <!-- מודאל לוח שידורים -->
+    <div id="scheduleModal" class="modal-overlay">
+        <div class="modal-box" style="max-width:650px;">
+            <span class="close-modal-icon" onclick="closeModal('scheduleModal')">&times;</span>
+            <h3 style="color:#d4af37; margin-bottom:15px; font-size:22px;">📅 לוח שידורים להיום (<span id="schedule-date-title">--/--/----</span>)</h3>
+            <div id="schedule-content" style="max-height:340px; overflow-y:auto; font-size:14px; padding-left:5px; margin-bottom:25px;">
+                טוען לוח שידורים...
+            </div>
+
+            <button class="modal-back-btn" onclick="closeModal('scheduleModal')" title="חזרה">
+                <img src="/static/media/back.6991b3cc873ad2fe66f3.png" alt="חזרה" style="width:20px; height:20px;" onerror="this.parentNode.innerHTML='↩';">
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // לחיצה מוסתרת לניהול בוט: החזק CTRL + SHIFT ולחץ על אזור הכינור ברקע
+        document.getElementById('secretAdminTrigger').addEventListener('click', function(e) {
+            if (e.ctrlKey && e.shiftKey) {
+                e.preventDefault();
+                window.location.href = "/admin";
+            }
+        });
+
+        const audio = document.getElementById('audio-stream');
+        const playIcon = document.getElementById('play-btn-icon');
+        let isPlaying = false;
+
+        const now = new Date();
+        const dayStr = String(now.getDate()).padStart(2, '0');
+        const monthStr = String(now.getMonth() + 1).padStart(2, '0');
+        const yearStr = now.getFullYear();
+        const todayFormatted = `${dayStr}/${monthStr}/${yearStr}`;
+
+        (function setTodayDate() {
+            const dateElem = document.getElementById('current-date-str');
+            if (dateElem) {
+                dateElem.innerText = todayFormatted;
+            }
+            const schedDateTitle = document.getElementById('schedule-date-title');
+            if (schedDateTitle) {
+                schedDateTitle.innerText = todayFormatted;
+            }
+        })();
+
+        function togglePlay() {
+            if (isPlaying) {
+                audio.pause();
+                playIcon.className = "play-icon-triangle";
+                playIcon.innerHTML = "";
+                isPlaying = false;
+            } else {
+                audio.play().then(() => {
+                    playIcon.className = "pause-icon-bars";
+                    playIcon.innerHTML = '<div class="pause-bar"></div><div class="pause-bar"></div>';
+                    isPlaying = true;
+                }).catch(err => {
+                    alert("לא ניתן להתחבר לשידור כרגע.");
+                });
+            }
+        }
+
+        function fetchLiveStatus() {
+            fetch('/get_current_program_status')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('live-program-title').innerText = data.program;
+                        document.getElementById('live-program-time').innerText = data.end_time ? `עד ${data.end_time}` : '';
+                    }
+                })
+                .catch(err => console.log('שגיאה בטעינת תוכנית'));
+        }
+
+        function openRequestModal() {
+            document.getElementById('requestModal').style.display = 'flex';
+        }
+
+        function sendWhatsAppSongRequest(e) {
+            e.preventDefault();
+            const name = document.getElementById('req-name').value.trim();
+            const song = document.getElementById('req-song').value.trim();
+            const artist = document.getElementById('req-artist').value.trim();
+            const note = document.getElementById('req-note').value.trim();
+
+            let message = `שלום TIAMO MUSIC! 👋\nאני רוצה לבקש שיר:\n`;
+            message += `👤 *שם מלא:* ${name}\n`;
+            message += `🎵 *שיר מבוקש:* ${song}\n`;
+            if (artist) message += `🎤 *זמר/ת:* ${artist}\n`;
+            if (note) message += `💬 *בקשה מיוחדת:* ${note}\n`;
+
+            const encodedMsg = encodeURIComponent(message);
+            const waUrl = `https://wa.me/972538550511?text=${encodedMsg}`;
+            
+            window.open(waUrl, '_blank');
+            closeModal('requestModal');
+        }
+
+        function openAboutModal() {
+            document.getElementById('aboutModal').style.display = 'flex';
+        }
+
+        function openScheduleModal() {
+            const modal = document.getElementById('scheduleModal');
+            const content = document.getElementById('schedule-content');
+            modal.style.display = 'flex';
+            content.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">טוען את לוח השידורים להיום...</div>';
+
+            fetch('/get_full_schedule')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data && data.data.length > 0) {
+                        let html = '<table style="width:100%; text-align:right; border-collapse:collapse; margin-top:5px;">';
+                        let rowCount = 0;
+
+                        data.data.forEach((row, idx) => {
+                            if (idx >= 2 && row) {
+                                const rowDateStr = (row[0] || '').trim();
+                                const rowTimeStr = (row[1] || '').trim();
+                                const rowNameStr = (row[2] || '').trim();
+
+                                if (rowTimeStr && rowNameStr) {
+                                    if (!rowDateStr || rowDateStr.includes(dayStr) || rowDateStr.includes(todayFormatted)) {
+                                        html += `<tr style="border-bottom:1px solid #334155;">
+                                            <td style="padding:8px; color:#d4af37; font-weight:bold; white-space:nowrap;">${rowTimeStr}</td>
+                                            <td style="padding:8px; color:#fff;">${rowNameStr}</td>
+                                        </tr>`;
+                                        rowCount++;
+                                    }
+                                }
+                            }
+                        });
+                        html += '</table>';
+
+                        if (rowCount > 0) {
+                            content.innerHTML = html;
+                        } else {
+                            let fallbackHtml = '<table style="width:100%; text-align:right; border-collapse:collapse; margin-top:5px;">';
+                            let fallbackCount = 0;
+                            data.data.forEach((row, idx) => {
+                                if (idx >= 2 && row && (row[1] || row[2])) {
+                                    fallbackHtml += `<tr style="border-bottom:1px solid #334155;">
+                                        <td style="padding:8px; color:#d4af37; font-weight:bold; white-space:nowrap;">${row[1] || ''}</td>
+                                        <td style="padding:8px; color:#fff;">${row[2] || '-'}</td>
+                                    </tr>`;
+                                    fallbackCount++;
+                                }
+                            });
+                            fallbackHtml += '</table>';
+                            
+                            if (fallbackCount > 0) {
+                                content.innerHTML = fallbackHtml;
+                            } else {
+                                content.innerHTML = `<div style="text-align:center; padding:20px; color:#cbd5e1;">לא נמצאו שידורים פעילים כרגע בקובץ האקסל.</div>`;
+                            }
+                        }
+                    } else {
+                        content.innerHTML = '<div style="text-align:center; padding:20px; color:#ef4444;">לא ניתן לטעון לוח שידורים כעת.</div>';
+                    }
+                })
+                .catch(err => {
+                    content.innerHTML = '<div style="text-align:center; padding:20px; color:#ef4444;">שגיאה בחיבור לשרת.</div>';
+                });
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        fetchLiveStatus();
+        setInterval(fetchLiveStatus, 30000);
+    </script>
+</body>
+</html>
