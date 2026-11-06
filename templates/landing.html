@@ -17,7 +17,7 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
-            background: #000 url('/static/media/background.jpg') no-repeat center center / cover;
+            background: #000 url('/static/media/bg.jpg') no-repeat center center / cover;
             color: #fff;
             direction: rtl;
             position: relative;
@@ -519,4 +519,70 @@
             <div class="center-display">
                 
                 <div class="waveform-box">
-                    <img src="/static/media/waves.ba97a297acb1d1a2d0c6.gif" alt="Audio Waves" class="waves-gif" onerror="this.onerror=null; this.src='/static/waves.gif';
+                    <img src="/static/media/waves.ba97a297acb1d1a2d0c6.gif" alt="Audio Waves" class="waves-gif" onerror="this.onerror=null; this.src='/static/waves.gif';">
+                </div>
+
+                <div class="now-playing-box">
+                    <div class="listening-label">אתם מאזינים לתוכנית</div>
+                    <div id="live-program-title" class="program-name-text">טוען תוכנית...</div>
+                    <div id="live-program-time" class="program-time-text">--:--</div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div></div>
+
+    </div>
+
+    <!-- נגן סאונד -->
+    <audio id="audio-stream" src="https://liveradio.co.il:8030/stream" preload="none"></audio>
+
+    <!-- מודאל "בא לי לשמוע" -->
+    <div id="requestModal" class="modal-overlay">
+        <div class="request-modal-card">
+            <h2 class="request-title">בא לי לשמוע</h2>
+            
+            <form id="song-request-form" onsubmit="sendWhatsAppSongRequest(event)">
+                <div class="req-form-row">
+                    <input type="text" id="req-name" class="req-input" required placeholder="">
+                    <label class="req-label">שם מלא</label>
+                </div>
+
+                <div class="req-form-row">
+                    <input type="text" id="req-song" class="req-input" required placeholder="">
+                    <label class="req-label">שם השיר המבוקש</label>
+                </div>
+
+                <div class="req-form-row">
+                    <input type="text" id="req-artist" class="req-input" placeholder="">
+                    <label class="req-label">שם הזמר</label>
+                </div>
+
+                <div class="req-form-row">
+                    <input type="text" id="req-note" class="req-input" placeholder="">
+                    <label class="req-label">בקשה מיוחדת</label>
+                </div>
+
+                <button type="submit" class="req-submit-btn">שליחה</button>
+            </form>
+
+            <button class="modal-back-btn" onclick="closeModal('requestModal')" title="חזרה">
+                <img src="/static/media/back.6991b3cc873ad2fe66f3.png" alt="חזרה" style="width:20px; height:20px;" onerror="this.parentNode.innerHTML='↩';">
+            </button>
+        </div>
+    </div>
+
+    <!-- מודאל אודות התחנה -->
+    <div id="aboutModal" class="modal-overlay">
+        <div class="modal-box">
+            <span class="close-modal-icon" onclick="closeModal('aboutModal')">&times;</span>
+            <h3 style="color:#d4af37; margin-bottom:18px; font-size:24px;">רדיו TIAMO MUSIC</h3>
+            <p style="line-height:1.75; color:#cbd5e1; font-size:15px; margin-bottom:12px;">
+                נועד לשדר למאזינים מוסיקה באוירה אחרת .
+            </p>
+            <p style="line-height:1.75; color:#cbd5e1; font-size:15px; margin-bottom:12px;">
+                "מוסיקה לנשמה" המיועדת לכל אלה שהמוסיקה מהווה עבורם נוסטלגיה, והערכה למלודיה מכל הסגנונות אך בדגש על מוסיקה אתנית מכל התפוצות , מוסיקה הפורצת את כל הגבולות מהמזרח, הדרום, הצפון והמערב.
+            </p>
+            <p style="line-height:1.75; color
