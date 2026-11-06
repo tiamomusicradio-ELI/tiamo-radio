@@ -701,7 +701,7 @@
             document.getElementById('aboutModal').style.display = 'flex';
         }
 
-        function openScheduleModal() {
+function openScheduleModal() {
             const modal = document.getElementById('scheduleModal');
             const content = document.getElementById('schedule-content');
             modal.style.display = 'flex';
@@ -714,20 +714,18 @@
                         let html = '<table style="width:100%; text-align:right; border-collapse:collapse; margin-top:5px;">';
                         let rowCount = 0;
 
+                        // עוברים על כל השורות ומציגים את כל מה שיש לו שעה ושם תוכנית, כדי ששום דבר לא יתפספס
                         data.data.forEach((row, idx) => {
                             if (idx >= 2 && row) {
-                                const rowDateStr = (row[0] || '').trim();
                                 const rowTimeStr = (row[1] || '').trim();
                                 const rowNameStr = (row[2] || '').trim();
 
-                                if (rowTimeStr && rowNameStr) {
-                                    if (!rowDateStr || rowDateStr.includes(dayStr) || rowDateStr.includes(todayFormatted)) {
-                                        html += `<tr style="border-bottom:1px solid #334155;">
-                                            <td style="padding:8px; color:#d4af37; font-weight:bold; white-space:nowrap;">${rowTimeStr}</td>
-                                            <td style="padding:8px; color:#fff;">${rowNameStr}</td>
-                                        </tr>`;
-                                        rowCount++;
-                                    }
+                                if (rowTimeStr && rowNameStr && rowNameStr !== '-') {
+                                    html += `<tr style="border-bottom:1px solid #334155;">
+                                        <td style="padding:10px; color:#d4af37; font-weight:bold; white-space:nowrap; width:30%;">${rowTimeStr}</td>
+                                        <td style="padding:10px; color:#fff; width:70%;">${rowNameStr}</td>
+                                    </tr>`;
+                                    rowCount++;
                                 }
                             }
                         });
@@ -736,24 +734,7 @@
                         if (rowCount > 0) {
                             content.innerHTML = html;
                         } else {
-                            let fallbackHtml = '<table style="width:100%; text-align:right; border-collapse:collapse; margin-top:5px;">';
-                            let fallbackCount = 0;
-                            data.data.forEach((row, idx) => {
-                                if (idx >= 2 && row && (row[1] || row[2])) {
-                                    fallbackHtml += `<tr style="border-bottom:1px solid #334155;">
-                                        <td style="padding:8px; color:#d4af37; font-weight:bold; white-space:nowrap;">${row[1] || ''}</td>
-                                        <td style="padding:8px; color:#fff;">${row[2] || '-'}</td>
-                                    </tr>`;
-                                    fallbackCount++;
-                                }
-                            });
-                            fallbackHtml += '</table>';
-                            
-                            if (fallbackCount > 0) {
-                                content.innerHTML = fallbackHtml;
-                            } else {
-                                content.innerHTML = `<div style="text-align:center; padding:20px; color:#cbd5e1;">לא נמצאו שידורים פעילים כרגע בקובץ האקסל.</div>`;
-                            }
+                            content.innerHTML = `<div style="text-align:center; padding:20px; color:#cbd5e1;">לא נמצאו שידורים פעילים כרגע בקובץ.</div>`;
                         }
                     } else {
                         content.innerHTML = '<div style="text-align:center; padding:20px; color:#ef4444;">לא ניתן לטעון לוח שידורים כעת.</div>';
@@ -763,7 +744,6 @@
                     content.innerHTML = '<div style="text-align:center; padding:20px; color:#ef4444;">שגיאה בחיבור לשרת.</div>';
                 });
         }
-
         function closeModal(id) {
             document.getElementById(id).style.display = 'none';
         }
