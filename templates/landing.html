@@ -66,7 +66,7 @@
             display: block;
         }
 
-        /* לוגו כותרת ראשי */
+        /* לוגו כותרת ראשי והסלוגן מתחתיו */
         .main-header {
             text-align: center;
             margin-top: 5px;
@@ -81,6 +81,14 @@
                 6px 6px 0px #000000,
                 0 0 25px rgba(243, 198, 83, 0.8);
             letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+        .header-tagline {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.9);
+            letter-spacing: 1px;
         }
 
         /* גוף הדף */
@@ -163,20 +171,12 @@
             transform: translateY(-2px);
         }
 
-        .tagline {
-            font-size: 17px;
-            font-weight: bold;
-            color: #ffffff;
-            text-shadow: 2px 2px 4px #000;
-            margin-top: 8px;
-            margin-bottom: 5px;
-        }
-
         /* סרגל אייקונים */
         .social-icons-row {
             display: flex;
             gap: 10px;
             align-items: center;
+            margin-top: 5px;
         }
         .icon-btn-img {
             width: 36px;
@@ -205,7 +205,7 @@
             margin-right: 60px;
         }
 
-        /* תיבת גלי קול רחבה שתופסת את כל הרוחב והגובה בצורה מלאה ומושלמת */
+        /* תיבת גלי קול רחבה */
         .waveform-box {
             width: 100%;
             max-width: 720px;
@@ -352,7 +352,6 @@
             transform: scale(1.04);
         }
 
-        /* כפתור חזרה אחיד לכל המודאלים */
         .modal-back-btn {
             position: absolute;
             bottom: 20px;
@@ -383,7 +382,7 @@
             color: #94a3b8;
         }
 
-        /* התאמה למסכים ניידים (Mobile Responsive) */
+        /* התאמה למסכים ניידים */
         @media screen and (max-width: 768px) {
             body {
                 height: auto;
@@ -412,6 +411,10 @@
 
             .main-logo {
                 font-size: 38px;
+            }
+
+            .header-tagline {
+                font-size: 16px;
             }
 
             .content-layout {
@@ -465,7 +468,7 @@
 
     <div class="page-container">
         
-        <!-- אזור לחיצה שקוף ומוסתר מעל הכינור הלבן ברקע (Ctrl + Shift + לחיצה) -->
+        <!-- אזור לחיצה מוסתר לניהול בוט -->
         <div id="secretAdminTrigger" title=""></div>
 
         <!-- תאריך ו-ON AIR בפינה השמאלית -->
@@ -474,9 +477,10 @@
             <img src="/static/media/onair.9c9a32ce220717d9c14a.png" alt="ON AIR" class="on-air-badge-img" onerror="this.onerror=null; this.src='/static/media/onair.png';">
         </div>
 
-        <!-- כותרת מותג -->
+        <!-- כותרת מותג וסלוגן למעלה -->
         <header class="main-header">
             <h1 class="main-logo">TIAMO MUSIC</h1>
+            <div class="header-tagline">מוזיקה באווירה אחרת</div>
         </header>
 
         <!-- חלק מרכזי -->
@@ -492,8 +496,6 @@
                 <button class="action-pill" onclick="openAboutModal()">אודות התחנה</button>
                 <button class="action-pill" onclick="openRequestModal()">בא לי לשמוע</button>
                 <button class="action-pill" onclick="openScheduleModal()">לוח שידורים</button>
-
-                <div class="tagline">מוזיקה באווירה אחרת</div>
 
                 <!-- אייקונים מקוריים בתחתית -->
                 <div class="social-icons-row">
@@ -513,7 +515,7 @@
 
             </div>
 
-            <!-- מרכז המסך - גלי קול מקוריים פרוסים על כל התיבה -->
+            <!-- מרכז המסך - נגן ויזואלי -->
             <div class="center-display">
                 
                 <div class="waveform-box">
@@ -615,7 +617,6 @@
     </div>
 
     <script>
-        // לחיצה מוסתרת לניהול בוט: החזק CTRL + SHIFT ולחץ על אזור הכינור ברקע
         document.getElementById('secretAdminTrigger').addEventListener('click', function(e) {
             if (e.ctrlKey && e.shiftKey) {
                 e.preventDefault();
@@ -701,7 +702,7 @@
             document.getElementById('aboutModal').style.display = 'flex';
         }
 
-function openScheduleModal() {
+        function openScheduleModal() {
             const modal = document.getElementById('scheduleModal');
             const content = document.getElementById('schedule-content');
             modal.style.display = 'flex';
@@ -714,7 +715,6 @@ function openScheduleModal() {
                         let html = '<table style="width:100%; text-align:right; border-collapse:collapse; margin-top:5px;">';
                         let rowCount = 0;
 
-                        // עוברים על כל השורות ומציגים את כל מה שיש לו שעה ושם תוכנית, כדי ששום דבר לא יתפספס
                         data.data.forEach((row, idx) => {
                             if (idx >= 2 && row) {
                                 const rowTimeStr = (row[1] || '').trim();
@@ -744,6 +744,7 @@ function openScheduleModal() {
                     content.innerHTML = '<div style="text-align:center; padding:20px; color:#ef4444;">שגיאה בחיבור לשרת.</div>';
                 });
         }
+
         function closeModal(id) {
             document.getElementById(id).style.display = 'none';
         }
