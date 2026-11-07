@@ -21,9 +21,9 @@
         }
 
         body {
-            background-color: #121824;
-            background-image: linear-gradient(rgba(5, 7, 12, 0.2), rgba(5, 7, 12, 0.45)),
-                              url("{{ url_for('static', filename='ULPAN HADASH.jpg') }}");
+            background-color: #05070c;
+            background-image: linear-gradient(rgba(5, 7, 12, 0.25), rgba(5, 7, 12, 0.55)),
+                              url('/static/ULPAN HADASH.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -43,12 +43,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 30px;
+            padding: 18px 35px;
             background: rgba(10, 14, 23, 0.65);
             backdrop-filter: blur(15px);
-            border: 1px solid rgba(212, 175, 55, 0.4);
-            border-radius: 18px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            border: 1.5px solid rgba(212, 175, 55, 0.45);
+            border-radius: 20px;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.6);
         }
 
         .brand-box {
@@ -56,19 +56,21 @@
             flex-direction: column;
         }
 
+        /* כותרת מוגדלת, ענקית ומעוצבת לגודל 48px בזהב יוקרתי ובולט */
         .brand-title {
             color: var(--gold);
-            font-size: 42px;
+            font-size: 48px;
             font-weight: 900;
-            letter-spacing: 2px;
-            text-shadow: 0 2px 12px rgba(212, 175, 55, 0.6);
+            letter-spacing: 3px;
+            text-shadow: 0 3px 15px rgba(212, 175, 55, 0.7), 0 2px 5px rgba(0,0,0,0.9);
         }
 
         .brand-slogan {
-            font-size: 13px;
+            font-size: 14px;
             color: var(--text-muted);
-            letter-spacing: 1.5px;
-            margin-top: 2px;
+            letter-spacing: 2px;
+            margin-top: 4px;
+            font-weight: 600;
         }
 
         nav ul {
@@ -80,7 +82,7 @@
         nav ul li a {
             color: var(--text-muted);
             text-decoration: none;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             transition: 0.3s;
             cursor: pointer;
@@ -149,6 +151,21 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* 1. לוח שידורים (משמאל) */
+        .studio-3d-btn.schedule-btn {
+            background: linear-gradient(145deg, #475569, #1e293b);
+            border-color: rgba(148, 163, 184, 0.5);
+            color: #f8fafc;
+        }
+
+        /* 2. אודות */
+        .studio-3d-btn.about-btn {
+            background: linear-gradient(145deg, #2b2b2b, #111111);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #e2e8f0;
+        }
+
+        /* 3. הפעל שידור חי (המרכזי הגדול בזהב) */
         .studio-3d-btn.main-play {
             background: linear-gradient(145deg, #d4af37, #8c7324);
             border: 4px solid #ffffff;
@@ -162,15 +179,7 @@
             transform: translateY(-8px);
         }
 
-        .studio-3d-btn.whatsapp-btn {
-            background: linear-gradient(145deg, #1b4d2e, #0a2213);
-            border-color: rgba(37, 211, 102, 0.8);
-            color: #25d366;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.7), 
-                        inset 0 3px 6px rgba(37, 211, 102, 0.4), 
-                        inset 0 -5px 10px rgba(0,0,0,0.8);
-        }
-
+        /* 4. שידור ניסיוני - בקרוב ! */
         .studio-3d-btn.caster-btn {
             background: linear-gradient(145deg, #1e3a8a, #0f172a);
             border-color: rgba(96, 165, 250, 0.8);
@@ -181,16 +190,14 @@
                         inset 0 -5px 10px rgba(0,0,0,0.8);
         }
 
-        .studio-3d-btn.about-btn {
-            background: linear-gradient(145deg, #2b2b2b, #111111);
-            border-color: rgba(255, 255, 255, 0.3);
-            color: #e2e8f0;
-        }
-
-        .studio-3d-btn.schedule-btn {
-            background: linear-gradient(145deg, #475569, #1e293b);
-            border-color: rgba(148, 163, 184, 0.5);
-            color: #f8fafc;
+        /* 5. בקשת שיר בוואצאפ (ירוק) */
+        .studio-3d-btn.whatsapp-btn {
+            background: linear-gradient(145deg, #1b4d2e, #0a2213);
+            border-color: rgba(37, 211, 102, 0.8);
+            color: #25d366;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7), 
+                        inset 0 3px 6px rgba(37, 211, 102, 0.4), 
+                        inset 0 -5px 10px rgba(0,0,0,0.8);
         }
 
         .studio-3d-btn:hover {
@@ -308,7 +315,6 @@
                 הפעל שידור חי
             </button>
 
-            <!-- לחצן Caster שפותח חלונית עם הווידג'ט הרשמי -->
             <button onclick="openCasterModal()" class="studio-3d-btn caster-btn">
                 <span style="font-size: 20px; margin-bottom: 4px;">📻</span>
                 שידור ניסיוני - בקרוב !
@@ -326,7 +332,6 @@
         </div>
     </div>
 
-    <!-- נגן האודיו הראשי -->
     <audio id="audio-stream" src="https://liveradio.co.il:8030/stream" preload="none"></audio>
 
     <footer>
@@ -366,4 +371,40 @@
     <div id="scheduleModal" class="modal-overlay">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('scheduleModal')">&times;</span>
-            <h3 style="color:var(--gold); margin-
+            <h3 style="color:var(--gold); margin-bottom:15px; font-size:20px;">📅 לוח שידורים יומי</h3>
+            <div id="schedule-content" style="color:#cbd5e1; font-size:14px;">טוען לוח שידורים...</div>
+        </div>
+    </div>
+
+    <div id="casterModal" class="modal-overlay">
+        <div class="modal-content" style="text-align: center;">
+            <span class="close-modal" onclick="closeModal('casterModal')">&times;</span>
+            <h3 style="color:var(--gold); margin-bottom:20px; font-size:20px;">📻 שידור ניסיוני - Caster.fm</h3>
+            <div style="margin: 20px 0; display: flex; justify-content: center;">
+                <div data-type="newStreamPlayer" data-publicToken="7f6125d4-0484-4fec-98df-157a153e7803" data-theme="light" data-color="e81e4d" data-channelId="" data-rendered="false" class="cstrEmbed">
+                    <a href="https://www.caster.fm">Shoutcast Hosting</a> 
+                    <a href="https://www.caster.fm">Stream Hosting</a> 
+                    <a href="https://www.caster.fm">Radio Server Hosting</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="//cdn.cloud.caster.fm//widgets/embed.js"></script>
+
+    <script>
+        const audio = document.getElementById('audio-stream');
+        let isPlaying = false;
+
+        function togglePlay() {
+            const btn = document.getElementById('play-btn-element');
+            const banner = document.getElementById('playing-status-banner');
+            
+            if (isPlaying) {
+                audio.pause();
+                isPlaying = false;
+                btn.innerHTML = `<span style="font-size: 26px; margin-bottom: 4px;">▶</span>הפעל שידור חי`;
+                banner.style.display = 'none';
+            } else {
+                audio.load();
+                audio.play().then(() => {
+                    isPlaying =
