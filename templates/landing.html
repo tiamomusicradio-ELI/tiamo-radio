@@ -7,12 +7,10 @@
     <style>
         :root {
             --bg-deep: #05070c;
-            --glass-bg: rgba(18, 24, 38, 0.85);
             --gold: #d4af37;
             --gold-light: #f3c653;
             --text-main: #ffffff;
             --text-muted: #94a3b8;
-            --border-gold: rgba(212, 175, 55, 0.5);
             --live-green: #10b981;
         }
 
@@ -25,7 +23,8 @@
 
         body {
             background-color: var(--bg-deep);
-            background-image: linear-gradient(rgba(5, 7, 12, 0.4), rgba(5, 7, 12, 0.7)),
+            /* רקע אולפן נקי ויוקרתי המשתרע על כל המסך */
+            background-image: linear-gradient(rgba(5, 7, 12, 0.45), rgba(5, 7, 12, 0.75)),
                               url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1920&q=80');
             background-size: cover;
             background-position: center;
@@ -35,55 +34,40 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 25px 40px;
+            padding: 20px 40px;
         }
 
+        /* חלק עליון - לוגו, סלוגן וכפתור PLAY מרכזי */
         header {
             width: 100%;
-            max-width: 1350px;
+            max-width: 1300px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 30px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--border-gold);
+            padding: 20px 30px;
+            background: rgba(10, 14, 23, 0.75);
+            backdrop-filter: blur(20px);
+            border: 1.5px solid rgba(212, 175, 55, 0.4);
             border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
         }
 
-        .brand-container {
+        .brand-box {
             display: flex;
             flex-direction: column;
         }
 
-        .brand-logo {
+        .brand-title {
             color: var(--gold);
-            font-size: 22px;
+            font-size: 26px;
             font-weight: 900;
             letter-spacing: 2px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .brand-logo span {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: 2px solid var(--gold);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(212, 175, 55, 0.2);
-            font-size: 16px;
+            text-shadow: 0 2px 10px rgba(212,175,55,0.4);
         }
 
         .brand-slogan {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-muted);
             letter-spacing: 1px;
             margin-top: 2px;
@@ -98,7 +82,7 @@
         nav ul li a {
             color: var(--text-muted);
             text-decoration: none;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             transition: 0.3s;
             cursor: pointer;
@@ -106,271 +90,180 @@
 
         nav ul li a:hover, nav ul li a.active { color: var(--gold); }
 
-        /* כפתור PLAY בולט במיוחד בראש העמוד */
+        /* לחצן PLAY ראשי גדול ובולט */
         .listen-live-btn {
             background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            color: #000;
+            color: #050507;
             border: none;
-            padding: 14px 28px;
-            border-radius: 30px;
+            padding: 14px 30px;
+            border-radius: 35px;
             font-weight: 900;
-            font-size: 15px;
+            font-size: 16px;
             cursor: pointer;
-            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.5), inset 0 2px 3px rgba(255,255,255,0.6);
+            box-shadow: 0 6px 25px rgba(212, 175, 55, 0.6), inset 0 2px 4px rgba(255,255,255,0.7);
             transition: 0.3s;
         }
 
-        .listen-live-btn:hover { transform: translateY(-2px) scale(1.03); }
+        .listen-live-btn:hover { transform: scale(1.05); }
 
-        .dashboard-container {
+        /* אזור מרכזי - נגן וגל קול מעל רקע האולפן */
+        .main-content-area {
             width: 100%;
-            max-width: 1350px;
-            margin: 25px auto;
+            max-width: 1300px;
+            margin: 20px auto;
             display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 30px;
+            grid-template-columns: 1fr 380px;
+            gap: 25px;
         }
 
-        .section-title {
-            font-size: 12px;
-            letter-spacing: 2px;
-            color: var(--gold);
-            margin-bottom: 12px;
-            font-weight: 800;
-            text-align: right;
+        .glass-panel {
+            background: rgba(12, 17, 27, 0.8);
+            backdrop-filter: blur(25px);
+            border: 1.5px solid rgba(212, 175, 55, 0.35);
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
         }
 
-        .now-playing-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1.5px solid var(--border-gold);
-            border-radius: 28px;
-            padding: 35px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255,255,255,0.15);
-        }
-
-        .now-playing-content {
+        .player-inner {
             display: flex;
             align-items: center;
-            gap: 30px;
-            margin-bottom: 30px;
+            gap: 25px;
         }
 
-        .album-art-box {
-            width: 180px;
-            height: 180px;
-            flex-shrink: 0;
-            border-radius: 20px;
-            background: radial-gradient(circle, rgba(26,34,51,0.8) 0%, rgba(5,7,10,0.9) 100%);
+        .album-art-sim {
+            width: 140px;
+            height: 140px;
+            border-radius: 18px;
+            background: radial-gradient(circle, #1a2233 0%, #05070a 100%);
             border: 2px solid var(--gold);
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             position: relative;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-            padding: 15px;
-            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
 
-        .live-badge {
+        .live-tag {
             position: absolute;
-            top: 12px;
-            left: 12px;
+            top: 10px;
+            left: 10px;
             font-size: 10px;
             font-weight: 800;
             color: var(--live-green);
             background: rgba(16, 185, 129, 0.18);
-            padding: 3px 10px;
-            border-radius: 10px;
+            padding: 2px 8px;
+            border-radius: 8px;
             border: 1px solid rgba(16, 185, 129, 0.4);
         }
 
-        .rotating-coin {
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            border: 2px solid var(--gold);
-            background: radial-gradient(circle, #111522 0%, #05070a 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            animation: coinRotate 12s linear infinite;
-            box-shadow: 0 0 15px rgba(212,175,55,0.4);
-            margin-bottom: 8px;
-        }
-
-        @keyframes coinRotate {
-            0% { transform: perspective(600px) rotateY(0deg); }
-            100% { transform: perspective(600px) rotateY(360deg); }
-        }
-
-        .track-details {
-            flex-grow: 1;
-            text-align: right;
-        }
-
-        .track-details h2 {
-            font-size: 24px;
+        .track-info h2 {
+            font-size: 22px;
             font-weight: 900;
             color: #fff;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
 
-        .track-details .artist {
-            font-size: 14px;
+        .track-info .sub {
+            font-size: 13px;
             color: var(--gold);
-            margin-bottom: 15px;
-        }
-
-        /* גל קול מעוצב */
-        .waveform-img {
-            width: 100%;
-            height: 45px;
-            background: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80') center/cover;
-            border-radius: 8px;
-            opacity: 0.9;
-            filter: sepia(100%) hue-rotate(10deg) saturate(350%);
             margin-bottom: 12px;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
 
-        /* גריד לחצנים בגודל אחיד ותלת-מימד עמוק */
-        .action-buttons-grid {
+        /* גל קול */
+        .waveform-bar {
+            width: 100%;
+            height: 40px;
+            background: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80') center/cover;
+            border-radius: 6px;
+            filter: sepia(100%) hue-rotate(10deg) saturate(350%);
+            opacity: 0.9;
+        }
+
+        /* שורה תחתונה - לחצנים תלת-מימדיים אחידים ובולטים */
+        .buttons-bottom-grid {
+            width: 100%;
+            max-width: 1300px;
+            margin: 10px auto 20px auto;
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 18px;
-            border-top: 1px solid rgba(255,255,255,0.12);
-            padding-top: 25px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
         }
 
-        .hero-action-btn {
-            background: linear-gradient(145deg, rgba(25, 33, 50, 0.9), rgba(12, 17, 27, 0.95));
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 2px solid var(--border-gold);
-            color: var(--text-main);
-            padding: 16px 20px;
+        .tactile-btn {
+            background: linear-gradient(145deg, rgba(25, 33, 50, 0.95), rgba(12, 17, 27, 0.98));
+            border: 2px solid rgba(212, 175, 55, 0.5);
+            color: #fff;
+            padding: 18px;
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 900;
             cursor: pointer;
             text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 
-                        inset 0 2px 4px rgba(255, 255, 255, 0.25), 
-                        inset 0 -3px 6px rgba(0, 0, 0, 0.6);
+            gap: 10px;
+            height: 65px;
             text-align: center;
-            height: 60px; /* גודל אחיד לכל הלחצנים */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6), 
+                        inset 0 2px 3px rgba(255,255,255,0.25), 
+                        inset 0 -3px 5px rgba(0,0,0,0.6);
+            transition: all 0.3s ease;
         }
 
-        .hero-action-btn.whatsapp {
-            background: linear-gradient(145deg, rgba(20, 50, 32, 0.9), rgba(10, 25, 15, 0.95));
+        .tactile-btn.whatsapp {
+            background: linear-gradient(145deg, rgba(20, 50, 32, 0.95), rgba(10, 25, 15, 0.98));
             border-color: rgba(37, 211, 102, 0.6);
             color: #25d366;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 
-                        inset 0 2px 4px rgba(37, 211, 102, 0.3), 
-                        inset 0 -3px 6px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6), 
+                        inset 0 2px 3px rgba(37, 211, 102, 0.3), 
+                        inset 0 -3px 5px rgba(0,0,0,0.6);
         }
 
-        .hero-action-btn.primary-gold {
-            background: linear-gradient(145deg, rgba(70, 58, 20, 0.9), rgba(30, 24, 8, 0.95));
-            border-color: var(--gold);
-            color: var(--gold-light);
-        }
-
-        .hero-action-btn:hover {
-            transform: translateY(-4px) scale(1.02);
+        .tactile-btn:hover {
+            transform: translateY(-4px);
             background: linear-gradient(145deg, var(--gold), #b38f28);
             color: #050507;
             border-color: #fff;
-            box-shadow: 0 20px 40px rgba(212, 175, 55, 0.5), 
-                        inset 0 2px 5px rgba(255, 255, 255, 0.6);
+            box-shadow: 0 15px 35px rgba(212, 175, 55, 0.5);
         }
 
-        .hero-action-btn.whatsapp:hover {
+        .tactile-btn.whatsapp:hover {
             background: linear-gradient(145deg, #25d366, #1ebe5d);
             color: #fff;
-            border-color: #fff;
-            box-shadow: 0 20px 40px rgba(37, 211, 102, 0.5), 
-                        inset 0 2px 5px rgba(255, 255, 255, 0.6);
         }
 
-        .schedule-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1.5px solid var(--border-gold);
-            border-radius: 28px;
-            padding: 30px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255,255,255,0.1);
-            max-height: 480px;
-            overflow-y: auto;
-        }
-
-        .schedule-item {
-            padding: 14px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .schedule-item:last-child { border-bottom: none; }
-
-        .schedule-time {
-            font-size: 13px;
-            color: var(--gold);
-            font-weight: 800;
-        }
-
-        .schedule-name {
-            font-size: 15px;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        /* פוטר עם אייקונים חברתיים ואקו"ם */
+        /* פוטר ואייקונים */
         footer {
             width: 100%;
-            max-width: 1350px;
-            margin: 20px auto 0 auto;
+            max-width: 1300px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 20px;
+            padding-top: 15px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             font-size: 13px;
             color: var(--text-muted);
         }
 
-        .social-icons {
+        .footer-social {
             display: flex;
             gap: 20px;
-            align-items: center;
         }
 
-        .social-icons a {
+        .footer-social a {
             color: var(--text-muted);
             text-decoration: none;
             font-weight: 700;
-            font-size: 14px;
             transition: 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
-        .social-icons a:hover {
-            color: var(--gold);
-        }
+        .footer-social a:hover { color: var(--gold); }
 
+        /* Modals */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -384,81 +277,31 @@
 
         .modal-content {
             background: rgba(13, 18, 28, 0.95);
-            backdrop-filter: blur(25px);
             border: 2px solid var(--gold);
-            padding: 40px;
-            border-radius: 28px;
+            padding: 35px;
+            border-radius: 25px;
             width: 90%;
-            max-width: 580px;
+            max-width: 500px;
             text-align: right;
             position: relative;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.9);
         }
 
         .close-modal {
             position: absolute;
-            top: 20px;
-            left: 25px;
+            top: 15px;
+            left: 20px;
             color: var(--text-muted);
-            font-size: 28px;
+            font-size: 26px;
             cursor: pointer;
         }
-
-        .close-modal:hover { color: var(--gold); }
-
-        .req-form-row {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 18px;
-        }
-
-        .req-label {
-            font-size: 14px;
-            font-weight: bold;
-            color: #fff;
-            min-width: 130px;
-        }
-
-        .req-input {
-            flex: 1;
-            background: rgba(0,0,0,0.5);
-            border: 1.5px solid rgba(255,255,255,0.25);
-            border-radius: 10px;
-            padding: 12px 16px;
-            color: #fff;
-            font-size: 15px;
-            outline: none;
-            direction: rtl;
-        }
-
-        .req-input:focus { border-color: var(--gold); }
-
-        .req-submit-btn {
-            width: 100%;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            color: #050507;
-            border: none;
-            padding: 14px 0;
-            border-radius: 25px;
-            font-weight: 900;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: 0.3s;
-            box-shadow: 0 0 20px rgba(212,175,55,0.4);
-        }
-
-        .req-submit-btn:hover { transform: scale(1.02); }
     </style>
 </head>
 <body>
 
+    <!-- כותרת עליונה -->
     <header>
-        <div class="brand-container">
-            <a href="#" class="brand-logo">
-                <span>T</span> TIAMO MUSIC
-            </a>
+        <div class="brand-box">
+            <div class="brand-title">TIAMO MUSIC</div>
             <div class="brand-slogan">מוזיקה באווירה אחרת</div>
         </div>
         <nav>
@@ -469,84 +312,61 @@
                 <li><a href="/admin">ניהול</a></li>
             </ul>
         </nav>
-        <div class="header-btns">
+        <div>
             <button onclick="togglePlay()" class="listen-live-btn">▶ הפעל שידור חי</button>
         </div>
     </header>
 
-    <div class="dashboard-container">
-        
-        <!-- נגן משמאל -->
-        <div>
-            <div class="section-title">מתנגן כעת ופקדי גישה מהירים</div>
-            <div class="now-playing-card">
-                <div class="now-playing-content">
-                    <div class="album-art-box">
-                        <div class="live-badge">שידור חי</div>
-                        <div class="rotating-coin">
-                            <span style="font-size: 11px; font-weight: 900; color: var(--gold);">TIAMO</span>
-                            <span style="font-size: 5px; color: var(--text-muted); letter-spacing: 1px;">MUSIC</span>
-                        </div>
-                        <div style="font-size: 11px; font-weight: 800; color: #fff;">TIAMO RADIO</div>
-                        <div style="font-size: 8px; color: var(--gold);">STREAM 24/7</div>
-                    </div>
-
-                    <div class="track-details">
-                        <h2 id="live-program-title">טוען תוכנית...</h2>
-                        <div class="artist">מוזיקה באווירה אחרת - עמדת שידור חי</div>
-                        <div class="waveform-img"></div>
-                        <div class="current-track-meta" id="live-program-time">שידור חי רציף</div>
-                    </div>
+    <!-- אזור מרכזי: נגן ולוח שידורים קומפקטי -->
+    <div class="main-content-area">
+        <div class="glass-panel">
+            <div style="font-size: 12px; color: var(--gold); font-weight: 800; margin-bottom: 12px; letter-spacing: 1px;">מתנגן כעת באולפן</div>
+            <div class="player-inner">
+                <div class="album-art-box album-art-sim">
+                    <div class="live-tag">שידור חי</div>
+                    <div style="font-size: 12px; font-weight: 900; color: var(--gold);">TIAMO</div>
+                    <div style="font-size: 9px; color: #fff;">MUSIC 24/7</div>
                 </div>
-
-                <div class="action-buttons-grid">
-                    <button onclick="openAboutModal()" class="hero-action-btn">
-                        🎙️ אודות התחנה
-                    </button>
-                    <button onclick="openRequestModal()" class="hero-action-btn whatsapp">
-                        💬 בא לי לשמוע
-                    </button>
-                    <a href="https://wa.me/972538550511?text=היי%2C%20אשמח%20לבקש%20פלייליסט%20אישי%20לתחנה:" target="_blank" class="hero-action-btn whatsapp">
-                        🎵 בקשת פלייליסט אישי
-                    </a>
-                    <button onclick="openScheduleModal()" class="hero-action-btn primary-gold">
-                        📅 לוח שידורים
-                    </button>
+                <div class="track-info" style="flex:1;">
+                    <h2 id="live-program-title">טוען תוכנית שידור...</h2>
+                    <div class="sub">מוזיקה באווירה אחרת - עמדת שידור חי</div>
+                    <div class="waveform-bar"></div>
+                    <div id="live-program-time" style="font-size: 12px; color: var(--text-muted);">שידור רציף סביב השעון</div>
                 </div>
             </div>
         </div>
 
-        <!-- לוח שידורים יומי מימין -->
-        <div>
-            <div class="section-title">לוח שידורים יומי</div>
-            <div class="schedule-panel" id="side-schedule-box">
-                <div class="schedule-item">
-                    <div class="schedule-time">08:00 - 12:00</div>
-                    <div class="schedule-name">בוקר רגוע עם מיטב הקלאסיקות</div>
-                </div>
-                <div class="schedule-item">
-                    <div class="schedule-time">12:00 - 16:00</div>
-                    <div class="schedule-name">צהריים קצביים מכל הזמנים</div>
-                </div>
-                <div class="schedule-item">
-                    <div class="schedule-time">16:00 - 20:00</div>
-                    <div class="schedule-name">שעה של להיטים חמים</div>
-                </div>
-                <div class="schedule-item">
-                    <div class="schedule-time">20:00 - 00:00</div>
-                    <div class="schedule-name">שעת לילה חלומית (שידור חי)</div>
-                </div>
-            </div>
+        <div class="glass-panel" style="max-height: 200px; overflow-y: auto;" id="side-schedule-box">
+            <div style="font-size: 12px; color: var(--gold); font-weight: 800; margin-bottom: 10px;">לוח שידורים להיום</div>
+            <div style="font-size: 13px; color:#fff; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.1);">08:00 - בוקר רגוע עם קלאסיקות</div>
+            <div style="font-size: 13px; color:#fff; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.1);">12:00 - צהריים קצביים מכל הזמנים</div>
+            <div style="font-size: 13px; color:#fff; padding:6px 0;">16:00 - להיטים חמים ושידור חי</div>
         </div>
+    </div>
 
+    <!-- שורה תחתונה - ארבעת הלחצנים הגדולים והאחידים בתלת מימד -->
+    <div class="buttons-bottom-grid">
+        <button onclick="openAboutModal()" class="tactile-btn">
+            🎙️ אודות התחנה
+        </button>
+        <button onclick="openRequestModal()" class="tactile-btn whatsapp">
+            💬 בא לי לשמוע
+        </button>
+        <a href="https://wa.me/972538550511?text=היי%2C%20אשמח%20לבקש%20פלייליסט%20אישי%20לתחנה:" target="_blank" class="tactile-btn whatsapp">
+            🎵 פלייליסט אישי
+        </a>
+        <button onclick="openScheduleModal()" class="tactile-btn" style="border-color: var(--gold); color: var(--gold-light);">
+            📅 לוח שידורים
+        </button>
     </div>
 
     <!-- נגן האודיו -->
     <audio id="audio-stream" src="https://liveradio.co.il:8030/stream" preload="none"></audio>
 
+    <!-- פוטר עם כל האייקונים -->
     <footer>
         <div>© 2026 TIAMO MUSIC - מוזיקה באווירה אחרת. כל הזכויות שמורות.</div>
-        <div class="social-icons">
+        <div class="footer-social">
             <a href="https://wa.me/972538550511" target="_blank">🟢 WhatsApp</a>
             <a href="https://facebook.com" target="_blank">🔵 Facebook</a>
             <a href="mailto:info@tiamomusic.co.il">✉️ E-Mail</a>
@@ -559,25 +379,13 @@
     <div id="requestModal" class="modal-overlay">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('requestModal')">&times;</span>
-            <h2 style="color:var(--gold); margin-bottom:25px; font-size:24px; text-align:center;">💬 בא לי לשמוע - בקשת שיר</h2>
+            <h2 style="color:var(--gold); margin-bottom:20px; font-size:20px; text-align:center;">💬 בא לי לשמוע - בקשת שיר</h2>
             <form onsubmit="sendWhatsAppSongRequest(event)">
-                <div class="req-form-row">
-                    <label class="req-label">שם מלא:</label>
-                    <input type="text" id="req-name" class="req-input" required>
-                </div>
-                <div class="req-form-row">
-                    <label class="req-label">שם השיר המבוקש:</label>
-                    <input type="text" id="req-song" class="req-input" required>
-                </div>
-                <div class="req-form-row">
-                    <label class="req-label">שם הזמר:</label>
-                    <input type="text" id="req-artist" class="req-input">
-                </div>
-                <div class="req-form-row">
-                    <label class="req-label">מוקדש ל:</label>
-                    <input type="text" id="req-note" class="req-input">
-                </div>
-                <button type="submit" class="req-submit-btn">שליחה בוואצאפ</button>
+                <div style="margin-bottom:12px;">שם מלא:</div>
+                <input type="text" id="req-name" style="width:100%; padding:10px; background:#05070c; border:1px solid #444; color:#fff; border-radius:8px;" required>
+                <div style="margin:12px 0 6px 0;">שם השיר המבוקש:</div>
+                <input type="text" id="req-song" style="width:100%; padding:10px; background:#05070c; border:1px solid #444; color:#fff; border-radius:8px;" required>
+                <button type="submit" style="width:100%; margin-top:20px; padding:12px; background:var(--gold); border:none; font-weight:bold; border-radius:20px; cursor:pointer;">שליחה בוואצאפ</button>
             </form>
         </div>
     </div>
@@ -585,26 +393,4 @@
     <div id="aboutModal" class="modal-overlay">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('aboutModal')">&times;</span>
-            <h3 style="color:var(--gold); margin-bottom:18px; font-size:22px;">🎙️ אודות רדיו TIAMO MUSIC</h3>
-            <p style="line-height:1.8; color:#cbd5e1; font-size:15px; margin-bottom:12px;">נועד לשדר למאזינים מוסיקה באוירה אחרת.</p>
-            <p style="line-height:1.8; color:#cbd5e1; font-size:15px; margin-bottom:12px;">"מוסיקה לנשמה" המיועדת לכל אלה שהמוסיקה מהווה עבורם נוסטלגיה, והערכה למלודיה מכל הסגנונות אך בדגש על מוסיקה אתנית מכל התפוצות – שידורים חיים מעמדת האולפן המקצועית שלנו.</p>
-            <p style="color:var(--gold); font-weight:bold; margin-top:18px; font-size:16px;">האזנה נעימה לכולם.</p>
-        </div>
-    </div>
-
-    <div id="scheduleModal" class="modal-overlay">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('scheduleModal')">&times;</span>
-            <h3 style="color:var(--gold); margin-bottom:20px; font-size:22px;">📅 לוח שידורים מלא להיום</h3>
-            <div id="schedule-content" style="max-height:350px; overflow-y:auto; font-size:15px; color:#cbd5e1;">
-                טוען לוח שידורים...
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const audio = document.getElementById('audio-stream');
-        let isPlaying = false;
-
-        function togglePlay() {
-            const btn = document.querySelector('.listen-live-btn');
+            <h3 style="color:var(--gold); margin-bottom:15px; font-size:20px;">🎙️ אוד
