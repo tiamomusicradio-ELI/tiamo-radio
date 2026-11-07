@@ -22,9 +22,8 @@
 
         body {
             background-color: #05070c;
-            /* שימוש בתמונת האולפן המקורית כרקע מלא למסך בדיוק כמו בתמונה שביקשת */
-            background-image: linear-gradient(rgba(5, 7, 12, 0.2), rgba(5, 7, 12, 0.5)),
-                              url('/static/ULPAN HADASH.jpg'); /* או קישור ישיר אם מעדיף */
+            background-image: linear-gradient(rgba(5, 7, 12, 0.25), rgba(5, 7, 12, 0.55)),
+                              url('/static/image_13.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -37,17 +36,16 @@
             overflow-x: hidden;
         }
 
-        /* חלק עליון - לוגו ותפריט נקי ושקוף למחצה */
         header {
             width: 100%;
-            max-width: 1350px;
+            max-width: 1400px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 15px 30px;
-            background: rgba(10, 14, 23, 0.6);
-            backdrop-filter: blur(15px);
+            background: rgba(10, 14, 23, 0.5);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(212, 175, 55, 0.35);
             border-radius: 18px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -89,40 +87,37 @@
 
         nav ul li a:hover, nav ul li a.active { color: var(--gold); }
 
-        /* אזור מרכזי - מדומה לשולחן האולפן שעליו יושבים הכפתורים התלת-מימדיים */
         .hero-stage {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            max-width: 1350px;
+            max-width: 1400px;
             margin: 0 auto;
             width: 100%;
             padding: 20px 0;
         }
 
-        /* כרטיס מתנגן כעת נסתר/דיסקרטי שמופיע בזמן אמת כשלוחצים על PLAY */
         .now-playing-banner {
             background: rgba(10, 14, 23, 0.85);
             backdrop-filter: blur(20px);
             border: 1.5px solid var(--gold);
             padding: 12px 25px;
             border-radius: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             display: flex;
             align-items: center;
             gap: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            max-width: 600px;
+            max-width: 500px;
             width: 100%;
             text-align: right;
         }
 
-        /* שורת 5 הלחצנים התלת-מימדיים בדיוק כמו בתמונה שצירפת */
         .studio-buttons-container {
             display: flex;
-            gap: 20px;
+            gap: 18px;
             justify-content: center;
             align-items: center;
             flex-wrap: wrap;
@@ -134,9 +129,9 @@
             background: linear-gradient(145deg, #3d3422, #1c180e);
             border: 3px solid rgba(212, 175, 55, 0.7);
             color: var(--gold-light);
-            padding: 20px 25px;
+            padding: 18px 15px;
             border-radius: 25px;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 900;
             cursor: pointer;
             text-decoration: none;
@@ -145,7 +140,7 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            width: 160px;
+            width: 150px;
             height: 120px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.7), 
                         inset 0 3px 6px rgba(255,255,255,0.35), 
@@ -153,21 +148,21 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* לחצן הפעל שידור חי - המרכזי והגדול ביותר בדיוק כמו בתמונה */
+        /* לחצן הפעל שידור חי - המרכזי הגדול בזהב */
         .studio-3d-btn.main-play {
             background: linear-gradient(145deg, #d4af37, #8c7324);
             border: 4px solid #ffffff;
             color: #050507;
-            width: 190px;
-            height: 145px;
-            font-size: 20px;
+            width: 180px;
+            height: 140px;
+            font-size: 18px;
             box-shadow: 0 20px 45px rgba(212, 175, 55, 0.6), 
                         inset 0 4px 8px rgba(255,255,255,0.7), 
                         inset 0 -6px 12px rgba(0,0,0,0.5);
             transform: translateY(-8px);
         }
 
-        /* לחצן בקשת שיר בוואצאפ - ירוק מודגש בדיוק כמו בתמונה */
+        /* לחצן וואצאפ ירוק מודגש */
         .studio-3d-btn.whatsapp-btn {
             background: linear-gradient(145deg, #1b4d2e, #0a2213);
             border-color: rgba(37, 211, 102, 0.8);
@@ -177,14 +172,25 @@
                         inset 0 -5px 10px rgba(0,0,0,0.8);
         }
 
-        /* לחצן אודות - גוון כהה יוקרתי כמו בתמונה */
+        /* לחצן סטרימינג Caster הניסיוני */
+        .studio-3d-btn.caster-btn {
+            background: linear-gradient(145deg, #1e3a8a, #0f172a);
+            border-color: rgba(96, 165, 250, 0.8);
+            color: #60a5fa;
+            font-size: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7), 
+                        inset 0 3px 6px rgba(96, 165, 250, 0.4), 
+                        inset 0 -5px 10px rgba(0,0,0,0.8);
+        }
+
+        /* לחצן אודות */
         .studio-3d-btn.about-btn {
             background: linear-gradient(145deg, #2b2b2b, #111111);
             border-color: rgba(255, 255, 255, 0.3);
             color: #e2e8f0;
         }
 
-        /* לחצן לוח שידורים - גוון כסוף/מתכתי כמו בתמונה */
+        /* לחצן לוח שידורים */
         .studio-3d-btn.schedule-btn {
             background: linear-gradient(145deg, #475569, #1e293b);
             border-color: rgba(148, 163, 184, 0.5);
@@ -196,31 +202,23 @@
             box-shadow: 0 25px 50px rgba(212, 175, 55, 0.5);
         }
 
-        .studio-3d-btn.main-play:hover {
-            background: linear-gradient(145deg, #f3c653, #d4af37);
-            color: #000;
-        }
+        .studio-3d-btn.main-play:hover { background: linear-gradient(145deg, #f3c653, #d4af37); color: #000; }
+        .studio-3d-btn.whatsapp-btn:hover { background: linear-gradient(145deg, #25d366, #1b4d2e); color: #fff; }
+        .studio-3d-btn.caster-btn:hover { background: linear-gradient(145deg, #3b82f6, #1e3a8a); color: #fff; }
 
-        .studio-3d-btn.whatsapp-btn:hover {
-            background: linear-gradient(145deg, #25d366, #1b4d2e);
-            color: #fff;
-        }
-
-        /* פוטר תחתי עם כל האייקונים הנדרשים */
         footer {
             width: 100%;
-            max-width: 1350px;
+            max-width: 1400px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 15px;
+            padding: 15px 30px;
             border-top: 1px solid rgba(255, 255, 255, 0.15);
             font-size: 13px;
             color: var(--text-muted);
-            background: rgba(10, 14, 23, 0.6);
-            backdrop-filter: blur(15px);
-            padding: 15px 30px;
+            background: rgba(10, 14, 23, 0.5);
+            backdrop-filter: blur(10px);
             border-radius: 18px;
         }
 
@@ -239,7 +237,6 @@
 
         .footer-social a:hover { color: var(--gold); }
 
-        /* Modals */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -274,7 +271,6 @@
 </head>
 <body>
 
-    <!-- כותרת עליונה -->
     <header>
         <div class="brand-box">
             <div class="brand-title">TIAMO MUSIC</div>
@@ -290,10 +286,8 @@
         </nav>
     </header>
 
-    <!-- אזור מרכזי עם 5 הלחצנים התלת-מימדיים בדיוק כמו בתמונה -->
     <div class="hero-stage">
         
-        <!-- חלונית סטטוס נגן דיסקרטית שמופיעה בעת ניגון -->
         <div id="playing-status-banner" class="now-playing-banner" style="display: none;">
             <div style="width: 12px; height: 12px; background: var(--live-green); border-radius: 50%; box-shadow: 0 0 10px var(--live-green);"></div>
             <div style="flex:1; text-align:right;">
@@ -302,9 +296,8 @@
             </div>
         </div>
 
-        <!-- 5 הלחצנים בדיוק כמו שמופיעים בצילום המסך שהעלית -->
         <div class="studio-buttons-container">
-            <!-- 1. לוח שידורים (משמאל) -->
+            <!-- 1. לוח שידורים -->
             <button onclick="openScheduleModal()" class="studio-3d-btn schedule-btn">
                 <span style="font-size: 22px; margin-bottom: 5px;">📅</span>
                 לוח שידורים
@@ -316,30 +309,37 @@
                 אודות
             </button>
 
-            <!-- 3. הפעל שידור חי (המרכזי הגדול והבולט ביותר בזהב) -->
+            <!-- 3. הפעל שידור חי ראשי -->
             <button onclick="togglePlay()" class="studio-3d-btn main-play" id="play-btn-element">
-                <span style="font-size: 28px; margin-bottom: 5px;">▶</span>
+                <span style="font-size: 26px; margin-bottom: 4px;">▶</span>
                 הפעל שידור חי
             </button>
 
-            <!-- 4. בקשת שיר בוואצאפ (הירוק) -->
+            <!-- 4. סטרימינג ניסיוני CASTER (מפעיל את הסטרימינג השני בלחיצה) -->
+            <button onclick="toggleCasterPlay()" class="studio-3d-btn caster-btn" id="caster-btn-element">
+                <span style="font-size: 20px; margin-bottom: 4px;">📻</span>
+                שידור ניסיוני - בקרוב !
+            </button>
+
+            <!-- 5. בקשת שיר בוואצאפ -->
             <button onclick="openRequestModal()" class="studio-3d-btn whatsapp-btn">
                 <span style="font-size: 22px; margin-bottom: 5px;">💬</span>
                 בקשת שיר בוואצאפ
             </button>
 
-            <!-- 5. בקשת פלייליסט / כפתור נוסף מימין -->
+            <!-- 6. בקשת פלייליסט -->
             <a href="https://wa.me/972538550511?text=היי%2C%20אשמח%20לבקש%20פלייליסט%20אישי%20לתחנה:" target="_blank" class="studio-3d-btn whatsapp-btn">
                 <span style="font-size: 22px; margin-bottom: 5px;">🎵</span>
-                בקשת פלייליסט
+                פלייליסט אישי
             </a>
         </div>
     </div>
 
-    <!-- נגן האודיו -->
+    <!-- נגן האודיו הראשי -->
     <audio id="audio-stream" src="https://liveradio.co.il:8030/stream" preload="none"></audio>
+    <!-- נגן האודיו השני עבור Caster (החלף את הקישור בכתובת הסטרימינג השנייה שלך אם צריך) -->
+    <audio id="caster-stream" src="https://server.caster.fm/stream/your_caster_stream" preload="none"></audio>
 
-    <!-- פוטר עם כל האייקונים (וואצאפ, פייסבוק, אימייל, אקו"ם) -->
     <footer>
         <div>© 2026 TIAMO MUSIC - מוזיקה באווירה אחרת. כל הזכויות שמורות.</div>
         <div class="footer-social">
@@ -384,30 +384,69 @@
 
     <script>
         const audio = document.getElementById('audio-stream');
+        const casterAudio = document.getElementById('caster-stream');
         let isPlaying = false;
+        let isCasterPlaying = false;
 
         function togglePlay() {
             const btn = document.getElementById('play-btn-element');
             const banner = document.getElementById('playing-status-banner');
             
+            // אם הסטרימינג השני פועל, נעצור אותו קודם
+            if (isCasterPlaying) {
+                casterAudio.pause();
+                isCasterPlaying = false;
+                document.getElementById('caster-btn-element').innerHTML = `<span style="font-size: 20px; margin-bottom: 4px;">📻</span>שידור ניסיוני - בקרוב !`;
+            }
+
             if (isPlaying) {
                 audio.pause();
                 isPlaying = false;
-                btn.innerHTML = `<span style="font-size: 28px; margin-bottom: 5px;">▶</span>הפעל שידור חי`;
+                btn.innerHTML = `<span style="font-size: 26px; margin-bottom: 4px;">▶</span>הפעל שידור חי`;
                 banner.style.display = 'none';
             } else {
                 audio.load();
                 audio.play().then(() => {
                     isPlaying = true;
-                    btn.innerHTML = `<span style="font-size: 28px; margin-bottom: 5px;">⏸</span>עצור שידור חי`;
+                    btn.innerHTML = `<span style="font-size: 26px; margin-bottom: 4px;">⏸</span>עצור שידור חי`;
                     banner.style.display = 'flex';
                 }).catch(err => {
-                    alert("לא ניתן להתחבר לשידור החי כרגע. ודא שכתובת הסטרימינג פעילה ותומכת ב-HTTPS.");
+                    alert("לא ניתן להתחבר לשידור החי כרגע.");
+                });
+            }
+        }
+
+        function toggleCasterPlay() {
+            const casterBtn = document.getElementById('caster-btn-element');
+            const banner = document.getElementById('playing-status-banner');
+            
+            // אם הסטרימינג הראשי פועל, נעצור אותו קודם
+            if (isPlaying) {
+                audio.pause();
+                isPlaying = false;
+                document.getElementById('play-btn-element').innerHTML = `<span style="font-size: 26px; margin-bottom: 4px;">▶</span>הפעל שידור חי`;
+            }
+
+            if (isCasterPlaying) {
+                casterAudio.pause();
+                isCasterPlaying = false;
+                casterBtn.innerHTML = `<span style="font-size: 20px; margin-bottom: 4px;">📻</span>שידור ניסיוני - בקרוב !`;
+                banner.style.display = 'none';
+            } else {
+                casterAudio.load();
+                casterAudio.play().then(() => {
+                    isCasterPlaying = true;
+                    casterBtn.innerHTML = `<span style="font-size: 20px; margin-bottom: 4px;">⏸</span>עצור שידור ניסיוני`;
+                    banner.style.display = 'flex';
+                    document.getElementById('live-program-title').innerText = "שידור ניסיוני (Caster)";
+                }).catch(err => {
+                    alert("לא ניתן להתחבר לסטרימינג של Caster כרגע. ודא שכתובת הסטרימינג תקינה.");
                 });
             }
         }
 
         function fetchLiveStatus() {
+            if (isPlaying) return; // לא לדרוס אם הסטרימינג הניסיוני פועל
             fetch('/get_current_program_status')
                 .then(res => res.json())
                 .then(data => {
