@@ -56,7 +56,6 @@
             flex-direction: column;
         }
 
-        /* כותרת מוגדלת, ענקית ומעוצבת לגודל 48px בזהב יוקרתי ובולט */
         .brand-title {
             color: var(--gold);
             font-size: 48px;
@@ -151,21 +150,18 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* 1. לוח שידורים (משמאל) */
         .studio-3d-btn.schedule-btn {
             background: linear-gradient(145deg, #475569, #1e293b);
             border-color: rgba(148, 163, 184, 0.5);
             color: #f8fafc;
         }
 
-        /* 2. אודות */
         .studio-3d-btn.about-btn {
             background: linear-gradient(145deg, #2b2b2b, #111111);
             border-color: rgba(255, 255, 255, 0.3);
             color: #e2e8f0;
         }
 
-        /* 3. הפעל שידור חי (המרכזי הגדול בזהב) */
         .studio-3d-btn.main-play {
             background: linear-gradient(145deg, #d4af37, #8c7324);
             border: 4px solid #ffffff;
@@ -179,7 +175,6 @@
             transform: translateY(-8px);
         }
 
-        /* 4. שידור ניסיוני - בקרוב ! */
         .studio-3d-btn.caster-btn {
             background: linear-gradient(145deg, #1e3a8a, #0f172a);
             border-color: rgba(96, 165, 250, 0.8);
@@ -190,7 +185,6 @@
                         inset 0 -5px 10px rgba(0,0,0,0.8);
         }
 
-        /* 5. בקשת שיר בוואצאפ (ירוק) */
         .studio-3d-btn.whatsapp-btn {
             background: linear-gradient(145deg, #1b4d2e, #0a2213);
             border-color: rgba(37, 211, 102, 0.8);
@@ -254,12 +248,14 @@
         .modal-content {
             background: rgba(13, 18, 28, 0.95);
             border: 2px solid var(--gold);
-            padding: 35px;
+            padding: 30px;
             border-radius: 25px;
-            width: 90%;
-            max-width: 500px;
+            width: 95%;
+            max-width: 650px;
             text-align: right;
             position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .close-modal {
@@ -300,35 +296,35 @@
         </div>
 
         <div class="studio-buttons-container">
-            <button onclick="openScheduleModal()" class="studio-3d-btn schedule-btn">
+            <button type="button" onclick="openScheduleModal()" class="studio-3d-btn schedule-btn">
                 <span style="font-size: 22px; margin-bottom: 5px;">📅</span>
                 לוח שידורים
             </button>
 
-            <button onclick="openAboutModal()" class="studio-3d-btn about-btn">
+            <button type="button" onclick="openAboutModal()" class="studio-3d-btn about-btn">
                 <span style="font-size: 22px; margin-bottom: 5px;">🎙️</span>
                 אודות
             </button>
 
-            <button onclick="togglePlay()" class="studio-3d-btn main-play" id="play-btn-element">
+            <button type="button" onclick="togglePlay()" class="studio-3d-btn main-play" id="play-btn-element">
                 <span style="font-size: 26px; margin-bottom: 4px;">▶</span>
                 הפעל שידור חי
             </button>
 
-            <button onclick="openCasterModal()" class="studio-3d-btn caster-btn">
+            <button type="button" onclick="openCasterModal()" class="studio-3d-btn caster-btn">
                 <span style="font-size: 20px; margin-bottom: 4px;">📻</span>
                 שידור ניסיוני - בקרוב !
             </button>
 
-            <button onclick="openRequestModal()" class="studio-3d-btn whatsapp-btn">
+            <button type="button" onclick="openRequestModal()" class="studio-3d-btn whatsapp-btn">
                 <span style="font-size: 22px; margin-bottom: 5px;">💬</span>
                 בקשת שיר בוואצאפ
             </button>
 
-            <a href="https://wa.me/972538550511?text=היי%2C%20אשמח%20לבקש%20פלייליסט%20אישי%20לתחנה:" target="_blank" class="studio-3d-btn whatsapp-btn">
+            <button type="button" onclick="openPlaylistModal()" class="studio-3d-btn whatsapp-btn">
                 <span style="font-size: 22px; margin-bottom: 5px;">🎵</span>
                 פלייליסט אישי
-            </a>
+            </button>
         </div>
     </div>
 
@@ -356,6 +352,47 @@
                 <div style="margin:12px 0 6px 0; font-size:14px;">שם השיר המבוקש:</div>
                 <input type="text" id="req-song" style="width:100%; padding:10px; background:#05070c; border:1px solid #444; color:#fff; border-radius:8px;" required>
                 <button type="submit" style="width:100%; margin-top:20px; padding:12px; background:var(--gold); border:none; font-weight:bold; border-radius:20px; cursor:pointer;">שליחה בוואצאפ</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="playlistModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('playlistModal')">&times;</span>
+            <h2 style="color:var(--gold); margin-bottom:15px; font-size:22px; text-align:center;">🎵 הרכבת פלייליסט אישי לתחנה</h2>
+            
+            <form onsubmit="sendPlaylistToWhatsApp(event)">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 6px; font-size: 14px; color: var(--gold-light); font-weight: bold;">שם מלא של המאזין:</label>
+                    <input type="text" id="playlist-listener-name" placeholder="הכנס את שמך המלא..." style="width:100%; padding:12px; background:#05070c; border:1px solid var(--gold); color:#fff; border-radius:10px; font-size:15px;" required>
+                </div>
+
+                <div style="margin-bottom: 10px; font-size: 14px; color: var(--text-muted);">הוסף שירים לפלייליסט שלך (שם הזמר ושם השיר):</div>
+
+                <div style="max-height: 250px; overflow-y: auto; margin-bottom: 15px; padding-left: 5px;">
+                    <table style="width: 100%; border-collapse: collapse;" id="playlist-table">
+                        <thead>
+                            <tr style="border-bottom: 2px solid rgba(212,175,55,0.4); text-align: right;">
+                                <th style="padding: 8px; color: var(--gold); font-size: 14px;">שם הזמר / אמן</th>
+                                <th style="padding: 8px; color: var(--gold); font-size: 14px;">שם השיר</th>
+                                <th style="padding: 8px; width: 40px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="playlist-rows">
+                            <tr>
+                                <td style="padding: 6px;"><input type="text" class="artist-input" placeholder="לדוגמה: אייל גולן" style="width:100%; padding:10px; background:#05070c; border:1px solid #444; color:#fff; border-radius:8px;" required></td>
+                                <td style="padding: 6px;"><input type="text" class="song-input" placeholder="לדוגמה: צליל מיתר" style="width:100%; padding:10px; background:#05070c; border:1px solid #444; color:#fff; border-radius:8px;" required></td>
+                                <td style="padding: 6px; text-align: center;"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button type="button" onclick="addPlaylistRow()" style="flex: 1; padding: 10px; background: rgba(212,175,55,0.15); border: 1px dashed var(--gold); color: var(--gold); border-radius: 10px; font-weight: bold; cursor: pointer;">+ הוסף שיר נוסף לרשימה</button>
+                </div>
+
+                <button type="submit" style="width:100%; padding:14px; background: linear-gradient(135deg, #25d366, #1b4d2e); border:none; color:#fff; font-weight:bold; border-radius:20px; font-size:16px; cursor:pointer; box-shadow: 0 5px 15px rgba(37,211,102,0.4);">שלח את הפלייליסט בוואצאפ 🟢</button>
             </form>
         </div>
     </div>
@@ -407,4 +444,97 @@
             } else {
                 audio.load();
                 audio.play().then(() => {
-                    isPlaying =
+                    isPlaying = true;
+                    btn.innerHTML = `<span style="font-size: 26px; margin-bottom: 4px;">⏸</span>עצור שידור חי`;
+                    banner.style.display = 'flex';
+                }).catch(err => {
+                    alert("לא ניתן להתחבר לשידור החי כרגע.");
+                });
+            }
+        }
+
+        function fetchLiveStatus() {
+            if (isPlaying) return;
+            fetch('/get_current_program_status')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.program) {
+                        document.getElementById('live-program-title').innerText = data.program;
+                    }
+                })
+                .catch(err => console.log('שגיאה בטעינת תוכנית'));
+        }
+
+        function openRequestModal() { document.getElementById('requestModal').style.display = 'flex'; }
+        function openAboutModal() { document.getElementById('aboutModal').style.display = 'flex'; }
+        function openCasterModal() { document.getElementById('casterModal').style.display = 'flex'; }
+        function openPlaylistModal() { document.getElementById('playlistModal').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function addPlaylistRow() {
+            const tbody = document.getElementById('playlist-rows');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="padding: 6px;"><input type="text" class="artist-input" placeholder="שם הזמר" style="width:100%; padding:10px; background:#05070c; border:1px solid #444; color:#fff; border-radius:8px;" required></td>
+                <td style="padding: 6px;"><input type="text" class="song-input" placeholder="שם השיר" style="width:100%; padding:10px; background:#05070c; border:1px solid #444; color:#fff; border-radius:8px;" required></td>
+                <td style="padding: 6px; text-align: center;"><button type="button" onclick="this.closest('tr').remove()" style="background:none; border:none; color:#ff4444; font-size:18px; cursor:pointer;" title="הסר שורה">&times;</button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function sendPlaylistToWhatsApp(e) {
+            e.preventDefault();
+            const listenerName = document.getElementById('playlist-listener-name').value.trim();
+            const artists = document.querySelectorAll('.artist-input');
+            const songs = document.querySelectorAll('.song-input');
+
+            let msg = `🎵 *פלייליסט אישי חדש ממאזין!*\n👤 *שם המאזין:* ${listenerName}\n\n*רשימת השירים המבוקשת:*\n`;
+
+            for (let i = 0; i < artists.length; i++) {
+                if (artists[i].value.trim() && songs[i].value.trim()) {
+                    msg += `${i + 1}. *זמר:* ${artists[i].value.trim()} | *שיר:* ${songs[i].value.trim()}\n`;
+                }
+            }
+
+            window.open(`https://wa.me/972538550511?text=${encodeURIComponent(msg)}`, '_blank');
+            closeModal('playlistModal');
+        }
+
+        function sendWhatsAppSongRequest(e) {
+            e.preventDefault();
+            const name = document.getElementById('req-name').value.trim();
+            const song = document.getElementById('req-song').value.trim();
+            let msg = `שלום TIAMO MUSIC! 👋\nאני רוצה לבקש שיר:\n👤 שם: ${name}\n🎵 שיר: ${song}`;
+            window.open(`https://wa.me/972538550511?text=${encodeURIComponent(msg)}`, '_blank');
+            closeModal('requestModal');
+        }
+
+        function openScheduleModal() {
+            const modal = document.getElementById('scheduleModal');
+            const content = document.getElementById('schedule-content');
+            modal.style.display = 'flex';
+            content.innerHTML = 'טוען לוח שידורים...';
+            fetch('/get_full_schedule')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data && data.data.length > 0) {
+                        let html = '<table style="width:100%; text-align:right;">';
+                        data.data.forEach((row, idx) => {
+                            if (idx >= 2 && row && (row[1] || row[2])) {
+                                html += `<tr><td style="padding:8px; color:var(--gold); font-weight:bold;">${row[1]||''}</td><td style="padding:8px; color:#fff;">${row[2]||'-'}</td></tr>`;
+                            }
+                        });
+                        html += '</table>';
+                        content.innerHTML = html;
+                    } else {
+                        content.innerHTML = 'לא נמצאו שידורים כרגע.';
+                    }
+                })
+                .catch(err => { content.innerHTML = 'שגיאה בטעינת לוח השידורים.'; });
+        }
+
+        fetchLiveStatus();
+        setInterval(fetchLiveStatus, 30000);
+    </script>
+</body>
+</html>
