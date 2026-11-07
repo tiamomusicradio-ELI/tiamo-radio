@@ -113,43 +113,6 @@
             z-index: 20;
         }
 
-        /* כפתור הפעלה סאונד */
-        .play-big-btn {
-            width: 95px;
-            height: 60px;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border: 3px solid #ffffff;
-            border-radius: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(29, 78, 216, 0.6);
-            transition: transform 0.2s;
-            margin-bottom: 6px;
-        }
-        .play-big-btn:hover {
-            transform: scale(1.08);
-        }
-        .play-icon-triangle {
-            width: 0;
-            height: 0;
-            border-top: 12px solid transparent;
-            border-bottom: 12px solid transparent;
-            border-left: 20px solid #ffffff;
-            margin-left: 4px;
-        }
-        .pause-icon-bars {
-            display: flex;
-            gap: 5px;
-        }
-        .pause-bar {
-            width: 5px;
-            height: 22px;
-            background: #fff;
-            border-radius: 2px;
-        }
-
         /* כפתורים לבנים */
         .action-pill {
             width: 100%;
@@ -384,33 +347,32 @@
 
         /* התאמה למסכים ניידים */
         @media screen and (max-width: 768px) {
-    body {
-        width: 100vw;
-        height: auto;
-        min-height: 100vh;
-        overflow-y: auto;
-    }
+            body {
+                width: 100vw;
+                height: auto;
+                min-height: 100vh;
+                overflow-y: auto;
+            }
 
-    .page-container {
-        width: 100%;
-        padding: 15px;
-        justify-content: flex-start;
-        gap: 20px;
-    }
+            .page-container {
+                width: 100%;
+                padding: 15px;
+                justify-content: flex-start;
+                gap: 20px;
+            }
 
-    .content-layout {
-        flex-direction: column-reverse;
-        align-items: center;
-        gap: 20px;
-        width: 100%;
-    }
+            .content-layout {
+                flex-direction: column-reverse;
+                align-items: center;
+                gap: 20px;
+                width: 100%;
+            }
 
-    .controls-column, .center-display {
-        width: 100%;
-        max-width: 100%;
-        margin-right: 0;
-    }
-}
+            .controls-column, .center-display {
+                width: 100%;
+                max-width: 100%;
+                margin-right: 0;
+            }
 
             .waveform-box {
                 max-width: 100%;
@@ -468,8 +430,12 @@
             <!-- עמודת כפתורים משמאל -->
             <div class="controls-column">
                 
-                <div class="play-big-btn" onclick="togglePlay()">
-                    <div id="play-btn-icon" class="play-icon-triangle"></div>
+                <!-- נגן Caster.fm רשמי מוטמע -->
+                <div style="width: 100%; margin-bottom: 6px; text-align: center;">
+                    <div data-type="newStreamPlayer" data-publicToken="7f6125d4-0484-4fec-98df-157a153e7803" data-theme="light" data-color="e81e4d" data-channelId="" data-rendered="false" class="cstrEmbed">
+                        <a href="https://www.caster.fm">Shoutcast Hosting</a>
+                    </div>
+                    <script src="https://cdn.cloud.caster.fm//widgets/embed.js"></script>
                 </div>
 
                 <button class="action-pill" onclick="openAboutModal()">אודות התחנה</button>
@@ -515,9 +481,8 @@
 
     </div>
 
-    <!-- נגן סאונד -->
-    <div data-type="newStreamPlayer" data-publicToken="7f6125d4-0484-4fec-98df-157a153e7803" data-theme="light" data-color="e81e4d" data-channelId="" data-rendered="false" class="cstrEmbed"><a href="https://www.caster.fm">Shoutcast Hosting</a> <a href="https://www.caster.fm">Stream Hosting</a> <a href="https://www.caster.fm">Radio Server Hosting</a></div>
-    <script src="https://cdn.cloud.caster.fm/widgets/embed.js"></script>    <div id="requestModal" class="modal-overlay">
+    <!-- מודאל "בא לי לשמוע" -->
+    <div id="requestModal" class="modal-overlay">
         <div class="request-modal-card">
             <h2 class="request-title">בא לי לשמוע</h2>
             
@@ -601,10 +566,6 @@
             }
         });
 
-        const audio = document.getElementById('audio-stream');
-        const playIcon = document.getElementById('play-btn-icon');
-        let isPlaying = false;
-
         const now = new Date();
         const dayStr = String(now.getDate()).padStart(2, '0');
         const monthStr = String(now.getMonth() + 1).padStart(2, '0');
@@ -621,23 +582,6 @@
                 schedDateTitle.innerText = todayFormatted;
             }
         })();
-
-        function togglePlay() {
-            if (isPlaying) {
-                audio.pause();
-                playIcon.className = "play-icon-triangle";
-                playIcon.innerHTML = "";
-                isPlaying = false;
-            } else {
-                audio.play().then(() => {
-                    playIcon.className = "pause-icon-bars";
-                    playIcon.innerHTML = '<div class="pause-bar"></div><div class="pause-bar"></div>';
-                    isPlaying = true;
-                }).catch(err => {
-                    alert("לא ניתן להתחבר לשידור כרגע.");
-                });
-            }
-        }
 
         function fetchLiveStatus() {
             fetch('/get_current_program_status')
