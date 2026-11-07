@@ -1,3 +1,6 @@
+from flask import Flask
+from playlist_blueprint import playlist_bp
+app = Flask(__name__)
 import datetime
 import time
 import subprocess
@@ -5,7 +8,6 @@ import os
 import pandas as pd
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-
 # --- הגדרות חיבור לGoogle Drive ---
 SCOPES = ['https://www.googleapis.com/auth/drive']
 SERVICE_ACCOUNT_FILE = 'credentials.json'
@@ -212,3 +214,4 @@ while True:
     except Exception as e:
         print(f"Error: {e}")
         time.sleep(60)
+        app.register_blueprint(playlist_bp)
