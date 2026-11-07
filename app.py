@@ -21,8 +21,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 EXCEL_FILE = "עדכון תוכנית שידורים TIAMO - שבועי.xlsx"
 SCOPES = ['https://www.googleapis.com/auth/drive']
  
-PARENT_FOLDER_ID = os.environ.get('GOOGLE_DRIVE_FOLDER_ID', '1tAy9l49lJAbMWRVJdoK4b2uEiU6vQLH-')
- 
+PARENT_FOLDER_ID = os.environ.get('GOOGLE_DRIVE_FOLDER_ID', '1lbF8oBk-nCITweZ1R_MxaSmyqjPJ_G0V') 
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
  
