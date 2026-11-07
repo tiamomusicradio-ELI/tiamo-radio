@@ -21,9 +21,9 @@
         }
 
         body {
-            background-color: #05070c;
-            background-image: linear-gradient(rgba(5, 7, 12, 0.25), rgba(5, 7, 12, 0.55)),
-                              url('/static/image_13.png');
+            background-color: #121824;
+            background-image: linear-gradient(rgba(5, 7, 12, 0.2), rgba(5, 7, 12, 0.45)),
+                              url("{{ url_for('static', filename='ULPAN HADASH.jpg') }}");
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -44,11 +44,11 @@
             justify-content: space-between;
             align-items: center;
             padding: 15px 30px;
-            background: rgba(10, 14, 23, 0.5);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(212, 175, 55, 0.35);
+            background: rgba(10, 14, 23, 0.65);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(212, 175, 55, 0.4);
             border-radius: 18px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
         }
 
         .brand-box {
@@ -58,16 +58,17 @@
 
         .brand-title {
             color: var(--gold);
-            font-size: 24px;
+            font-size: 42px;
             font-weight: 900;
             letter-spacing: 2px;
-            text-shadow: 0 2px 10px rgba(212,175,55,0.5);
+            text-shadow: 0 2px 12px rgba(212, 175, 55, 0.6);
         }
 
         .brand-slogan {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-muted);
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
+            margin-top: 2px;
         }
 
         nav ul {
@@ -148,7 +149,6 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* לחצן הפעל שידור חי - המרכזי הגדול בזהב */
         .studio-3d-btn.main-play {
             background: linear-gradient(145deg, #d4af37, #8c7324);
             border: 4px solid #ffffff;
@@ -162,7 +162,6 @@
             transform: translateY(-8px);
         }
 
-        /* לחצן וואצאפ ירוק מודגש */
         .studio-3d-btn.whatsapp-btn {
             background: linear-gradient(145deg, #1b4d2e, #0a2213);
             border-color: rgba(37, 211, 102, 0.8);
@@ -172,7 +171,6 @@
                         inset 0 -5px 10px rgba(0,0,0,0.8);
         }
 
-        /* לחצן סטרימינג Caster הניסיוני */
         .studio-3d-btn.caster-btn {
             background: linear-gradient(145deg, #1e3a8a, #0f172a);
             border-color: rgba(96, 165, 250, 0.8);
@@ -183,14 +181,12 @@
                         inset 0 -5px 10px rgba(0,0,0,0.8);
         }
 
-        /* לחצן אודות */
         .studio-3d-btn.about-btn {
             background: linear-gradient(145deg, #2b2b2b, #111111);
             border-color: rgba(255, 255, 255, 0.3);
             color: #e2e8f0;
         }
 
-        /* לחצן לוח שידורים */
         .studio-3d-btn.schedule-btn {
             background: linear-gradient(145deg, #475569, #1e293b);
             border-color: rgba(148, 163, 184, 0.5);
@@ -217,8 +213,8 @@
             border-top: 1px solid rgba(255, 255, 255, 0.15);
             font-size: 13px;
             color: var(--text-muted);
-            background: rgba(10, 14, 23, 0.5);
-            backdrop-filter: blur(10px);
+            background: rgba(10, 14, 23, 0.65);
+            backdrop-filter: blur(15px);
             border-radius: 18px;
         }
 
@@ -297,37 +293,32 @@
         </div>
 
         <div class="studio-buttons-container">
-            <!-- 1. לוח שידורים -->
             <button onclick="openScheduleModal()" class="studio-3d-btn schedule-btn">
                 <span style="font-size: 22px; margin-bottom: 5px;">📅</span>
                 לוח שידורים
             </button>
 
-            <!-- 2. אודות -->
             <button onclick="openAboutModal()" class="studio-3d-btn about-btn">
                 <span style="font-size: 22px; margin-bottom: 5px;">🎙️</span>
                 אודות
             </button>
 
-            <!-- 3. הפעל שידור חי ראשי -->
             <button onclick="togglePlay()" class="studio-3d-btn main-play" id="play-btn-element">
                 <span style="font-size: 26px; margin-bottom: 4px;">▶</span>
                 הפעל שידור חי
             </button>
 
-            <!-- 4. סטרימינג ניסיוני CASTER (מפעיל את הסטרימינג השני בלחיצה) -->
-            <button onclick="toggleCasterPlay()" class="studio-3d-btn caster-btn" id="caster-btn-element">
+            <!-- לחצן Caster שפותח חלונית עם הווידג'ט הרשמי -->
+            <button onclick="openCasterModal()" class="studio-3d-btn caster-btn">
                 <span style="font-size: 20px; margin-bottom: 4px;">📻</span>
                 שידור ניסיוני - בקרוב !
             </button>
 
-            <!-- 5. בקשת שיר בוואצאפ -->
             <button onclick="openRequestModal()" class="studio-3d-btn whatsapp-btn">
                 <span style="font-size: 22px; margin-bottom: 5px;">💬</span>
                 בקשת שיר בוואצאפ
             </button>
 
-            <!-- 6. בקשת פלייליסט -->
             <a href="https://wa.me/972538550511?text=היי%2C%20אשמח%20לבקש%20פלייליסט%20אישי%20לתחנה:" target="_blank" class="studio-3d-btn whatsapp-btn">
                 <span style="font-size: 22px; margin-bottom: 5px;">🎵</span>
                 פלייליסט אישי
@@ -337,8 +328,6 @@
 
     <!-- נגן האודיו הראשי -->
     <audio id="audio-stream" src="https://liveradio.co.il:8030/stream" preload="none"></audio>
-    <!-- נגן האודיו השני עבור Caster (החלף את הקישור בכתובת הסטרימינג השנייה שלך אם צריך) -->
-    <audio id="caster-stream" src="https://server.caster.fm/stream/your_caster_stream" preload="none"></audio>
 
     <footer>
         <div>© 2026 TIAMO MUSIC - מוזיקה באווירה אחרת. כל הזכויות שמורות.</div>
@@ -377,125 +366,4 @@
     <div id="scheduleModal" class="modal-overlay">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('scheduleModal')">&times;</span>
-            <h3 style="color:var(--gold); margin-bottom:15px; font-size:20px;">📅 לוח שידורים יומי</h3>
-            <div id="schedule-content" style="color:#cbd5e1; font-size:14px;">טוען לוח שידורים...</div>
-        </div>
-    </div>
-
-    <script>
-        const audio = document.getElementById('audio-stream');
-        const casterAudio = document.getElementById('caster-stream');
-        let isPlaying = false;
-        let isCasterPlaying = false;
-
-        function togglePlay() {
-            const btn = document.getElementById('play-btn-element');
-            const banner = document.getElementById('playing-status-banner');
-            
-            // אם הסטרימינג השני פועל, נעצור אותו קודם
-            if (isCasterPlaying) {
-                casterAudio.pause();
-                isCasterPlaying = false;
-                document.getElementById('caster-btn-element').innerHTML = `<span style="font-size: 20px; margin-bottom: 4px;">📻</span>שידור ניסיוני - בקרוב !`;
-            }
-
-            if (isPlaying) {
-                audio.pause();
-                isPlaying = false;
-                btn.innerHTML = `<span style="font-size: 26px; margin-bottom: 4px;">▶</span>הפעל שידור חי`;
-                banner.style.display = 'none';
-            } else {
-                audio.load();
-                audio.play().then(() => {
-                    isPlaying = true;
-                    btn.innerHTML = `<span style="font-size: 26px; margin-bottom: 4px;">⏸</span>עצור שידור חי`;
-                    banner.style.display = 'flex';
-                }).catch(err => {
-                    alert("לא ניתן להתחבר לשידור החי כרגע.");
-                });
-            }
-        }
-
-        function toggleCasterPlay() {
-            const casterBtn = document.getElementById('caster-btn-element');
-            const banner = document.getElementById('playing-status-banner');
-            
-            // אם הסטרימינג הראשי פועל, נעצור אותו קודם
-            if (isPlaying) {
-                audio.pause();
-                isPlaying = false;
-                document.getElementById('play-btn-element').innerHTML = `<span style="font-size: 26px; margin-bottom: 4px;">▶</span>הפעל שידור חי`;
-            }
-
-            if (isCasterPlaying) {
-                casterAudio.pause();
-                isCasterPlaying = false;
-                casterBtn.innerHTML = `<span style="font-size: 20px; margin-bottom: 4px;">📻</span>שידור ניסיוני - בקרוב !`;
-                banner.style.display = 'none';
-            } else {
-                casterAudio.load();
-                casterAudio.play().then(() => {
-                    isCasterPlaying = true;
-                    casterBtn.innerHTML = `<span style="font-size: 20px; margin-bottom: 4px;">⏸</span>עצור שידור ניסיוני`;
-                    banner.style.display = 'flex';
-                    document.getElementById('live-program-title').innerText = "שידור ניסיוני (Caster)";
-                }).catch(err => {
-                    alert("לא ניתן להתחבר לסטרימינג של Caster כרגע. ודא שכתובת הסטרימינג תקינה.");
-                });
-            }
-        }
-
-        function fetchLiveStatus() {
-            if (isPlaying) return; // לא לדרוס אם הסטרימינג הניסיוני פועל
-            fetch('/get_current_program_status')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.program) {
-                        document.getElementById('live-program-title').innerText = data.program;
-                    }
-                })
-                .catch(err => console.log('שגיאה בטעינת תוכנית'));
-        }
-
-        function openRequestModal() { document.getElementById('requestModal').style.display = 'flex'; }
-        function openAboutModal() { document.getElementById('aboutModal').style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        function sendWhatsAppSongRequest(e) {
-            e.preventDefault();
-            const name = document.getElementById('req-name').value.trim();
-            const song = document.getElementById('req-song').value.trim();
-            let msg = `שלום TIAMO MUSIC! 👋\nאני רוצה לבקש שיר:\n👤 שם: ${name}\n🎵 שיר: ${song}`;
-            window.open(`https://wa.me/972538550511?text=${encodeURIComponent(msg)}`, '_blank');
-            closeModal('requestModal');
-        }
-
-        function openScheduleModal() {
-            const modal = document.getElementById('scheduleModal');
-            const content = document.getElementById('schedule-content');
-            modal.style.display = 'flex';
-            content.innerHTML = 'טוען לוח שידורים...';
-            fetch('/get_full_schedule')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.data && data.data.length > 0) {
-                        let html = '<table style="width:100%; text-align:right;">';
-                        data.data.forEach((row, idx) => {
-                            if (idx >= 2 && row && (row[1] || row[2])) {
-                                html += `<tr><td style="padding:8px; color:var(--gold); font-weight:bold;">${row[1]||''}</td><td style="padding:8px; color:#fff;">${row[2]||'-'}</td></tr>`;
-                            }
-                        });
-                        html += '</table>';
-                        content.innerHTML = html;
-                    } else {
-                        content.innerHTML = 'לא נמצאו שידורים כרגע.';
-                    }
-                })
-                .catch(err => { content.innerHTML = 'שגיאה בטעינת לוח השידורים.'; });
-        }
-
-        fetchLiveStatus();
-        setInterval(fetchLiveStatus, 30000);
-    </script>
-</body>
-</html>
+            <h3 style="color:var(--gold); margin-
