@@ -360,7 +360,7 @@
             <span class="close-modal" onclick="closeModal('playlistModal')">&times;</span>
             <h2 style="color:var(--gold); margin-bottom:15px; font-size:22px; text-align:center;">🎵 הרכבת פלייליסט אישי לתחנה</h2>
             
-            <form onsubmit="sendPlaylistToWhatsApp(event)">
+            <form onsubmit="submitPlaylistToDrive(event)">
                 <div style="margin-bottom: 15px;">
                     <label style="display: block; margin-bottom: 6px; font-size: 14px; color: var(--gold-light); font-weight: bold;">שם מלא של המאזין:</label>
                     <input type="text" id="playlist-listener-name" placeholder="הכנס את שמך המלא..." style="width:100%; padding:12px; background:#05070c; border:1px solid var(--gold); color:#fff; border-radius:10px; font-size:15px;" required>
@@ -391,7 +391,7 @@
                     <button type="button" onclick="addPlaylistRow()" style="flex: 1; padding: 10px; background: rgba(212,175,55,0.15); border: 1px dashed var(--gold); color: var(--gold); border-radius: 10px; font-weight: bold; cursor: pointer;">+ הוסף שיר נוסף לרשימה</button>
                 </div>
 
-                <button type="submit" style="width:100%; padding:14px; background: linear-gradient(135deg, #25d366, #1b4d2e); border:none; color:#fff; font-weight:bold; border-radius:20px; font-size:16px; cursor:pointer; box-shadow: 0 5px 15px rgba(37,211,102,0.4);">שלח את הפלייליסט בוואצאפ 🟢</button>
+                <button type="submit" style="width:100%; padding:14px; background: linear-gradient(135deg, #d4af37, #8c7324); border:none; color:#050507; font-weight:bold; border-radius:20px; font-size:16px; cursor:pointer; box-shadow: 0 5px 15px rgba(212,175,55,0.4);">שליחת פלייליסט אישי 🎵</button>
             </form>
         </div>
     </div>
@@ -449,91 +449,3 @@
                 }).catch(err => {
                     alert("לא ניתן להתחבר לשידור החי כרגע.");
                 });
-            }
-        }
-
-        function fetchLiveStatus() {
-            if (isPlaying) return;
-            fetch('/get_current_program_status')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.program) {
-                        document.getElementById('live-program-title').innerText = data.program;
-                    }
-                })
-                .catch(err => console.log('שגיאה בטעינת תוכנית'));
-        }
-
-        function openRequestModal() { document.getElementById('requestModal').style.display = 'flex'; }
-        function openAboutModal() { document.getElementById('aboutModal').style.display = 'flex'; }
-        function openCasterModal() { document.getElementById('casterModal').style.display = 'flex'; }
-        function openPlaylistModal() { document.getElementById('playlistModal').style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        function addPlaylistRow() {
-            const tbody = document.getElementById('playlist-rows');
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="padding: 6px;"><input type="text" class="artist-input" placeholder="שם הזמר" style="width:100%; padding:10px; background:#05070c; border:1px solid #444; color:#fff; border-radius:8px;" required></td>
-                <td style="padding: 6px;"><input type="text" class="song-input" placeholder="שם השיר" style="width:100%; padding:10px; background:#05070c; border:1px solid #444; color:#fff; border-radius:8px;" required></td>
-                <td style="padding: 6px; text-align: center;"><button type="button" onclick="this.closest('tr').remove()" style="background:none; border:none; color:#ff4444; font-size:18px; cursor:pointer;" title="הסר שורה">&times;</button></td>
-            `;
-            tbody.appendChild(tr);
-        }
-
-        function sendPlaylistToWhatsApp(e) {
-            e.preventDefault();
-            const listenerName = document.getElementById('playlist-listener-name').value.trim();
-            const artists = document.querySelectorAll('.artist-input');
-            const songs = document.querySelectorAll('.song-input');
-
-            let msg = `🎵 *פלייליסט אישי חדש ממאזין!*\n👤 *שם המאזין:* ${listenerName}\n\n*רשימת השירים המבוקשת:*\n`;
-
-            for (let i = 0; i < artists.length; i++) {
-                if (artists[i].value.trim() && songs[i].value.trim()) {
-                    msg += `${i + 1}. *זמר:* ${artists[i].value.trim()} | *שיר:* ${songs[i].value.trim()}\n`;
-                }
-            }
-
-            window.open(`https://wa.me/972538550511?text=${encodeURIComponent(msg)}`, '_blank');
-            closeModal('playlistModal');
-        }
-
-        function sendWhatsAppSongRequest(e) {
-            e.preventDefault();
-            const name = document.getElementById('req-name').value.trim();
-            const song = document.getElementById('req-song').value.trim();
-            let msg = `שלום TIAMO MUSIC! 👋\nאני רוצה לבקש שיר:\n👤 שם: ${name}\n🎵 שיר: ${song}`;
-            window.open(`https://wa.me/972538550511?text=${encodeURIComponent(msg)}`, '_blank');
-            closeModal('requestModal');
-        }
-
-        function openScheduleModal() {
-            const modal = document.getElementById('scheduleModal');
-            const content = document.getElementById('schedule-content');
-            modal.style.display = 'flex';
-            content.innerHTML = 'טוען לוח שידורים...';
-            fetch('/get_full_schedule')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.data && data.data.length > 0) {
-                        let html = '<table style="width:100%; text-align:right;">';
-                        data.data.forEach((row, idx) => {
-                            if (idx >= 2 && row && (row[1] || row[2])) {
-                                html += `<tr><td style="padding:8px; color:var(--gold); font-weight:bold;">${row[1]||''}</td><td style="padding:8px; color:#fff;">${row[2]||'-'}</td></tr>`;
-                            }
-                        });
-                        html += '</table>';
-                        content.innerHTML = html;
-                    } else {
-                        content.innerHTML = 'לא נמצאו שידורים כרגע.';
-                    }
-                })
-                .catch(err => { content.innerHTML = 'שגיאה בטעינת לוח השידורים.'; });
-        }
-
-        fetchLiveStatus();
-        setInterval(fetchLiveStatus, 30000);
-    </script>
-</body>
-</html>
