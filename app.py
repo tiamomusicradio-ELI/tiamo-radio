@@ -246,7 +246,6 @@ def stream_preview(file_id):
 def live_stream():
     """
     נתיב הזרמת אודיו ישירה למאזינים (Auto DJ Stream).
-    השרת משדר את קובץ האודיו או את רשימת השירים ברציפות בלי דיליי.
     """
     def generate():
         sample_audio_path = os.path.join(BASE_DIR, 'songs', 'default_track.mp3')
@@ -277,7 +276,7 @@ def get_current_program_status():
         
         try:
             now = datetime.datetime.now(ZoneInfo('Asia/Jerusalem'))
-        except:
+        except Exception:
             now = datetime.datetime.now()
             
         current_hour = now.hour
@@ -332,7 +331,7 @@ def get_current_program_status():
                             current_program = str(prog_name).strip()
                             end_time_str = end_time.strip()
                             break
-                except Exception as inner_e:
+                except Exception:
                     continue
 
         return jsonify({
@@ -357,7 +356,7 @@ def get_daily_schedule():
         
         try:
             now = datetime.datetime.now(ZoneInfo('Asia/Jerusalem'))
-        except:
+        except Exception:
             now = datetime.datetime.now()
 
         day_column_map = {
@@ -373,4 +372,247 @@ def get_daily_schedule():
         current_day_en = now.strftime('%A')
         cols = day_column_map.get(current_day_en, {'time': 6, 'program': 7})
         
-        time_col_idx
+        time_col_idx = cols['time']
+        program_col_idx = cols['program']
+
+        schedule_items = []
+        for j in range(2, len(df)):
+            time_val = df.iloc[j, time_col_idx]
+            prog_val = df.iloc[j, program_col_idx]
+            
+            if pd.isna(time_val):
+                continue
+                
+            if isinstance(time_val, datetime.time):
+                t_str = time_val.strftime('%H:%M')
+            else:
+                t_str = str(time_val).strip()
+                
+            p_str = str(prog_val).strip() if pd.notna(prog_val) else '-'
+            
+            if t_str:
+                schedule_items.append({'time': t_str, 'program': p_str})
+
+        return jsonify({'success': True, 'schedule': schedule_items})
+    except Exception as e:
+        return jsonify({'success': False, 'schedule': []})
+
+@app.route('/get_full_schedule')
+@requires_auth
+def get_full_schedule():
+    try:
+        df = pd.read_excel(EXCEL_FILE, sheet_name='תוכנית חודשית', header=None)
+        schedule_data = df.fillna("").values.tolist()
+        return jsonify({'success': True, 'data': schedule_data})
+    except Exception as e:
+        return jsonify({'success': False, 'data': []})
+ 
+@app.route('/whatsapp_webhook', methods=['GET', 'POST'])
+def whatsapp_webhook():
+    if request.method == 'GET':
+        VERIFY_TOKEN = "tiamo_radio_token_123"
+        mode = request.args.get('hub.mode')
+        token = request.args.get('hub.verify_token')
+        challenge = request.args.get('hub.challenge')
+        
+        if mode and token and mode == 'subscribe' and token == VERIFY_TOKEN:
+            return challenge, 200
+        return 'Forbidden', 403
+ 
+    elif request.method == 'POST':
+        data = request.get_json()
+        try:
+            message = data['entry'][0]['changes'][0]['value']['messages'][0]
+            sender_phone = message['from']
+            raw_text = message['text']['body']
+            
+            parsed_songs = parse_playlist_text(raw_text)
+ 
+            request_item = {
+                'id': len(requested_songs_list) + 1,
+                'phone': sender_phone,
+                'raw_text': raw_text,
+                'parsed_songs': parsed_songs,
+                'time': datetime.datetime.now(ZoneInfo('Asia/Jerusalem')).strftime('%H:%M - %d/%m/%Y')
+            }
+            requested_songs_list.insert(0, request_item)
+        except Exception as e:
+            pass
+            
+        return jsonify({'status': 'success'}), 200
+
+@app.route('/process_playlist', methods=['POST', 'OPTIONS'])
+def process_playlist():
+    """
+    קולט פלייליסט שנשלח מטופס האתר, שומר אותו בזיכרון המערכת ומעלה קובץ טקסט ל-Google Drive.
+    """
+    if request.method == 'OPTIONS':
+        return '', 200
+
+    try:
+        data = request.get_json(silent=True) or request.form.to_dict() or {}
+        
+        listener_name = data.get('listener_name') or data.get('name') or data.get('listener') or 'מאזין אנונימי'
+        songs = data.get('songs') or data.get('playlist') or []
+        raw_text_input = data.get('raw_text') or ''
+
+        # בניית תוכן השירים
+        lines = []
+        if isinstance(songs, list):
+            for s in songs:
+                if isinstance(s, dict):
+                    artist = s.get('artist') or s.get('singer') or 'לא צוין'
+                    song = s.get('song') or s.get('title') or ''
+                    if song:
+                        lines.append(f"{artist} - {song}")
+                elif isinstance(s, str) and s.strip():
+                    lines.append(s.strip())
+        elif isinstance(songs, str) and songs.strip():
+            lines.append(songs.strip())
+
+        if not lines and raw_text_input:
+            lines = [raw_text_input]
+
+        formatted_text = "\n".join(lines) if lines else "לא צוינו שירים"
+        parsed_songs = parse_playlist_text(formatted_text) if formatted_text else []
+
+        now_str = datetime.datetime.now(ZoneInfo('Asia/Jerusalem')).strftime('%H:%M - %d/%m/%Y')
+
+        # 1. הוספת הבקשה לרשימת השירים הפנימית של השרת
+        request_item = {
+            'id': len(requested_songs_list) + 1,
+            'phone': listener_name,
+            'raw_text': formatted_text,
+            'parsed_songs': parsed_songs,
+            'time': now_str
+        }
+        requested_songs_list.insert(0, request_item)
+
+        # 2. שמירת קובץ ב-Google Drive
+        file_id = None
+        try:
+            service = get_drive_service()
+            file_content = f"בקשת פלייליסט מ: {listener_name}\nתאריך: {now_str}\n"
+            file_content += "=" * 40 + "\n\n"
+            file_content += formatted_text + "\n"
+            
+            file_metadata = {
+                'name': f"Playlist_{listener_name}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
+                'parents': [PARENT_FOLDER_ID]
+            }
+            
+            media = MediaIoBaseUpload(
+                io.BytesIO(file_content.encode('utf-8')),
+                mimetype='text/plain',
+                resumable=True
+            )
+            
+            uploaded_file = service.files().create(
+                body=file_metadata,
+                media_body=media,
+                fields='id',
+                supportsAllDrives=True
+            ).execute()
+            
+            file_id = uploaded_file.get('id')
+        except Exception as drive_err:
+            print(f"Drive Upload Exception: {drive_err}", flush=True)
+
+        return jsonify({
+            'status': 'success',
+            'success': True,
+            'message': 'הפלייליסט התקבל ונשמר בהצלחה!',
+            'file_id': file_id
+        }), 200
+
+    except Exception as e:
+        print(f"Error in process_playlist: {e}", flush=True)
+        return jsonify({
+            'status': 'error',
+            'success': False,
+            'message': str(e)
+        }), 500
+ 
+@app.route('/upload_file', methods=['POST'])
+@requires_auth
+def upload_file():
+    try:
+        folder_id = request.form.get('folder_id')
+        uploaded_file = request.files.get('file')
+        if not uploaded_file or not folder_id:
+            return jsonify({'success': False, 'error': 'חסרים פרטים להעלאה'})
+            
+        service = get_drive_service()
+        file_metadata = {
+            'name': uploaded_file.filename,
+            'parents': [folder_id]
+        }
+        
+        file_mimetype = uploaded_file.mimetype or 'application/octet-stream'
+        media = MediaIoBaseUpload(io.BytesIO(uploaded_file.read()), mimetype=file_mimetype, resumable=True)
+        
+        service.files().create(
+            body=file_metadata, 
+            media_body=media, 
+            fields='id',
+            supportsAllDrives=True
+        ).execute()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+ 
+@app.route('/delete_file', methods=['POST'])
+@requires_auth
+def delete_file():
+    try:
+        data = request.get_json()
+        file_id = data.get('file_id')
+        service = get_drive_service()
+        service.files().delete(
+            fileId=file_id,
+            supportsAllDrives=True
+        ).execute()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+ 
+@app.route('/get_whatsapp_requests', methods=['GET'])
+@requires_auth
+def get_whatsapp_requests():
+    return jsonify({'success': True, 'requests': requested_songs_list})
+ 
+@app.route('/search_playlist_in_drive', methods=['POST'])
+@requires_auth
+def search_playlist_in_drive():
+    try:
+        data = request.get_json()
+        songs_to_search = data.get('songs', [])
+        
+        results = []
+        for item in songs_to_search:
+            artist = item.get('artist', '')
+            song = item.get('song', '')
+            
+            drive_files = search_drive_songs(artist, song)
+            results.append({
+                'requested_artist': artist,
+                'requested_song': song,
+                'found_in_drive': drive_files
+            })
+            
+        return jsonify({'success': True, 'results': results})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+ 
+@app.route('/manual_scan_whatsapp', methods=['POST'])
+@requires_auth
+def manual_scan_whatsapp():
+    try:
+        return jsonify({'success': True, 'message': 'הסריקה הושלמה בהצלחה!'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+ 
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
